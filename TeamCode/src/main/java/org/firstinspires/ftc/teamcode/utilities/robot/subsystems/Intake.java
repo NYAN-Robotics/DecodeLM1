@@ -11,6 +11,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
+import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
+import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
 @Config
 public class Intake implements Subsystem {
@@ -88,11 +91,11 @@ public class Intake implements Subsystem {
 
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
-        leftServo = hardwareMap.get(Servo.class, "leftIntakeServo");
-        rightServo = hardwareMap.get(Servo.class, "rightIntakeServo");
-        leftDropdownServo = hardwareMap.get(Servo.class, "leftDropdownServo");
-        rightDropdownServo = hardwareMap.get(Servo.class, "rightDropdownServo");
-        activeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        leftServo = new CachingServo(hardwareMap.get(Servo.class, "leftIntakeServo"), 1e-5);
+        rightServo = new CachingServo(hardwareMap.get(Servo.class, "rightIntakeServo"), 1e-5);
+        leftDropdownServo = new CachingServo(hardwareMap.get(Servo.class, "leftDropdownServo"), 1e-5);
+        rightDropdownServo = new CachingServo(hardwareMap.get(Servo.class, "rightDropdownServo"), 1e-5);
+        activeMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
         leftServo.setDirection(Servo.Direction.REVERSE);
         rightServo.setDirection(Servo.Direction.REVERSE);
@@ -131,9 +134,11 @@ public class Intake implements Subsystem {
         telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
 
         if (reverse) {
-            activeMotor.setPower(-1);
+            activeMotor.setPower(-0.9);
         } else if (currentIntakeState == IntakeState.EXTENDED && getCurrentPosition()-0.01 > LinkageStates.DEFAULT.position) {
-            activeMotor.setPower(1);
+            activeMotor.setPower(0.9);
+        } else if (RobotEx.getInstance().outtake.slidesTimer.seconds() < 0.5) {
+            activeMotor.setPower(0.1);
         } else {
             activeMotor.setPower(0);
         }

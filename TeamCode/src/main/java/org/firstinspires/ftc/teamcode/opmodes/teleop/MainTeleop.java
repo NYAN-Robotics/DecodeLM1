@@ -59,7 +59,7 @@ public class MainTeleop extends LinearOpMode {
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
         double frameTime = 0;
-        ElapsedTime t = new ElapsedTime();
+
         while (!robot.stopRequested) {
 
             e.reset();
@@ -104,19 +104,42 @@ public class MainTeleop extends LinearOpMode {
                 }
             }
 
-            if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
-                robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
-            }
-
-            if (currentFrameGamepad1.square && !previousFrameGamepad1.square) {
-                robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
-            }
-
             if (currentFrameGamepad1.circle) {
                 robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
                 robot.intake.reverseIntake();
             } else if (previousFrameGamepad1.circle && !currentFrameGamepad1.circle) {
                 robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
+            }
+
+            if (currentFrameGamepad2.dpad_up && !previousFrameGamepad2.dpad_up) {
+                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+            }
+
+            if (currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left) {
+                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+
+            }
+
+            if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+            }
+
+            if (currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) {
+                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.EXTENDED);
+            }
+
+            if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+            }
+
+
+            if (currentFrameGamepad2.square && !previousFrameGamepad2.square) {
+                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);
+                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
             }
 
             /*

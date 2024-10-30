@@ -1,19 +1,29 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
+import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
+import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
+import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
+import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
+@Config
 public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(600),
-        SPECIMENS(400);
+        SAMPLES(2250),
+        SPECIMENS(1000),
+        HOVER(400);
 
         public double position;
 
@@ -64,7 +74,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeClawStates {
-        DEFAULT(0.8),
+        DEFAULT(0.85),
         CLOSED(0.35);
 
         public double position;
@@ -91,27 +101,51 @@ public class Outtake implements Subsystem {
 
     DcMotorEx intakeMotor;
 
+    DigitalChannel magneticLimitSwitch;
+
     OuttakeServoState currentOuttakeServoState = OuttakeServoState.DEFAULT;
     OuttakeRotationStates currentRotationState = OuttakeRotationStates.DEFAULT;
     OuttakeClawStates currentClawState = OuttakeClawStates.DEFAULT;
+    OuttakeSlidesStates currentSlideState = OuttakeSlidesStates.DEFAULT;
+    OuttakeSlidesStates previousSlideState = OuttakeSlidesStates.DEFAULT;
+    public static double kP = 0.0025;
+    public static double kI = 0;
+    public static double kD = 0.0001;
+    public static double kF = 0.1;
+    public static double kV = 0.0005;
+    public static double kA = 0;
+    public static double vMax = 5000;
+    public static double aMax = 8000;
+
+    private GeneralPIDController controller = new GeneralPIDController(kP, kI, kD, kF);
+    public ElapsedTime slidesTimer = new ElapsedTime();
+
+    private MotionProfiledMotion profile = new MotionProfiledMotion(
+            new MotionProfile(0, 0, vMax, aMax),
+            new GeneralPIDController(kP, kI, kD, kF)
+    );
 
     double liftPower = 0;
+    boolean currentSwitchState = false;
+    boolean pushingDown = false;
 
     Telemetry telemetry;
 
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
-        leftLiftMotor = hardwareMap.get(DcMotorEx.class, "leftLiftMotor");
-        rightLiftMotor = hardwareMap.get(DcMotorEx.class, "rightLiftMotor");
+        leftLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "leftLiftMotor"), 1e-5);
+        rightLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "rightLiftMotor"), 1e-5);
 
-        leftOuttakeServo = hardwareMap.get(Servo.class, "leftOuttakeServo");
-        rightOuttakeServo = hardwareMap.get(Servo.class, "rightOuttakeServo");
+        leftOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "leftOuttakeServo"), 1e-5);
+        rightOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "rightOuttakeServo"), 1e-5);
 
-        rotationOuttakeServo = hardwareMap.get(Servo.class, "wrist");
+        rotationOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "wrist"), 1e-5);
 
-        clawServo = hardwareMap.get(Servo.class, "claw");
+        clawServo = new CachingServo(hardwareMap.get(Servo.class, "claw"), 1e-5);
 
-        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        intakeMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
+
+        magneticLimitSwitch = hardwareMap.get(DigitalChannel.class, "slidesMagnetic");
 
         leftOuttakeServo.setDirection(Servo.Direction.FORWARD); // dir
         rightOuttakeServo.setDirection(Servo.Direction.REVERSE); // Dir
@@ -139,6 +173,35 @@ public class Outtake implements Subsystem {
 
     @Override
     public void onCyclePassed() {
+
+        profile.setPIDCoefficients(kP, kI, kD, kF);
+        profile.setProfileCoefficients(kV, kA, vMax, aMax);
+
+        currentSwitchState = !magneticLimitSwitch.getState();
+
+        if (atTargetPosition() && this.currentSlideState == OuttakeSlidesStates.DEFAULT) {
+            liftPower /= 2;
+
+            if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.5) {
+                liftPower = -0.2;
+                pushingDown = true;
+            } else if (pushingDown) {
+                pushingDown = false;
+                leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            }
+        }
+        if (liftPower == 0) {
+            liftPower = profile.getOutput(getCurrentSensorPosition());
+        }
+
+        if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition()) {
+            setCurrentOuttakeState(OuttakeServoState.EXTENDED);
+        }
+
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
 
@@ -153,13 +216,36 @@ public class Outtake implements Subsystem {
 
         telemetry.addData("Rotation State: ", currentRotationState);
         telemetry.addData("Claw State: ", currentClawState);
-        telemetry.addData("Lift Power: ", liftPower);
-        telemetry.addData("Position: ", leftLiftMotor.getCurrentPosition());
+        telemetry.addData("Position: ", getCurrentSensorPosition());
+        telemetry.addData("Target Position: ", profile.feedforwardProfile.getPositionFromTime(slidesTimer.seconds()));
+        telemetry.addData("Magnetic Switch: ", currentSwitchState);
         liftPower = 0;
     }
 
     public void setLiftPower(double liftPower) {
         this.liftPower = liftPower;
+    }
+
+    public void setSlidesState(OuttakeSlidesStates newState) {
+
+        if (newState == currentSlideState) {
+            return;
+        }
+
+
+        previousSlideState = currentSlideState;
+        currentSlideState = newState;
+        regenerateProfile();
+    }
+
+    public void regenerateProfile() {
+        slidesTimer.reset();
+
+        profile.updateTargetPosition(currentSlideState.position, getCurrentSensorPosition());
+    }
+
+    public double getCurrentSensorPosition() {
+        return (double) (leftLiftMotor.getCurrentPosition() + rightLiftMotor.getCurrentPosition()) / 2.00;
     }
 
     public void setCurrentOuttakeState(OuttakeServoState newState) {
@@ -172,5 +258,9 @@ public class Outtake implements Subsystem {
 
     public void setCurrentClawState(OuttakeClawStates newState) {
         currentClawState = newState;
+    }
+
+    public boolean atTargetPosition() {
+        return profile.atTargetPosition();
     }
 }
