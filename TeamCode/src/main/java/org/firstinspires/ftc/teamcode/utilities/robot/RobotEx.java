@@ -9,15 +9,10 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.TempUnit;
-import org.firstinspires.ftc.teamcode.utilities.localizer.TwoWheelLocalizer;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Camera;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.DepositLift;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.InternalIMU;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.ClimbLift;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.PlaneLauncher;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.OpticalOdometry;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Subsystem;
 
 
@@ -53,30 +48,24 @@ public class RobotEx {
 
     List<LynxModule> allHubs;
 
-    public InternalIMU internalIMU = InternalIMU.getInstance();
-
     public Drivetrain drivetrain = new Drivetrain();
-    public ClimbLift climbLift = new ClimbLift();
-    public DepositLift depositLift = new DepositLift();
+    public OpticalOdometry odometry = new OpticalOdometry();
+    public Outtake outtake = new Outtake();
     public Intake intake = new Intake();
     public VoltageSensor voltageSensor;
 
-    public PlaneLauncher planeLauncher = new PlaneLauncher();
-    public Camera camera = new Camera();
+
     private final ElapsedTime frameTimer = new ElapsedTime();
 
     private final Subsystem[] robotSubsystems = new Subsystem[]{
             drivetrain,
-            climbLift,
-            intake,
-            depositLift,
-            planeLauncher,
-            camera
+            odometry,
+            outtake,
+            intake
     };
 
     Telemetry telemetry;
 
-    public TwoWheelLocalizer localizer;
     public HardwareMap hardwareMap;
 
     public LinearOpMode opMode;
@@ -118,15 +107,6 @@ public class RobotEx {
             subsystem.onInit(hardwareMap, telemetry);
         }
 
-        internalIMU.onInit(hardwareMap, telemetry);
-
-        this.localizer = new TwoWheelLocalizer(
-                new BaseEncoder(this.drivetrain.rightBackMotor, -1), // 0 LEFT // Swapped w/ 3
-                new BaseEncoder(this.drivetrain.leftFrontMotor,  1), // 2 // Changed sign
-                internalIMU,
-                telemetry
-        );
-
         telemetry.update();
     }
 
@@ -150,8 +130,6 @@ public class RobotEx {
             subsystem.onOpmodeStarted();
         }
 
-        internalIMU.onOpmodeStarted();
-        internalIMU.stopAngularVelocityTracking();
     }
 
     @SuppressLint("")
@@ -179,7 +157,6 @@ public class RobotEx {
             hub.clearBulkCache();
         }
 
-        localizer.updatePose();
 
         for (Subsystem subsystem : robotSubsystems) {
             subsystem.onCyclePassed();
@@ -205,6 +182,9 @@ public class RobotEx {
 
 
 
+        telemetry.addData("x: ", odometry.getPose().getX());
+        telemetry.addData("y: ", odometry.getPose().getY());
+        telemetry.addData("h: ", odometry.getPose().getHeading());
         telemetry.addLine("Refresh Rate: " + frames + " hz");
         telemetry.addData("Run time: ", runTime);
 
@@ -226,7 +206,7 @@ public class RobotEx {
     }
 
     public void persistData() {
-        PersistentData.startPose = this.localizer.getPose();
+        PersistentData.startPose = this.odometry.getPose();
     }
 
     public double getVoltage() {

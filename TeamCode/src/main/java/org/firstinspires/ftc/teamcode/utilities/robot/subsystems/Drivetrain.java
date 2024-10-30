@@ -5,19 +5,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utilities.localizer.ThreeWheelLocalizer;
-import org.firstinspires.ftc.teamcode.utilities.localizer.TwoWheelLocalizer;
-import org.firstinspires.ftc.teamcode.utilities.math.AngleHelper;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.physics.states.MecanumWheelState;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.extensions.MotorGroup;
-import org.firstinspires.ftc.teamcode.utilities.robot.extensions.RobotOrientation;
-import org.firstinspires.ftc.teamcode.utilities.robot.movement.EncoderDrive;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 
 import java.util.ArrayList;
@@ -25,7 +19,10 @@ import java.util.ArrayList;
 /**
  * Robot Drivetrain
  */
-
+// LF - 0
+// RF - 2
+// RB - 1
+// LB - 3
 @Config
 public class Drivetrain implements Subsystem {
 
@@ -35,8 +32,6 @@ public class Drivetrain implements Subsystem {
     private final DcMotorEx.ZeroPowerBehavior START_ZERO_POWER_BEHAVIOR = DcMotor.ZeroPowerBehavior.FLOAT;
 
     private RobotEx robotInstance;
-    private InternalIMU internalIMU;
-    private TwoWheelLocalizer localizer;
 
     MotorGroup<DcMotorEx> drivetrainMotorGroup;
     private DcMotorEx[] drivetrainMotors;
@@ -92,7 +87,6 @@ public class Drivetrain implements Subsystem {
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
 
-        this.internalIMU = InternalIMU.getInstance();
         this.robotInstance = RobotEx.getInstance();
 
         this.rightFrontMotor = new CachingDcMotorEX((DcMotorEx) hardwareMap.get(DcMotor.class, "rightFrontMotor"), 1e-5);
@@ -115,7 +109,7 @@ public class Drivetrain implements Subsystem {
         this.rightFrontMotor.setDirection(DcMotorEx.Direction.FORWARD);
         this.leftFrontMotor.setDirection(DcMotorEx.Direction.REVERSE);
         this.leftBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        this.rightBackMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        this.rightBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
 /*        this.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -164,7 +158,6 @@ public class Drivetrain implements Subsystem {
     @Override
     public void onOpmodeStarted() {
         this.robotInstance = RobotEx.getInstance();
-        this.localizer = robotInstance.localizer;
     }
 
     @Override
@@ -263,7 +256,6 @@ public class Drivetrain implements Subsystem {
             }
         }
 */
-        leftJoystickY = -leftJoystickY;
         leftJoystickX *= LATERAL_MULTIPLIER;
 
         double multiple = RobotEx.getInstance().getPowerMultiple();
@@ -281,54 +273,17 @@ public class Drivetrain implements Subsystem {
         this.lastX = leftJoystickX;
         this.lastY = leftJoystickY;
         this.lastRot = rightJoystickX;
-
     }
 
     public void fieldCentricDriveFromGamepad(double leftJoystickY, double leftJoystickX, double rightJoystickX) {
-        double currentRobotOrientation = this.localizer.getPose().getHeading() + Math.PI / 2;
-
-        leftJoystickX = -leftJoystickX;
+        double currentRobotOrientation = robotInstance.odometry.currentPose.getHeading() - Math.PI / 2;
 
         this.robotCentricDriveFromGamepad(
-                Math.sin(currentRobotOrientation) * leftJoystickX + Math.cos(currentRobotOrientation) * leftJoystickY,
-                (Math.cos(currentRobotOrientation) * leftJoystickX - Math.sin(currentRobotOrientation) * leftJoystickY),
+                Math.sin(-currentRobotOrientation) * leftJoystickX + Math.cos(-currentRobotOrientation) * leftJoystickY,
+                (Math.cos(-currentRobotOrientation) * leftJoystickX - Math.sin(-currentRobotOrientation) * leftJoystickY),
                 rightJoystickX
         );
         // todo: write code for field centric drive
-    }
-
-    public void fieldCentricRotationPIDFromGamepad(double leftJoystickY, double leftJoystickX, double rightJoystickY, double rightJoystickX) {
-
-        double targetAngle = Math.atan2(-rightJoystickX, -rightJoystickY);
-        double currentAngle = this.internalIMU.getCurrentFrameHeadingCW();
-        double error = targetAngle - currentAngle;
-
-        if (Math.abs(error) > Math.PI) {
-            if (targetAngle < 0) {
-                targetAngle = AngleHelper.norm(targetAngle);
-                error = targetAngle - currentAngle;
-            } else if (targetAngle > 0) {
-                currentAngle = AngleHelper.norm(currentAngle);
-                error = targetAngle - currentAngle;
-            }
-        }
-
-
-        if (rightJoystickY == 0 && rightJoystickX == 0) {
-            targetAngle = currentAngle;
-            error = 0;
-        }
-
-        double output = this.headingPID.getOutputFromError(
-                error
-        );
-
-        this.fieldCentricDriveFromGamepad(
-                leftJoystickY,
-                leftJoystickX,
-                -Math.min(Math.max(output, -0.3), 0.3) + Math.signum(output) * EncoderDrive.kStatic
-        );
-
     }
 
     public void setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior newZeroPowerBehavior) {

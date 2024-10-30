@@ -128,4 +128,5 @@ public class MotionProfile {
     public double getDuration() {
         return duration;
     }
+
 }

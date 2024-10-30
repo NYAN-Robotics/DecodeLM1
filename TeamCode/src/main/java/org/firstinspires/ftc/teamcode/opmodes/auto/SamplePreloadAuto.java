@@ -4,21 +4,20 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 
 /**
  * Example teleop code for a basic mecanum drive
  */
 
-@Autonomous(name = "Drive Forward")
-public class DriveForward extends LinearOpMode {
+@Autonomous(name = "SamplePreloadAuto")
+public class SamplePreloadAuto extends LinearOpMode {
 
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
@@ -57,29 +56,28 @@ public class DriveForward extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.odometry.setPose(new Pose(0, 0, -Math.PI / 2));
 
-        /*
-        drive.gotoPoint(new Pose(20, 0, 0));
-        drive.gotoPoint(new Pose(20, 10, 0));
-        drive.gotoPoint(new Pose(0, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-30, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 40, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 0, 0));
-        drive.gotoPoint(new Pose(0, 0, 0));
 
-         */
 
         robot.update();
         robot.pause(0.5);
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(20, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(-30, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 60, Math.PI / 2));
-        drive.gotoPoint(new Pose(-35, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
+        drive.gotoPoint(new Pose(0, 30, -Math.PI / 2));
+        drive.gotoPoint(new Pose(-20, 10, 0));
+        drive.gotoPoint(new Pose(-22, 23, Math.toRadians(90 + 65)));
+        robot.pause(1);
+        drive.gotoPoint(new Pose(-45, 10, Math.PI / 4));
+        robot.pause(1);
+        drive.gotoPoint(new Pose(-20, 10, Math.PI/2));
+        drive.gotoPoint(new Pose(-32, 33, Math.PI));
+        drive.gotoPoint(new Pose(-43, 9, Math.PI / 4));
+        drive.gotoPoint(new Pose(-20, 10, Math.PI/2));
+        drive.gotoPoint(new Pose(-42, 34, Math.PI));
+        drive.gotoPoint(new Pose(-40, 8, Math.PI / 4));
+
+
+
+
 
 
         while (!isStopRequested()) {

@@ -1,18 +1,15 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.movement;
 
-import static org.firstinspires.ftc.teamcode.utilities.robot.movement.MotionProfileLocalizerLineDrive.kStaticTurn;
-
 import androidx.core.math.MathUtils;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.util.MathUtil;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.index.qual.LTEqLengthOf;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.math.AngleHelper;
@@ -27,12 +24,12 @@ public class PIDDrive {
    //  GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
     // GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
 
-    GeneralPIDController xController = new GeneralPIDController(0.2,0, 0, 0);
-    GeneralPIDController yController = new GeneralPIDController(0.2, 0, 0, 0);
+    GeneralPIDController xController = new GeneralPIDController(0.3,0, 0, 0);
+    GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
     GeneralPIDController headingController = new GeneralPIDController(1.5, 0, 0, 0);
 
     public static double vMax = 55;
-    public static double aMax = 55;
+    public static double aMax = 35;
 
     public static double kA = 0.003;
     public static double kV = 1/vMax;
@@ -47,8 +44,8 @@ public class PIDDrive {
         this.telemetry = t;
         this.opmode = opmode;
     }
-    public static Pose threshold = new Pose(1, 1, Math.toRadians(2));
-    public static double thresholdTime = 0.25;
+    public static Pose threshold = new Pose(0.25, 0.25, Math.toRadians(2));
+    public static double thresholdTime = 1;
     public void gotoPoint(Pose point) {
         this.gotoPoint(
                 point,
@@ -65,8 +62,8 @@ public class PIDDrive {
     public void gotoPoint(Pose point, MovementConstants constants) {
         Pose error = new Pose(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
-        Pose currentPose = robot.localizer.getPose();
-        Pose currentVelocity = robot.localizer.getVelocity();
+        Pose currentPose = robot.odometry.getPose();
+        Pose currentVelocity = new Pose();
 
         Pose startPosition = new Pose(currentPose.getX(), currentPose.getY(), currentPose.getHeading());
         error = new Pose(
@@ -95,40 +92,57 @@ public class PIDDrive {
 
         while (!robot.stopRequested) {
 
-            currentPose = robot.localizer.getPose();
-            currentVelocity = robot.localizer.getVelocity();
+            currentPose = robot.odometry.getPose();
             currentProfileTime = profileTime.seconds();
 
             double targetDisplacement = motion.getPositionFromTime(currentProfileTime);
             double xTarget = cosineTerm * targetDisplacement + startPosition.getX();
             double yTarget = sineTerm * targetDisplacement + startPosition.getY();
-            // double headingTarget = MathHelper.lerp(startPosition.getHeading(), point.getHeading(), Math.min(currentProfileTime, duration) / duration);
+
+
+            double headingTarget = MathHelper.lerp(startPosition.getHeading(), point.getHeading(), Math.min(currentProfileTime+0.05, duration) / duration);
 
             error = new Pose(
                     xTarget - currentPose.getX(),
                     yTarget - currentPose.getY(),
-                    point.getHeading() - currentPose.getHeading()
+                    headingTarget - currentPose.getHeading()
             );
+
+
+            if (Math.abs(error.getHeading()) > Math.PI) {
+                error.setHeading(
+                        AngleHelper.norm(headingTarget) - AngleHelper.norm(currentPose.getHeading())
+                );
+            }
+
+
 
             double feedforward = motion.getAccelerationFromTime(currentProfileTime) * kA + motion.getVelocityFromTime(currentProfileTime) * kV;
 
-            double feedforwardX = feedforward * cosineTerm;
-            double feedforwardY = feedforward * sineTerm;
+            double feedforwardX = feedforward * sineTerm;
+            double feedforwardY = feedforward * cosineTerm;
 
             double feedbackX = xController.getOutputFromError(error.getX());
             double feedbackY = yController.getOutputFromError(error.getY());
 
             robot.drivetrain.fieldCentricDriveFromGamepad(
-                    feedbackX + feedforwardX,
-                    feedbackY + feedforwardY,
+                    feedforwardX + feedbackY,
+                    feedforwardY + feedbackX,
                     -MathUtils.clamp(headingController.getOutputFromError(
                             error.getHeading()
-                    ), -0.5, 0.5)
+                    ), -0.75, 0.75)
             );
 
 
             telemetry.addData("Profile time: ", currentProfileTime);
             telemetry.addData("Motion time: ", duration);
+            telemetry.addData("Error h: ", error.getHeading());
+            /*
+            telemetry.addData("Error y: ", error.getY());
+            telemetry.addData("feedback x: ", feedbackX);
+            telemetry.addData("feedback y: ", feedbackY);
+
+             */
 
             robot.update();
             error.map(Math::abs);
@@ -161,85 +175,10 @@ public class PIDDrive {
     }
 
 
-    public void oldGotoPoint(Pose point) {
-        Pose error = new Pose(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-
-        Pose currentPose = robot.localizer.getPose();
-        error = new Pose(
-                point.getX() - currentPose.getX(),
-                point.getY() - currentPose.getY(),
-                point.getHeading() - currentPose.getHeading()
-        );
-
-        MotionProfile motion = new MotionProfile(
-                0, Math.sqrt(error.getX() * error.getX() + error.getY() * error.getY()), vMax, aMax
-        );
-
-        boolean inPosition = false;
-
-        ElapsedTime inPositionTime = new ElapsedTime();
-        ElapsedTime profileTime = new ElapsedTime();
-
-        while (true) {
-
-            currentPose = robot.localizer.getPose();
-            double targetDisplacement = motion.getPositionFromTime(profileTime.time());
-
-            error = new Pose(
-                    point.getX() - currentPose.getX(),
-                    point.getY() - currentPose.getY(),
-                    point.getHeading() - currentPose.getHeading()
-            );
-
-            robot.drivetrain.fieldCentricDriveFromGamepad(
-                    MathUtils.clamp(xController.getOutputFromError(
-                            error.getX()
-                    ), -0.6, 0.6),
-                    MathUtils.clamp(yController.getOutputFromError(
-                            error.getY()
-                    ), -0.6, 0.6),
-                    -MathUtils.clamp(headingController.getOutputFromError(
-                            error.getHeading()
-                    ), -0.6, 0.6)
-            );
-
-
-            telemetry.addData("X: ", error.getX());
-            telemetry.addData("Y: ", error.getY());
-            telemetry.addData("Heading: ", error.getHeading());
-            telemetry.update();
-            robot.update();
-
-            if (Math.abs(error.getX()) < threshold.getX() & Math.abs(error.getY()) < threshold.getY() & Math.abs(error.getHeading()) < threshold.getHeading()) {
-                if (inPosition) {
-                    if (inPositionTime.seconds() > thresholdTime) {
-                        break;
-                    }
-                } else {
-                    inPosition = true;
-                    inPositionTime.reset();
-                }
-            } else {
-                inPosition = false;
-            }
-
-        }
-
-        robot.drivetrain.fieldCentricDriveFromGamepad(
-                0,
-                0,
-                0
-        );
-
-        robot.update();
-
-    }
-
-
     public void turnToAngle(double angle, MovementConstants constants) {
         angle = AngleHelper.normDelta(angle);
 
-        double currentIMUPosition = robot.localizer.getPose().getHeading();
+        double currentIMUPosition = robot.odometry.getPose().getHeading();
         double turnError;
 
         MotionProfile turnProfile = new MotionProfile(currentIMUPosition, angle, DriveConstants.MAX_ANGULAR_VELOCITY, DriveConstants.MAX_ANGULAR_VELOCITY);
@@ -273,10 +212,10 @@ public class PIDDrive {
             robot.drivetrain.robotCentricDriveFromGamepad(
                     0,
                     0,
-                    -Math.min(Math.max(output, -1), 1) + Math.signum(output) * kStaticTurn
+                    -Math.min(Math.max(output, -1), 1) + Math.signum(output)
             );
 
-            currentIMUPosition = robot.localizer.getPose().getHeading();
+            currentIMUPosition = robot.odometry.getPose().getHeading();
 
             if (telemetry != null) {
                 telemetry.addData("Target Angle: ", currentTargetAngle);
