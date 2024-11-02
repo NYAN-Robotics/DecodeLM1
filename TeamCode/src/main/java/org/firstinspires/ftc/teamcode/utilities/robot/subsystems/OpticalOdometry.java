@@ -35,7 +35,7 @@ public class OpticalOdometry implements Subsystem {
         SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-1.42, 0, 180);
         otos.setOffset(offset);
         otos.setLinearScalar(1);
-        otos.setAngularScalar(1);
+        otos.setAngularScalar(0.992); // -23.503
 
         otos.calibrateImu();
 

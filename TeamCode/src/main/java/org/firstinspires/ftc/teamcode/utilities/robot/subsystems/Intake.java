@@ -19,7 +19,7 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.075),
+        DEFAULT(0),
         EXTENDED(0.2);
 
         public double position;
@@ -63,7 +63,7 @@ public class Intake implements Subsystem {
     Servo rightDropdownServo;
 
     public static double startPosition = 0.07;
-    public static double extendedPosition = 0.27;
+    public static double extendedPosition = 0.25;
 
     public static double defaultIntakePosition = IntakeState.DEFAULT.position;
     public static double extendedIntakePosition = IntakeState.EXTENDED.position;
@@ -134,13 +134,15 @@ public class Intake implements Subsystem {
         telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
 
         if (reverse) {
-            activeMotor.setPower(-0.9);
+            activeMotor.setPower(-0.5);
         } else if (currentIntakeState == IntakeState.EXTENDED && getCurrentPosition()-0.01 > LinkageStates.DEFAULT.position) {
-            activeMotor.setPower(0.9);
-        } else if (RobotEx.getInstance().outtake.slidesTimer.seconds() < 0.5) {
-            activeMotor.setPower(0.1);
+            activeMotor.setPower(1);
+        } else if (RobotEx.getInstance().outtake.slidesTimer.seconds() < 1) {
+            activeMotor.setPower(0.5);
+        } else if (RobotEx.getInstance().outtake.getClawState() == Outtake.OuttakeClawStates.CLOSED) {
+            activeMotor.setPower(0.3);
         } else {
-            activeMotor.setPower(0);
+            activeMotor.setPower(0.);
         }
 
         if (currentLinkageState == LinkageStates.DEFAULT && profile.getDuration() <= linkageTimer.seconds()) {

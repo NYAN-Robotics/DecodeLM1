@@ -28,10 +28,10 @@ public class PIDDrive {
     GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
     GeneralPIDController headingController = new GeneralPIDController(1.5, 0, 0, 0);
 
-    public static double vMax = 55;
-    public static double aMax = 35;
+    public static double vMax = 60;
+    public static double aMax = 45;
 
-    public static double kA = 0.003;
+    public static double kA = 0.006;
     public static double kV = 1/vMax;
 
     RobotEx robot;

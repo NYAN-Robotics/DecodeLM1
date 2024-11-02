@@ -22,8 +22,9 @@ public class Outtake implements Subsystem {
     public enum OuttakeSlidesStates {
         DEFAULT(0),
         SAMPLES(2250),
-        SPECIMENS(1000),
-        HOVER(400);
+        SPECIMENS(700),
+        SPECIMENS_DROP(190),
+        HOVER(350);
 
         public double position;
 
@@ -41,7 +42,8 @@ public class Outtake implements Subsystem {
     public enum OuttakeServoState {
         DEFAULT(0.625),
         BACK_PICKUP(0.95),
-        EXTENDED(0);
+        AUTO_DEFAULT(0.37),
+        EXTENDED(0.1);
 
         public double position;
 
@@ -74,6 +76,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeClawStates {
+        FULL_DEFAULT(1),
         DEFAULT(0.85),
         CLOSED(0.35);
 
@@ -108,6 +111,7 @@ public class Outtake implements Subsystem {
     OuttakeClawStates currentClawState = OuttakeClawStates.DEFAULT;
     OuttakeSlidesStates currentSlideState = OuttakeSlidesStates.DEFAULT;
     OuttakeSlidesStates previousSlideState = OuttakeSlidesStates.DEFAULT;
+
     public static double kP = 0.0025;
     public static double kI = 0;
     public static double kD = 0.0001;
@@ -128,6 +132,7 @@ public class Outtake implements Subsystem {
     double liftPower = 0;
     boolean currentSwitchState = false;
     boolean pushingDown = false;
+    boolean outtakeReset = false;
 
     Telemetry telemetry;
 
@@ -155,9 +160,6 @@ public class Outtake implements Subsystem {
 
         leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -198,8 +200,19 @@ public class Outtake implements Subsystem {
             liftPower = profile.getOutput(getCurrentSensorPosition());
         }
 
-        if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition()) {
-            setCurrentOuttakeState(OuttakeServoState.EXTENDED);
+        if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition() && !outtakeReset) {
+            if (currentSlideState == OuttakeSlidesStates.HOVER) {
+                setCurrentOuttakeState(OuttakeServoState.BACK_PICKUP);
+            } else {
+                setCurrentOuttakeState(OuttakeServoState.EXTENDED);
+                setCurrentRotationState(OuttakeRotationStates.DEFAULT);
+            }
+
+            if (currentSlideState == OuttakeSlidesStates.SPECIMENS || currentSlideState == OuttakeSlidesStates.SPECIMENS_DROP || currentSlideState == OuttakeSlidesStates.SAMPLES) {
+                setCurrentRotationState(OuttakeRotationStates.ROTATED);
+            }
+
+            outtakeReset = true;
         }
 
         leftLiftMotor.setPower(liftPower);
@@ -235,6 +248,8 @@ public class Outtake implements Subsystem {
 
         previousSlideState = currentSlideState;
         currentSlideState = newState;
+
+        outtakeReset = false;
         regenerateProfile();
     }
 
@@ -262,5 +277,20 @@ public class Outtake implements Subsystem {
 
     public boolean atTargetPosition() {
         return profile.atTargetPosition();
+    }
+
+    public OuttakeSlidesStates getSlidesState() {
+        return currentSlideState;
+    }
+
+    public OuttakeClawStates getClawState() {
+        return currentClawState;
+    }
+
+    public void reset() {
+        setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);
+        setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
+        setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+        setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
     }
 }

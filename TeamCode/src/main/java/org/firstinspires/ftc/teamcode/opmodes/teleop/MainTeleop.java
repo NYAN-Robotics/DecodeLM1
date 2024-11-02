@@ -119,21 +119,35 @@ public class MainTeleop extends LinearOpMode {
             if (currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left) {
                 robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
                 robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-
             }
 
-            if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
-                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+            if (currentFrameGamepad2.dpad_right && !previousFrameGamepad2.dpad_right) {
+                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
+            }
+
+            if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
+                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.HOVER);
+                robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED);
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.FULL_DEFAULT);
             }
 
             if (currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) {
-                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.EXTENDED);
+                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
             }
 
-            if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
+            if (currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) {
                 robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
             }
 
+            if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {
+                if (robot.outtake.getSlidesState() != Outtake.OuttakeSlidesStates.DEFAULT) {
+                    robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.BACK_PICKUP);
+                }
+            }
+
+            if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
+                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.EXTENDED);
+            }
 
             if (currentFrameGamepad2.square && !previousFrameGamepad2.square) {
                 robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);

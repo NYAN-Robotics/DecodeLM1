@@ -57,7 +57,7 @@ public class DriveForward extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.odometry.setPose(new Pose(0, 0, 0));
 
         /*
         drive.gotoPoint(new Pose(20, 0, 0));
@@ -73,13 +73,8 @@ public class DriveForward extends LinearOpMode {
 
         robot.update();
         robot.pause(0.5);
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(20, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(-30, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 60, Math.PI / 2));
-        drive.gotoPoint(new Pose(-35, 10, Math.PI / 2));
-        drive.gotoPoint(new Pose(0, 10, Math.PI / 2));
+        drive.gotoPoint(new Pose(100, 0, 0));
+
 
 
         while (!isStopRequested()) {

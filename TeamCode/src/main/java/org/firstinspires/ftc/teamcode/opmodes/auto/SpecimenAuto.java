@@ -3,23 +3,22 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 
 /**
  * Example teleop code for a basic mecanum drive
  */
 
-@Disabled
-@Autonomous(name = "OIJFAOIJSf")
-public class SamplePreloadAuto extends LinearOpMode {
+@Autonomous(name = "Specimen Auto")
+public class SpecimenAuto extends LinearOpMode {
 
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
@@ -35,6 +34,7 @@ public class SamplePreloadAuto extends LinearOpMode {
 
         waitForStart();
 
+        robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
         // Notify subsystems before loop
         robot.postInit();
 
@@ -64,18 +64,14 @@ public class SamplePreloadAuto extends LinearOpMode {
 
         robot.update();
         robot.pause(0.5);
-        drive.gotoPoint(new Pose(0, 30, -Math.PI / 2));
-        drive.gotoPoint(new Pose(-20, 10, 0));
-        drive.gotoPoint(new Pose(-22, 23, Math.toRadians(90 + 65)));
-        robot.pause(1);
-        drive.gotoPoint(new Pose(-45, 10, Math.PI / 4));
-        robot.pause(1);
-        drive.gotoPoint(new Pose(-20, 10, Math.PI/2));
-        drive.gotoPoint(new Pose(-32, 33, Math.PI));
-        drive.gotoPoint(new Pose(-43, 9, Math.PI / 4));
-        drive.gotoPoint(new Pose(-20, 10, Math.PI/2));
-        drive.gotoPoint(new Pose(-42, 34, Math.PI));
-        drive.gotoPoint(new Pose(-40, 8, Math.PI / 4));
+        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
+        drive.gotoPoint(new Pose(0, 20, -Math.PI / 2));
+        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
+        robot.pause(2);
+        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+        drive.gotoPoint(new Pose(0, 15, -Math.PI / 2));
+
+
 
 
 
