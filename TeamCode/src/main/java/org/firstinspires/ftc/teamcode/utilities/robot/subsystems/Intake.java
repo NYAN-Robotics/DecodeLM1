@@ -36,8 +36,10 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
+        PUSH_DOWN(1),
         DEFAULT(0.56),
-        EXTENDED(0.76);
+        EXTENDED(0.76),
+        UP(0.45);
 
         public double position;
 
@@ -62,8 +64,8 @@ public class Intake implements Subsystem {
     Servo leftDropdownServo;
     Servo rightDropdownServo;
 
-    public static double startPosition = 0.07;
-    public static double extendedPosition = 0.25;
+    public static double startPosition = LinkageStates.DEFAULT.position;
+    public static double extendedPosition = LinkageStates.EXTENDED.position;
 
     public static double defaultIntakePosition = IntakeState.DEFAULT.position;
     public static double extendedIntakePosition = IntakeState.EXTENDED.position;
@@ -145,7 +147,7 @@ public class Intake implements Subsystem {
             activeMotor.setPower(0.);
         }
 
-        if (currentLinkageState == LinkageStates.DEFAULT && profile.getDuration() <= linkageTimer.seconds()) {
+        if (currentLinkageState == LinkageStates.DEFAULT && profile.getDuration() <= linkageTimer.seconds() && currentIntakeState == IntakeState.DEFAULT) {
             this.setIntakeState(IntakeState.EXTENDED);
         }
 
@@ -157,6 +159,7 @@ public class Intake implements Subsystem {
         rightServo.setPosition(currentTargetPosition);
 
         telemetry.addData("Intake State: ", currentLinkageState);
+        telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
 
         reverse = false;

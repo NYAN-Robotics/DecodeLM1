@@ -64,7 +64,7 @@ public class SampleAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(-4, 0, Math.PI / 2));
+        robot.odometry.setPose(new Pose(-7, 0, Math.PI / 2));
 
         robot.update();
         robot.pause(0.5);
@@ -102,7 +102,7 @@ public class SampleAuto extends LinearOpMode {
         robot.pause(0.5);
         robot.outtake.reset();
 
-        drive.gotoPoint(new Pose(-33.5-6*Math.cos(2.25), 19-6*Math.sin(2.25), 2.25));
+        drive.gotoPoint(new Pose(-35-6*Math.cos(2.1), 19-6*Math.sin(2.1), 2.1));
         robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
         robot.outtake.reset();
         robot.intake.setTargetLinkageState(Intake.LinkageStates.EXTENDED);
@@ -110,7 +110,7 @@ public class SampleAuto extends LinearOpMode {
         robot.pause(1);
         robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
         robot.pause(0.5);
-        drive.gotoPoint(new Pose(-33.5+6*Math.cos(2.25), 19+6*Math.sin(2.25), 2.25));
+        drive.gotoPoint(new Pose(-35+6*Math.cos(2.1), 19+6*Math.sin(2.1), 2.1));
         robot.pause(2);
         robot.intake.setTargetLinkageState(Intake.LinkageStates.DEFAULT);
         drive.gotoPoint(new Pose(-39.5, 8, Math.PI/4));
