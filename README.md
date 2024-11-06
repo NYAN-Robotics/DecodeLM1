@@ -1,2 +1,2 @@
 # NYAN-IntoTheDeep
-Developers: Jorge Seoane (mentor)
+Developers: Jorge Seoane (mentor), Darren Pinto
