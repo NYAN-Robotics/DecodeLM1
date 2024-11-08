@@ -46,44 +46,21 @@ public class DriveForward extends LinearOpMode {
         Gamepad previousFrameGamepad1 = new Gamepad();
         Gamepad previousFrameGamepad2 = new Gamepad();
 
-        // robot.drivetrain.enableAntiTip();
-
-        robot.update();
-
         ElapsedTime e = new ElapsedTime();
 
-        // robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
 
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
         robot.odometry.setPose(new Pose(0, 0, 0));
 
-        /*
-        drive.gotoPoint(new Pose(20, 0, 0));
-        drive.gotoPoint(new Pose(20, 10, 0));
-        drive.gotoPoint(new Pose(0, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-30, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 40, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 0, Math.PI / 2));
-        drive.gotoPoint(new Pose(-40, 0, 0));
-        drive.gotoPoint(new Pose(0, 0, 0));
-
-         */
-
-        robot.update();
         robot.pause(0.5);
+
         drive.gotoPoint(new Pose(100, 0, 0));
-
-
 
         while (!isStopRequested()) {
             robot.update();
         }
-
-
-
-
 
     }
 }

@@ -169,34 +169,6 @@ public class MainTeleop extends LinearOpMode {
             }
 
 
-
-            /*
-
-            if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {
-                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeState.DEFAULT);
-            }
-
-            if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
-                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeState.EXTENDED);
-            }
-
-            if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
-                robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
-            }
-
-            if (currentFrameGamepad2.square && !previousFrameGamepad2.square) {
-                robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED);
-            }
-
-            if (currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) {
-                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-            }
-
-            if (currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) {
-                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
-            }
-            */
-
             frameTime = robot.update();
 
             Pose currentPose = robot.odometry.getPose();
