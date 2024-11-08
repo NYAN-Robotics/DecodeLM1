@@ -68,6 +68,7 @@ public class MotionProfiledMotion {
 
     public boolean atTargetPosition() {
         return timer.seconds() >= feedforwardProfile.getDuration();
+        // testing
     }
 
 
