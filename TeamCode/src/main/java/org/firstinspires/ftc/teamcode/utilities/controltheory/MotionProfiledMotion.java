@@ -17,9 +17,9 @@ public class MotionProfiledMotion {
 
     private double vMax = 1000;
     private double aMax = 1000;
-    public MotionProfiledMotion(MotionProfile feedforward, GeneralPIDController feedback) {
-        this.feedforwardProfile = feedforward;
-        this.feedbackPositionController = feedback;
+    public MotionProfiledMotion(MotionProfile newFeedforwardProfile, GeneralPIDController newPositionController) {
+        this.feedforwardProfile = newFeedforwardProfile;
+        this.feedbackPositionController = newPositionController;
 
         this.timer = new ElapsedTime();
     }
@@ -28,13 +28,13 @@ public class MotionProfiledMotion {
 
         double currentUpdateTime = timer.seconds();
 
-        double targetPosition = this.feedforwardProfile.getPositionFromTime(currentUpdateTime);
-        double targetVelocity = this.feedforwardProfile.getVelocityFromTime(currentUpdateTime);
-        double targetAcceleration = this.feedforwardProfile.getAccelerationFromTime(currentUpdateTime);
+        double targetPosition = feedforwardProfile.getPositionFromTime(currentUpdateTime);
+        double targetVelocity = feedforwardProfile.getVelocityFromTime(currentUpdateTime);
+        double targetAcceleration = feedforwardProfile.getAccelerationFromTime(currentUpdateTime);
 
         double feedforward = targetAcceleration * kA + targetVelocity * kV;
 
-        double feedback = this.feedbackPositionController.getOutputFromError(
+        double feedback = feedbackPositionController.getOutputFromError(
                 targetPosition - currentPosition
         );
 
@@ -43,31 +43,31 @@ public class MotionProfiledMotion {
     }
 
     public void setPIDCoefficients(double kP, double kI, double kD, double kF) {
-        this.feedbackPositionController.updateCoefficients(
+        feedbackPositionController.updateCoefficients(
                 kP, kI, kD, kF
         );
     }
 
-    public void setProfileCoefficients(double kV, double kA, double vMax, double aMax) {
-        this.kV = kV;
-        this.kA = kA;
-        this.vMax = vMax;
-        this.aMax = aMax;
+    public void setProfileCoefficients(double newKV, double newKA, double newVMax, double newAMax) {
+        kV = newKV;
+        kA = newKA;
+        vMax = newVMax;
+        aMax = newAMax;
     }
 
-    public void updateTargetPosition(double targetPosition, double currentPosition) {
-        this.feedforwardProfile = new MotionProfile(
-                currentPosition,
-                targetPosition,
+    public void updateTargetPosition(double newTargetPosition, double newCurrentPosition) {
+        feedforwardProfile = new MotionProfile(
+                newCurrentPosition,
+                newTargetPosition,
                 vMax,
                 aMax
         );
 
-        this.timer.reset();
+        timer.reset();
     }
 
     public boolean atTargetPosition() {
-        return this.timer.seconds() >= this.feedforwardProfile.getDuration();
+        return timer.seconds() >= feedforwardProfile.getDuration();
     }
 
 
