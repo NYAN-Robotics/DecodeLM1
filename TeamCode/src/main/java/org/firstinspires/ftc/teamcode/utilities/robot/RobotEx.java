@@ -54,7 +54,6 @@ public class RobotEx {
     public Intake intake = new Intake();
     public VoltageSensor voltageSensor;
 
-
     private final ElapsedTime frameTimer = new ElapsedTime();
 
     private final Subsystem[] robotSubsystems = new Subsystem[]{
@@ -162,29 +161,6 @@ public class RobotEx {
             subsystem.onCyclePassed();
         }
 
-
-        /*
-        telemetry.addData("Parallel Encoder 1 Ticks: ", drivetrain.rightBackMotor.getCurrentPosition());
-        telemetry.addData("Parallel Encoder 2 Ticks: ", drivetrain.leftBackMotor.getCurrentPosition());
-        telemetry.addData("Perpendicular Encoder 1 Ticks: ", drivetrain.leftFrontMotor.getCurrentPosition());
-
-
-         */
-        /*
-        TelemetryPacket packet = new TelemetryPacket();
-        Canvas fieldOverlay = packet.fieldOverlay();
-
-
-        fieldOverlay.setStrokeWidth(1);
-        fieldOverlay.setStroke("#4CAF50");
-        */
-        // drawRobot(fieldOverlay, currentPose);
-
-
-
-        telemetry.addData("x: ", odometry.getPose().getX());
-        telemetry.addData("y: ", odometry.getPose().getY());
-        telemetry.addData("h: ", odometry.getPose().getHeading());
         telemetry.addLine("Refresh Rate: " + frames + " hz");
         telemetry.addData("Run time: ", runTime);
 
@@ -216,20 +192,6 @@ public class RobotEx {
     public double getPowerMultiple() {
         return 12 / this.voltageCompensator;
     }
-
-    /*
-    public static void drawRobot(Canvas canvas, Pose2d pose) {
-        canvas.strokeCircle(pose.getX(), pose.getY(), 9);
-        Vector2d v = pose.headingVec().times(9);
-        double x1 = pose.getX() + v.getX() / 2, y1 = pose.getY() + v.getY() / 2;
-        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
-        canvas.strokeLine(x1, y1, x2, y2);
-    }
-
-
-    public void clearPersistData() {
-        PersistentData.startPose = new Pose2d();
-    }*/
 
     public void destroy() {
         RobotEx.robotInstance = null;

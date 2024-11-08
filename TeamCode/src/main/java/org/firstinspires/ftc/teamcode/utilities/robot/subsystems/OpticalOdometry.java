@@ -15,6 +15,8 @@ public class OpticalOdometry implements Subsystem {
     Pose currentPose = new Pose();
     Pose lastPose = new Pose();
 
+    Telemetry telemetry;
+
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
         otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
@@ -41,6 +43,8 @@ public class OpticalOdometry implements Subsystem {
 
         otos.resetTracking();
 
+        this.telemetry = telemetry;
+
 
     }
 
@@ -61,6 +65,10 @@ public class OpticalOdometry implements Subsystem {
                 pos.y,
                 Math.toRadians(pos.h)
         );
+
+        telemetry.addData("x: ", currentPose.getX());
+        telemetry.addData("y: ", currentPose.getY());
+        telemetry.addData("h: ", currentPose.getHeading());
 
     }
 
