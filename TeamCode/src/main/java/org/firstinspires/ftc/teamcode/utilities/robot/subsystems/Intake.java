@@ -24,7 +24,6 @@ public class Intake implements Subsystem {
 
         public double position;
 
-        // Constructor
         LinkageStates(double position) {
             this.position = position;
         }
@@ -43,7 +42,6 @@ public class Intake implements Subsystem {
 
         public double position;
 
-        // Constructor
         IntakeState(double position) {
             this.position = position;
         }
@@ -92,12 +90,12 @@ public class Intake implements Subsystem {
     Telemetry telemetry;
 
     @Override
-    public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
-        leftServo = new CachingServo(hardwareMap.get(Servo.class, "leftIntakeServo"), 1e-5);
-        rightServo = new CachingServo(hardwareMap.get(Servo.class, "rightIntakeServo"), 1e-5);
-        leftDropdownServo = new CachingServo(hardwareMap.get(Servo.class, "leftDropdownServo"), 1e-5);
-        rightDropdownServo = new CachingServo(hardwareMap.get(Servo.class, "rightDropdownServo"), 1e-5);
-        activeMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
+    public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
+        leftServo = new CachingServo(newHardwareMap.get(Servo.class, "leftIntakeServo"), 1e-5);
+        rightServo = new CachingServo(newHardwareMap.get(Servo.class, "rightIntakeServo"), 1e-5);
+        leftDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "leftDropdownServo"), 1e-5);
+        rightDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "rightDropdownServo"), 1e-5);
+        activeMotor = new CachingDcMotorEX(newHardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
         leftServo.setDirection(Servo.Direction.REVERSE);
         rightServo.setDirection(Servo.Direction.REVERSE);
@@ -112,7 +110,7 @@ public class Intake implements Subsystem {
         activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        this.telemetry = telemetry;
+        telemetry = newTelemetry;
     }
 
     @Override
@@ -176,7 +174,7 @@ public class Intake implements Subsystem {
             return targetPosition;
         }
 
-        return this.profile.getPositionFromTime(linkageTimer.seconds());
+        return profile.getPositionFromTime(linkageTimer.seconds());
     }
 
     private void rebuildProfile(double targetPosition) {
@@ -184,7 +182,7 @@ public class Intake implements Subsystem {
         manual = false;
 
 
-        this.profile = new MotionProfile(
+        profile = new MotionProfile(
                 getCurrentPosition(),
                 targetPosition,
                 vMax,

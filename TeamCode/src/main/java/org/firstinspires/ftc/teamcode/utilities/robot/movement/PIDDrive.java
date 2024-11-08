@@ -21,10 +21,10 @@ import org.firstinspires.ftc.teamcode.utilities.robot.extensions.MotorGroup;
 
 @Config
 public class PIDDrive {
-   //  GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
+    //  GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
     // GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
 
-    GeneralPIDController xController = new GeneralPIDController(0.3,0, 0, 0);
+    GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
     GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
     GeneralPIDController headingController = new GeneralPIDController(1.5, 0, 0, 0);
 
@@ -32,20 +32,23 @@ public class PIDDrive {
     public static double aMax = 45;
 
     public static double kA = 0.006;
-    public static double kV = 1/vMax;
+    public static double kV = 1 / vMax;
+
+    public static Pose threshold = new Pose(0.25, 0.25, Math.toRadians(2));
+    public static double thresholdTime = 1;
 
     RobotEx robot;
 
     Telemetry telemetry;
     LinearOpMode opmode;
 
-    public PIDDrive(RobotEx robot, LinearOpMode opmode, Telemetry t) {
-        this.robot = robot;
-        this.telemetry = t;
-        this.opmode = opmode;
+    public PIDDrive(RobotEx newRobot, LinearOpMode newOpmode, Telemetry newTelemetry) {
+        robot = newRobot;
+        opmode = newOpmode;
+        telemetry = newTelemetry;
     }
-    public static Pose threshold = new Pose(0.25, 0.25, Math.toRadians(2));
-    public static double thresholdTime = 1;
+
+
     public void gotoPoint(Pose point) {
         this.gotoPoint(
                 point,
@@ -59,6 +62,7 @@ public class PIDDrive {
                 new MovementConstants(vMax, aMax, correctionTime)
         );
     }
+
     public void gotoPoint(Pose point, MovementConstants constants) {
         Pose error = new Pose(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
@@ -100,7 +104,7 @@ public class PIDDrive {
             double yTarget = sineTerm * targetDisplacement + startPosition.getY();
 
 
-            double headingTarget = MathHelper.lerp(startPosition.getHeading(), point.getHeading(), Math.min(currentProfileTime+0.05, duration) / duration);
+            double headingTarget = MathHelper.lerp(startPosition.getHeading(), point.getHeading(), Math.min(currentProfileTime + 0.05, duration) / duration);
 
             error = new Pose(
                     xTarget - currentPose.getX(),
@@ -114,8 +118,6 @@ public class PIDDrive {
                         AngleHelper.norm(headingTarget) - AngleHelper.norm(currentPose.getHeading())
                 );
             }
-
-
 
             double feedforward = motion.getAccelerationFromTime(currentProfileTime) * kA + motion.getVelocityFromTime(currentProfileTime) * kV;
 
@@ -132,7 +134,6 @@ public class PIDDrive {
                             error.getHeading()
                     ), -0.75, 0.75)
             );
-
 
             telemetry.addData("Profile time: ", currentProfileTime);
             telemetry.addData("Motion time: ", duration);
@@ -189,10 +190,10 @@ public class PIDDrive {
         boolean atTarget = false;
         double atTargetStartTime = -1;
 
-        while (!atTarget && elapsedTurnTime.seconds() < turnProfile.getDuration()+constants.maxCorrectionTime) {
+        while (!atTarget && elapsedTurnTime.seconds() < turnProfile.getDuration() + constants.maxCorrectionTime) {
 
             double currentTargetAngle = turnProfile.getPositionFromTime(elapsedTurnTime.seconds());
-            turnError = currentTargetAngle  - currentIMUPosition;
+            turnError = currentTargetAngle - currentIMUPosition;
 
             if (Math.abs(turnError) > Math.PI) {
                 if (angle < 0) {
@@ -237,8 +238,6 @@ public class PIDDrive {
             robot.pause(0.1);
             robotDrivetrain.setZeroPowerBehavior(currentZeroPowerBehavior);
         }
-
-
 
 
     }

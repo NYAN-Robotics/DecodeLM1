@@ -29,7 +29,6 @@ public class Drivetrain implements Subsystem {
     public enum TurnDirection {
         LEFT, RIGHT
     }
-    private final DcMotorEx.ZeroPowerBehavior START_ZERO_POWER_BEHAVIOR = DcMotor.ZeroPowerBehavior.FLOAT;
 
     private RobotEx robotInstance;
 
@@ -65,13 +64,10 @@ public class Drivetrain implements Subsystem {
     private double lastLeftBackPower = 0;
     private double lastRightBackPower = 0;
 
-    private double targetTurnAngle = 0;
 
     private double lastX = 0;
     private double lastY = 0;
     private double lastRot = 0;
-
-
 
     private double weight = 1;
 
@@ -82,61 +78,50 @@ public class Drivetrain implements Subsystem {
     private double trackWidth = 12;
     private double wheelBase = 6.5;
     private double lateralMultiplier = -1.2;
+
     public static double LATERAL_MULTIPLIER = 1.33;
 
     @Override
-    public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
+    public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
 
         this.robotInstance = RobotEx.getInstance();
 
-        this.rightFrontMotor = new CachingDcMotorEX((DcMotorEx) hardwareMap.get(DcMotor.class, "rightFrontMotor"), 1e-5);
-        this.leftFrontMotor = new CachingDcMotorEX((DcMotorEx) hardwareMap.get(DcMotor.class, "leftFrontMotor"), 1e-5);
-        this.leftBackMotor = new CachingDcMotorEX((DcMotorEx) hardwareMap.get(DcMotor.class, "leftBackMotor"), 1e-5);
-        this.rightBackMotor = new CachingDcMotorEX((DcMotorEx) hardwareMap.get(DcMotor.class, "rightBackMotor"), 1e-5);
+        rightFrontMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "rightFrontMotor"), 1e-5);
+        leftFrontMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "leftFrontMotor"), 1e-5);
+        leftBackMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "leftBackMotor"), 1e-5);
+        rightBackMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "rightBackMotor"), 1e-5);
 
         // todo: figure out the directions
 
-        this.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        this.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.leftBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.rightBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        this.rightFrontMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        this.leftFrontMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        this.leftBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        this.rightBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        leftFrontMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
-/*        this.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
-
-        this.drivetrainMotors = new DcMotorEx[] {
+        drivetrainMotors = new DcMotorEx[] {
             this.rightFrontMotor,
             this.leftFrontMotor,
             this.leftBackMotor,
             this.rightBackMotor
         };
 
-        this.drivetrainMotorGroup = new MotorGroup<>(
+        drivetrainMotorGroup = new MotorGroup<>(
                 this.rightFrontMotor,
                 this.leftFrontMotor,
                 this.leftBackMotor,
                 this.rightBackMotor
         );
 
-        this.rightBackPower = 0;
-        this.leftBackPower = 0;
-        this.leftFrontPower = 0;
-        this.rightFrontPower = 0;
+        rightBackPower = 0;
+        leftBackPower = 0;
+        leftFrontPower = 0;
+        rightFrontPower = 0;
 
-        this.telemetry = telemetry;
-        // this.headingPID.setTelemetry(telemetry);
+        telemetry = newTelemetry;
     }
 
     public void enableAntiTip() {
@@ -165,51 +150,6 @@ public class Drivetrain implements Subsystem {
 
         this.headingPID.updateCoefficients(Drivetrain.kP, Drivetrain.kI, Drivetrain.kD, 0);
 
-/*        RobotOrientation currentOrientation = this.internalIMU.getCurrentFrameRobotOrientation();
-        RobotOrientation startOrientation = this.internalIMU.getStartFrameRobotOrientation();
-
-        double tiltError = currentOrientation.getTilt() - startOrientation.getTilt();
-        double yawError = currentOrientation.getYaw() - startOrientation.getYaw();
-
-
-        if (this.enableAntiTip && tiltError > InternalIMU.TILT_THRESHOLD || this.enableAntiTip && yawError > InternalIMU.YAW_THRESHOLD) {
-            double tiltOutput = this.tiltPID.getOutputFromError(startOrientation.getTilt(), currentOrientation.getTilt());
-            double yawOutput = this.yawPID.getOutputFromError(startOrientation.getYaw(), currentOrientation.getYaw());
-
-            telemetry.addData("Tilt Error: ", tiltError);
-            telemetry.addData("Yaw Error: ", yawError);
-
-            telemetry.addData("Tilt Output: ", tiltOutput);
-            telemetry.addData("Yaw Output: ", yawOutput);
-
-*//*            leftBackPower -= yawOutput;
-            leftFrontPower += yawOutput;
-            rightBackPower += yawOutput;
-            rightFrontPower -= yawOutput;
-
-            leftBackPower += tiltOutput;
-            leftFrontPower += tiltOutput;
-            rightBackPower += tiltOutput;
-            rightFrontPower += tiltOutput;*//*
-        }*/
-
-        rightBackPower *= this.weight;
-        rightFrontPower *= this.weight;
-        leftBackPower *= this.weight;
-        leftFrontPower *= this.weight;
-
-        /*
-        if (lastLeftBackPower == 0 && lastLeftFrontPower == 0 && lastRightBackPower == 0 && lastRightFrontPower == 0 && leftBackPower == 0 && leftFrontPower == 0 && rightBackPower == 0 && rightFrontPower == 0) {
-
-        } else {
-            this.rightBackMotor.setPower(rightBackPower);
-            this.rightFrontMotor.setPower(rightFrontPower);
-            this.leftBackMotor.setPower(leftBackPower);
-            this.leftFrontMotor.setPower(leftFrontPower);
-        }
-
-         */
-
         this.rightBackMotor.setPower(rightBackPower);
         this.rightFrontMotor.setPower(rightFrontPower);
         this.leftBackMotor.setPower(leftBackPower);
@@ -222,40 +162,12 @@ public class Drivetrain implements Subsystem {
 
         this.rightBackPower = 0;
         this.leftBackPower = 0;
-        this.leftFrontPower = 0;
-        this.rightFrontPower = 0;
-
-/*        this.telemetry.addData("LF Pos: ", this.leftFrontMotor.getCurrentPosition());
-        this.telemetry.addData("LB Pos: ", this.leftBackMotor.getCurrentPosition());
-        this.telemetry.addData("RB Pos: ", this.rightBackMotor.getCurrentPosition());
-        this.telemetry.addData("RF Pos: ", this.rightFrontMotor.getCurrentPosition());*/
-
-/*        this.telemetry.addData("LF Vel: ", this.leftFrontMotor.getVelocity());
-        this.telemetry.addData("LB Vel: ", this.leftBackMotor.getVelocity());
-        this.telemetry.addData("RB Vel: ", this.rightBackMotor.getVelocity());
-        this.telemetry.addData("RF Vel: ", this.rightFrontMotor.getVelocity());*/
+        leftFrontPower = 0;
+        rightFrontPower = 0;
     }
 
     public void robotCentricDriveFromGamepad(double leftJoystickY, double leftJoystickX, double rightJoystickX) {
-        // todo: write code for robot centric drive
 
-        /*
-        if (this.enableHeadingRetention) {
-            if (rightJoystickX == 0) {
-
-                if (lastRot != 0) {
-                    this.targetTurnAngle = this.internalIMU.getCurrentFrameHeadingCCW();
-                }
-
-                double headingError = MathHelper.getErrorBetweenAngles(
-                        this.internalIMU.getCurrentFrameHeadingCCW(),
-                        this.targetTurnAngle
-                );
-
-                rightJoystickX = headingPID.getOutputFromError(headingError);
-            }
-        }
-*/
         leftJoystickX *= LATERAL_MULTIPLIER;
 
         double multiple = RobotEx.getInstance().getPowerMultiple();
@@ -283,7 +195,6 @@ public class Drivetrain implements Subsystem {
                 (Math.cos(-currentRobotOrientation) * leftJoystickX - Math.sin(-currentRobotOrientation) * leftJoystickY),
                 rightJoystickX
         );
-        // todo: write code for field centric drive
     }
 
     public void setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior newZeroPowerBehavior) {
@@ -310,12 +221,6 @@ public class Drivetrain implements Subsystem {
         return this.leftBackMotor.getZeroPowerBehavior();
     }
 
-    public TurnDirection getTurnDirection() {
-        double leftPower = this.leftBackPower + this.leftFrontPower;
-        double rightPower = this.rightBackPower + this.rightFrontPower;
-
-        return Math.abs(leftPower) > Math.abs(rightPower) ? TurnDirection.LEFT : TurnDirection.RIGHT;
-    }
 
     public int[] getCWMotorTicks() {
         return new int[] {
@@ -328,67 +233,37 @@ public class Drivetrain implements Subsystem {
 
     public MecanumWheelState getMotorTicks() {
         return new MecanumWheelState(
-                this.rightFrontMotor.getCurrentPosition(),
-                this.leftFrontMotor.getCurrentPosition(),
-                this.leftBackMotor.getCurrentPosition(),
-                this.rightBackMotor.getCurrentPosition()
+                rightFrontMotor.getCurrentPosition(),
+                leftFrontMotor.getCurrentPosition(),
+                leftBackMotor.getCurrentPosition(),
+                rightBackMotor.getCurrentPosition()
         );
     }
 
     public MecanumWheelState getMotorVelocity() {
         return new MecanumWheelState(
-                this.rightFrontMotor.getVelocity(),
-                this.leftFrontMotor.getVelocity(),
-                this.leftBackMotor.getVelocity(),
-                this.rightBackMotor.getVelocity()
+                rightFrontMotor.getVelocity(),
+                leftFrontMotor.getVelocity(),
+                leftBackMotor.getVelocity(),
+                rightBackMotor.getVelocity()
         );
-    }
-
-    public ArrayList<Integer> getMotorTicksCCWFromFL() {
-        ArrayList<Integer> returnArray = new ArrayList<>();
-        returnArray.add(this.leftFrontMotor.getCurrentPosition());
-        returnArray.add(this.leftBackMotor.getCurrentPosition());
-        returnArray.add(this.rightBackMotor.getCurrentPosition());
-        returnArray.add(this.rightFrontMotor.getCurrentPosition());
-
-        return returnArray;
-    }
-
-    public ArrayList<Double> getMotorVelocitiesCCWFromFL() {
-        ArrayList<Double> returnArray = new ArrayList<>();
-        returnArray.add(this.leftFrontMotor.getVelocity());
-        returnArray.add(this.leftBackMotor.getVelocity());
-        returnArray.add(this.rightBackMotor.getVelocity());
-        returnArray.add(this.rightFrontMotor.getVelocity());
-
-        return returnArray;
     }
 
     public void setWeightedDrivePower(double weight) {
         this.weight = weight;
     }
 
-    public static double getAverageFromArray(int[] array) {
-        int sum = 0;
-
-        for (int currentMotorTick : array) {
-            sum += currentMotorTick;
-        }
-
-        return (double) sum / array.length;
-
-    }
 
     public double getTrackWidth() {
-        return this.trackWidth;
+        return trackWidth;
     }
 
     public double getWheelBase() {
-        return this.wheelBase;
+        return wheelBase;
     }
 
     public double getLateralMultiplier() {
-        return this.lateralMultiplier;
+        return lateralMultiplier;
     }
 }
 
