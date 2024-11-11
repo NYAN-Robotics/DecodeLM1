@@ -22,16 +22,20 @@ public class Limelight implements Subsystem {
 
     Pose currentPose;
 
+    Telemetry telemetry;
+
     @Override
-    public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
+    public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
 
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight = newHardwareMap.get(Limelight3A.class, "limelight");
 
-        limelight.setPollRateHz(100);
+        limelight.setPollRateHz(250);
 
         limelight.pipelineSwitch(0);
 
         limelight.start();
+
+        telemetry = newTelemetry;
 
         // Set Up limelight
 
@@ -52,12 +56,10 @@ public class Limelight implements Subsystem {
 
         Pose3D botpose = null;
         LLResult result = limelight.getLatestResult();
+
         if (result != null) {
             if (result.isValid()) {
-                botpose = result.getBotpose(); // (x, y, z, h) -> (x, y, h)
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("ty", result.getTy());
-                telemetry.addData("Botpose", botpose.toString());
+                botpose = result.getBotpose_MT2(); // (x, y, z, h) -> (x, y, h)
             }
         }
 
@@ -65,6 +67,11 @@ public class Limelight implements Subsystem {
         if (botpose != null) {
             Position botPosition = botpose.getPosition();
             currentPose = new Pose(botPosition.x, botPosition.y, odometry.getPose().getHeading());
+
+            telemetry.addLine("--LIMELIGHT--");
+            telemetry.addData("X: ", currentPose.getX());
+            telemetry.addData("Y: ", currentPose.getY());
+            telemetry.addData("Heading: ", currentPose.getHeading());
         }
         // Get the position of hte robot & store in a variable for access
     }

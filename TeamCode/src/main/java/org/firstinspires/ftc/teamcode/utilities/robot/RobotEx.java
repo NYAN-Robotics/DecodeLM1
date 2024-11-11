@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.OpticalOdometry;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Subsystem;
@@ -52,6 +53,8 @@ public class RobotEx {
     public OpticalOdometry odometry = new OpticalOdometry();
     public Outtake outtake = new Outtake();
     public Intake intake = new Intake();
+    public Limelight limelight = new Limelight();
+
     public VoltageSensor voltageSensor;
 
     private final ElapsedTime frameTimer = new ElapsedTime();
@@ -60,7 +63,8 @@ public class RobotEx {
             drivetrain,
             odometry,
             outtake,
-            intake
+            intake,
+            limelight
     };
 
     Telemetry telemetry;

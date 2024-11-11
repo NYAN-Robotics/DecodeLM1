@@ -171,12 +171,6 @@ public class MainTeleop extends LinearOpMode {
 
             frameTime = robot.update();
 
-            Pose currentPose = robot.odometry.getPose();
-
-            telemetry.addData("X Position: ", currentPose.getX());
-            telemetry.addData("Y Position: ", currentPose.getY());
-            telemetry.addData("Heading: ", currentPose.getHeading());
-
             telemetry.addData("Frame Time: ", MathHelper.truncate(frameTime, 3));
         }
     }

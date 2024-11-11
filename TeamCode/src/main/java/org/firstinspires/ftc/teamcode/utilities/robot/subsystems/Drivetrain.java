@@ -93,6 +93,13 @@ public class Drivetrain implements Subsystem {
 
         // todo: figure out the directions
 
+        drivetrainMotors = new DcMotorEx[] {
+                this.rightFrontMotor,
+                this.leftFrontMotor,
+                this.leftBackMotor,
+                this.rightBackMotor
+        };
+
 
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -102,12 +109,6 @@ public class Drivetrain implements Subsystem {
         leftBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
         rightBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
-        drivetrainMotors = new DcMotorEx[] {
-            this.rightFrontMotor,
-            this.leftFrontMotor,
-            this.leftBackMotor,
-            this.rightBackMotor
-        };
 
         drivetrainMotorGroup = new MotorGroup<>(
                 this.rightFrontMotor,
