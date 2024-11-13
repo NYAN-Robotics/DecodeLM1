@@ -62,16 +62,6 @@ public class SpecimenAuto extends LinearOpMode {
 
 
 
-        robot.update();
-        robot.pause(0.5);
-        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
-        drive.gotoPoint(new Pose(0, 20, -Math.PI / 2));
-        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
-        robot.pause(2);
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
-        drive.gotoPoint(new Pose(0, 15, -Math.PI / 2));
-
-
 
 
 

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
@@ -64,70 +65,39 @@ public class SampleAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(-7, 0, Math.PI / 2));
+        robot.odometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
-        robot.update();
-        robot.pause(0.5);
-        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
-        drive.gotoPoint(new Pose(-39.5, 8, Math.PI/4));
-        robot.pause(0.25);
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
-        robot.pause(0.25);
-        drive.gotoPoint(new Pose(-43.5-1*Math.cos(1.23), 11.5-1*Math.sin(1.23), 1.23));
-        robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
-        robot.outtake.reset();
-        robot.intake.setTargetLinkageState(Intake.LinkageStates.EXTENDED);
-        robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
-        robot.pause(1);
-        robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
-        robot.pause(0.5);
-        drive.gotoPoint(new Pose(-43.5+6*Math.cos(1.23), 11.5+6*Math.sin(1.23), 1.23));
-        robot.pause(1);
-        robot.intake.setTargetLinkageState(Intake.LinkageStates.DEFAULT);
-        drive.gotoPoint(new Pose(-39.5, 8, Math.PI/4));
-        robot.pause(0.5);
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-        robot.pause(0.5);
-        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
-        robot.pause(1);
+        robot.pause(0.05);
 
-        timer.reset();
-
-        while (timer.seconds() < 1) {
-            robot.intake.reverseIntake();
-            robot.update();
-        }
-
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
-        robot.pause(0.5);
-        robot.outtake.reset();
-
-        drive.gotoPoint(new Pose(-35-6*Math.cos(2.1), 19-6*Math.sin(2.1), 2.1));
-        robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
-        robot.outtake.reset();
-        robot.intake.setTargetLinkageState(Intake.LinkageStates.EXTENDED);
-        robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
-        robot.pause(1);
-        robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
-        robot.pause(0.5);
-        drive.gotoPoint(new Pose(-35+6*Math.cos(2.1), 19+6*Math.sin(2.1), 2.1));
+        drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
         robot.pause(2);
-        robot.intake.setTargetLinkageState(Intake.LinkageStates.DEFAULT);
-        drive.gotoPoint(new Pose(-39.5, 8, Math.PI/4));
-        robot.pause(0.5);
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-        robot.pause(0.5);
-        robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
-        robot.pause(1);
-        timer.reset();
+        drive.gotoPoint(new Pose(-48.2, -52.2, Math.PI / 2));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-57.6, -47.8, Math.PI / 2));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-44, -27, Math.PI));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
+        robot.pause(2);
+        drive.gotoPoint(new Pose(-40, -10, 0));
+        drive.gotoPoint(new Pose(-30, -10, Math.PI / 4), new MovementConstants(10, 10, 0));
 
-        while (timer.seconds() < 1) {
-            robot.intake.reverseIntake();
+
+
+
+
+
+        while (!isStopRequested()) {
             robot.update();
         }
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
-        robot.pause(0.5);
-        robot.outtake.reset();
+
+
+
+
 
 
 
