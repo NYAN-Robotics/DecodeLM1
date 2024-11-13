@@ -156,13 +156,18 @@ public class RobotEx {
 
         log.reset();
 
+        double startTime = frameTimer.milliseconds();
+
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
 
+        telemetry.addData("End Cache Clear time: ", frameTimer.milliseconds() - startTime);
+
 
         for (Subsystem subsystem : robotSubsystems) {
             subsystem.onCyclePassed();
+            telemetry.addData("Subsystem Update: ", frameTimer.milliseconds() - startTime);
         }
 
         telemetry.addLine("Refresh Rate: " + frames + " hz");

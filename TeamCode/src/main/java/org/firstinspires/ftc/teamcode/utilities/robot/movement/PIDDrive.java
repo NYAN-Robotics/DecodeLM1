@@ -24,15 +24,15 @@ public class PIDDrive {
     //  GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
     // GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
 
-    GeneralPIDController xController = new GeneralPIDController(0.3, 0, 0, 0);
-    GeneralPIDController yController = new GeneralPIDController(0.3, 0, 0, 0);
+    GeneralPIDController xController = new GeneralPIDController(0.2, 0, 1, 0);
+    GeneralPIDController yController = new GeneralPIDController(0.2, 0, 1, 0);
     GeneralPIDController headingController = new GeneralPIDController(1.5, 0, 0, 0);
 
-    public static double vMax = 60;
-    public static double aMax = 45;
+    public static double vMax = 50;
+    public static double aMax = 40;
 
-    public static double kA = 0.006;
-    public static double kV = 1 / vMax;
+    public static double kA = 0.0035;
+    public static double kV = 0.013;
 
     public static Pose threshold = new Pose(0.25, 0.25, Math.toRadians(2));
     public static double thresholdTime = 1;
@@ -119,6 +119,8 @@ public class PIDDrive {
                 );
             }
 
+            double currentAcceleration = motion.getAccelerationFromTime(currentProfileTime);
+            double currentVelocityAmount = motion.getVelocityFromTime(currentProfileTime);
             double feedforward = motion.getAccelerationFromTime(currentProfileTime) * kA + motion.getVelocityFromTime(currentProfileTime) * kV;
 
             double feedforwardX = feedforward * sineTerm;
@@ -135,9 +137,13 @@ public class PIDDrive {
                     ), -0.75, 0.75)
             );
 
-            telemetry.addData("Profile time: ", currentProfileTime);
-            telemetry.addData("Motion time: ", duration);
-            telemetry.addData("Error h: ", error.getHeading());
+            // telemetry.addData("Profile time: ", currentProfileTime);
+            // telemetry.addData("Motion time: ", duration);
+            // telemetry.addData("Error h: ", error.getHeading());
+
+            telemetry.addData("Target Velocity X: ", currentVelocityAmount * sineTerm);
+            telemetry.addData("Target Velocity Y: ", currentVelocityAmount * cosineTerm);
+
             /*
             telemetry.addData("Error y: ", error.getY());
             telemetry.addData("feedback x: ", feedbackX);

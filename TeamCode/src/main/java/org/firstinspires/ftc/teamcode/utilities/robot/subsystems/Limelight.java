@@ -13,14 +13,14 @@ import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 
 
-// 36 mm
+// 435/2 - 5 mm
 public class Limelight implements Subsystem {
 
     Limelight3A limelight;
 
     OpticalOdometry odometry;
 
-    Pose currentPose;
+    Pose currentPose = new Pose(0, 0, 0);
 
     Telemetry telemetry;
 
@@ -29,7 +29,7 @@ public class Limelight implements Subsystem {
 
         limelight = newHardwareMap.get(Limelight3A.class, "limelight");
 
-        limelight.setPollRateHz(250);
+        limelight.setPollRateHz(100);
 
         limelight.pipelineSwitch(0);
 
@@ -52,7 +52,7 @@ public class Limelight implements Subsystem {
     public void onCyclePassed() {
         if (limelight == null) return;
 
-        limelight.updateRobotOrientation(Math.toRadians(odometry.getPose().getHeading()));
+        limelight.updateRobotOrientation(Math.toDegrees(odometry.getPose().getHeading()));
 
         Pose3D botpose = null;
         LLResult result = limelight.getLatestResult();
@@ -64,15 +64,19 @@ public class Limelight implements Subsystem {
         }
 
 
+
+
         if (botpose != null) {
             Position botPosition = botpose.getPosition();
-            currentPose = new Pose(botPosition.x, botPosition.y, odometry.getPose().getHeading());
+            currentPose = new Pose(botPosition.x * 39.37, botPosition.y * 39.37, odometry.getPose().getHeading());
 
-            telemetry.addLine("--LIMELIGHT--");
-            telemetry.addData("X: ", currentPose.getX());
-            telemetry.addData("Y: ", currentPose.getY());
-            telemetry.addData("Heading: ", currentPose.getHeading());
         }
+
+
+        telemetry.addLine("--LIMELIGHT--");
+        telemetry.addData("X: ", currentPose.getX());
+        telemetry.addData("Y: ", currentPose.getY());
+        telemetry.addData("Heading: ", currentPose.getHeading());
         // Get the position of hte robot & store in a variable for access
     }
 

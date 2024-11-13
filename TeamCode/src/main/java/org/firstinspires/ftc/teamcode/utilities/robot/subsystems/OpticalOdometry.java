@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -15,7 +16,11 @@ public class OpticalOdometry implements Subsystem {
     Pose currentPose = new Pose();
     Pose lastPose = new Pose();
 
+    Pose currentVelocity = new Pose();
+
     Telemetry telemetry;
+
+    ElapsedTime poseTimer;
 
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -45,6 +50,7 @@ public class OpticalOdometry implements Subsystem {
 
         this.telemetry = telemetry;
 
+        poseTimer = new ElapsedTime();
 
     }
 
@@ -59,6 +65,7 @@ public class OpticalOdometry implements Subsystem {
         lastPose = currentPose;
 
         SparkFunOTOS.Pose2D pos = otos.getPosition();
+        // SparkFunOTOS.Pose2D vel = otos.getVelocity();
 
         currentPose = new Pose(
                 pos.x,
@@ -66,9 +73,15 @@ public class OpticalOdometry implements Subsystem {
                 Math.toRadians(pos.h)
         );
 
+
         telemetry.addData("x: ", currentPose.getX());
         telemetry.addData("y: ", currentPose.getY());
+        // telemetry.addData("x velocity: ", vel.x);
+        // telemetry.addData("y velocity: ", vel.y);
+
         telemetry.addData("h: ", currentPose.getHeading());
+
+        poseTimer.reset();
 
     }
 
