@@ -71,7 +71,7 @@ public class SampleAuto extends LinearOpMode {
 
         drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
         robot.pause(2);
-        drive.gotoPoint(new Pose(-48.2, -52.2, Math.PI / 2));
+        drive.gotoPoint(new Pose(-48.5, -52.2, Math.PI / 2));
         robot.pause(2);
         drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
         robot.pause(2);
@@ -83,8 +83,9 @@ public class SampleAuto extends LinearOpMode {
         robot.pause(2);
         drive.gotoPoint(new Pose(-54, -55, Math.PI / 4));
         robot.pause(2);
-        drive.gotoPoint(new Pose(-40, -10, 0));
-        drive.gotoPoint(new Pose(-30, -10, Math.PI / 4), new MovementConstants(10, 10, 0));
+        drive.gotoPoint(new Pose(-40, -5, -Math.PI));
+        // robot.pause(2);
+        // drive.gotoPoint(new Pose(-20, -5, -Math.PI), new MovementConstants(10, 10, 3));
 
 
 

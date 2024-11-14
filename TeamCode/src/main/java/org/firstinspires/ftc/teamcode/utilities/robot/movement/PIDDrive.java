@@ -73,7 +73,7 @@ public class PIDDrive {
         error = new Pose(
                 point.getX() - currentPose.getX(),
                 point.getY() - currentPose.getY(),
-                point.getHeading() - currentPose.getHeading()
+                AngleHelper.normDelta(point.getHeading()) - AngleHelper.normDelta(currentPose.getHeading())
         );
 
         double displacement = Math.sqrt(error.getX() * error.getX() + error.getY() * error.getY());
