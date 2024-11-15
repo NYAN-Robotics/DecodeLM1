@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.utilities.robot;
 
 import android.annotation.SuppressLint;
 
+import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -117,7 +119,7 @@ public class RobotEx {
         this.init(opMode, opMode.telemetry);
     }
 
-    public void postInit() {
+    public void postStart() {
 
         stopRequested = opMode.isStopRequested();
 
@@ -127,7 +129,16 @@ public class RobotEx {
 
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+            LynxI2cConfigureChannelCommand command = new LynxI2cConfigureChannelCommand(hub, 1, LynxI2cConfigureChannelCommand.SpeedCode.FAST_400K);
+
+            try {
+                command.send();
+            } catch (Exception e) {
+                // Fail
+            }
+
         }
+
 
         for (Subsystem subsystem : this.robotSubsystems) {
             subsystem.onOpmodeStarted();

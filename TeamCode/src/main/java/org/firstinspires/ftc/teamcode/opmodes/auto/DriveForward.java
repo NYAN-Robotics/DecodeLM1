@@ -4,11 +4,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
@@ -35,7 +33,7 @@ public class DriveForward extends LinearOpMode {
         waitForStart();
 
         // Notify subsystems before loop
-        robot.postInit();
+        robot.postStart();
 
         if (isStopRequested()) return;
 

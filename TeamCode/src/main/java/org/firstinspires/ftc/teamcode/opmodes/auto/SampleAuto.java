@@ -4,16 +4,12 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 
 /**
@@ -41,7 +37,7 @@ public class SampleAuto extends LinearOpMode {
 
         robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
         // Notify subsystems before loop
-        robot.postInit();
+        robot.postStart();
 
         if (isStopRequested()) return;
 

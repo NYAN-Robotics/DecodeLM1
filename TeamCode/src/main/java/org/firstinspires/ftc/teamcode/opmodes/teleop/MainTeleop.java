@@ -36,7 +36,7 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
 
         // Notify subsystems before loop
-        robot.postInit();
+        robot.postStart();
 
         if (isStopRequested()) return;
 
