@@ -64,13 +64,11 @@ public class PIDDrive {
     }
 
     public void gotoPoint(Pose point, MovementConstants constants) {
-        Pose error = new Pose(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-
         Pose currentPose = robot.odometry.getPose();
         Pose currentVelocity = new Pose();
 
         Pose startPosition = new Pose(currentPose.getX(), currentPose.getY(), currentPose.getHeading());
-        error = new Pose(
+        Pose error = new Pose(
                 point.getX() - currentPose.getX(),
                 point.getY() - currentPose.getY(),
                 AngleHelper.normDelta(point.getHeading()) - AngleHelper.normDelta(currentPose.getHeading())
@@ -109,7 +107,7 @@ public class PIDDrive {
             error = new Pose(
                     xTarget - currentPose.getX(),
                     yTarget - currentPose.getY(),
-                    headingTarget - currentPose.getHeading()
+                    AngleHelper.normDelta(headingTarget) - AngleHelper.normDelta(currentPose.getHeading())
             );
 
 
@@ -121,7 +119,8 @@ public class PIDDrive {
 
             double currentAcceleration = motion.getAccelerationFromTime(currentProfileTime);
             double currentVelocityAmount = motion.getVelocityFromTime(currentProfileTime);
-            double feedforward = motion.getAccelerationFromTime(currentProfileTime) * kA + motion.getVelocityFromTime(currentProfileTime) * kV;
+
+            double feedforward = currentAcceleration * kA + currentVelocityAmount * kV;
 
             double feedforwardX = feedforward * sineTerm;
             double feedforwardY = feedforward * cosineTerm;
@@ -151,7 +150,6 @@ public class PIDDrive {
 
              */
 
-            robot.update();
             error.map(Math::abs);
             currentVelocity = new Pose(currentVelocity).map(Math::abs);
 
@@ -170,6 +168,7 @@ public class PIDDrive {
                 inPosition = false;
             }
 
+            robot.update();
         }
 
         robot.drivetrain.fieldCentricDriveFromGamepad(

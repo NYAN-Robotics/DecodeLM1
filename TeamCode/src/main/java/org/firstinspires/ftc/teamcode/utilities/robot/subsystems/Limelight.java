@@ -33,7 +33,6 @@ public class Limelight implements Subsystem {
 
         limelight.pipelineSwitch(0);
 
-        limelight.start();
 
         telemetry = newTelemetry;
 
@@ -44,6 +43,7 @@ public class Limelight implements Subsystem {
     @Override
     public void onOpmodeStarted() {
         // if (limelight == null) return;
+        limelight.start();
         odometry = RobotEx.getInstance().odometry;
         // More setup
     }
