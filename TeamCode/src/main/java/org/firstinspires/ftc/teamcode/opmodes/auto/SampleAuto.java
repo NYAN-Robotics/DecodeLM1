@@ -30,7 +30,6 @@ public class SampleAuto extends LinearOpMode {
         // Initialize the robot
         robot.init(this, telemetry);
 
-
         waitForStart();
 
         robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
