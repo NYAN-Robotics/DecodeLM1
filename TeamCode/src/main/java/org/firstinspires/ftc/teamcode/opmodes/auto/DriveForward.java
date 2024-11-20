@@ -44,10 +44,6 @@ public class DriveForward extends LinearOpMode {
         Gamepad previousFrameGamepad1 = new Gamepad();
         Gamepad previousFrameGamepad2 = new Gamepad();
 
-        ElapsedTime e = new ElapsedTime();
-
-
-
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
         robot.odometry.setPose(new Pose(0, 0, Math.PI / 2));

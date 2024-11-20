@@ -33,8 +33,8 @@ public class SampleAuto extends LinearOpMode {
         waitForStart();
 
         robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-
         robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
+
         // Notify subsystems before loop
         robot.postStart();
 
