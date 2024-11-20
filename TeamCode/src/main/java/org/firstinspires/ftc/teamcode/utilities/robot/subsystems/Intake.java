@@ -52,23 +52,45 @@ public class Intake implements Subsystem {
 
     }
 
+    public enum HolderState {
+        EXTENDED(0.5),
+        DEFAULT(0.5);
+
+        public double position;
+
+        HolderState(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+    }
+
     public LinkageStates currentLinkageState = LinkageStates.DEFAULT;
     public IntakeState currentIntakeState = IntakeState.DEFAULT;
+    public HolderState currentHolderState = HolderState.DEFAULT;
 
     DcMotorEx activeMotor;
 
     Servo leftServo;
     Servo rightServo;
+
     Servo leftDropdownServo;
     Servo rightDropdownServo;
 
-    public static double startPosition = LinkageStates.DEFAULT.position;
-    public static double extendedPosition = LinkageStates.EXTENDED.position;
+    Servo holderServo;
+
+    public static double startLinkagePosition = LinkageStates.DEFAULT.position;
+    public static double extendedLinkagePosition = LinkageStates.EXTENDED.position;
 
     public static double defaultIntakePosition = IntakeState.DEFAULT.position;
     public static double extendedIntakePosition = IntakeState.EXTENDED.position;
 
-    private double targetPosition = startPosition;
+    public static double defaultHolderPosition = IntakeState.DEFAULT.position;
+    public static double extendedHolderPosition = IntakeState.EXTENDED.position;
+
+    private double targetPosition = startLinkagePosition;
 
     boolean manual = false;
     boolean reverse = false;
@@ -79,8 +101,8 @@ public class Intake implements Subsystem {
     public static double velocity = 1;
 
     private MotionProfile profile = new MotionProfile(
-            startPosition,
-            startPosition,
+            startLinkagePosition,
+            startLinkagePosition,
             vMax,
             aMax
     );
@@ -95,6 +117,8 @@ public class Intake implements Subsystem {
         rightServo = new CachingServo(newHardwareMap.get(Servo.class, "rightIntakeServo"), 1e-5);
         leftDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "leftDropdownServo"), 1e-5);
         rightDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "rightDropdownServo"), 1e-5);
+        holderServo = new CachingServo(newHardwareMap.get(Servo.class, "holderServo"), 1e-5);
+
         activeMotor = new CachingDcMotorEX(newHardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
         leftServo.setDirection(Servo.Direction.REVERSE);
@@ -121,11 +145,14 @@ public class Intake implements Subsystem {
     @Override
     public void onCyclePassed() {
 
-        LinkageStates.DEFAULT.setPosition(startPosition);
-        LinkageStates.EXTENDED.setPosition(extendedPosition);
+        LinkageStates.DEFAULT.setPosition(startLinkagePosition);
+        LinkageStates.EXTENDED.setPosition(extendedLinkagePosition);
 
         IntakeState.DEFAULT.setPosition(defaultIntakePosition);
         IntakeState.EXTENDED.setPosition(extendedIntakePosition);
+
+        HolderState.DEFAULT.setPosition(defaultHolderPosition);
+        HolderState.EXTENDED.setPosition(extendedHolderPosition);
 
         double currentTargetPosition = getCurrentPosition();
 
@@ -153,12 +180,14 @@ public class Intake implements Subsystem {
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
+        holderServo.setPosition(currentHolderState.position);
         leftServo.setPosition(currentTargetPosition);
         rightServo.setPosition(currentTargetPosition);
 
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
+        telemetry.addData("Holder State: ", holderServo);
 
         reverse = false;
     }
@@ -197,6 +226,10 @@ public class Intake implements Subsystem {
         rebuildProfile(newState.position);
 
         currentLinkageState = newState;
+    }
+
+    public void setTargetHolderState(HolderState newState) {
+        currentHolderState = newState;
     }
 
     public void incrementPositionByVelocity(double amount, double dt) {
