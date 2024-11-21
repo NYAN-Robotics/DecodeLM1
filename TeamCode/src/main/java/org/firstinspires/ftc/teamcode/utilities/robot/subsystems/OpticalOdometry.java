@@ -73,6 +73,12 @@ public class OpticalOdometry implements Subsystem {
                 Math.toRadians(pos.h)
         );
 
+        currentVelocity = new Pose(
+                (currentPose.getX() - lastPose.getX()) / poseTimer.seconds(),
+                (currentPose.getY() - lastPose.getY()) / poseTimer.seconds(),
+                (currentPose.getHeading() - lastPose.getHeading()) / poseTimer.seconds()
+        );
+
 
         telemetry.addData("x: ", currentPose.getX());
         telemetry.addData("y: ", currentPose.getY());
@@ -89,6 +95,9 @@ public class OpticalOdometry implements Subsystem {
         return currentPose;
     }
 
+    public Pose getVelocity() {
+        return currentVelocity;
+    }
     public void setPose(Pose newPose) {
         otos.setPosition(new SparkFunOTOS.Pose2D(
                 newPose.getX(),

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.Mot
 import org.firstinspires.ftc.teamcode.utilities.math.AngleHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
+import org.firstinspires.ftc.teamcode.utilities.physics.states.KinematicState;
 import org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.extensions.MotorGroup;
@@ -52,14 +53,14 @@ public class PIDDrive {
     public void gotoPoint(Pose point) {
         this.gotoPoint(
                 point,
-                new MovementConstants(vMax, aMax, DriveConstants.MAX_CORRECTION_TIME)
+                new MovementConstants(vMax, aMax, DriveConstants.MAX_CORRECTION_TIME, kV, kA)
         );
     }
 
     public void gotoPoint(Pose point, double correctionTime) {
         this.gotoPoint(
                 point,
-                new MovementConstants(vMax, aMax, correctionTime)
+                new MovementConstants(vMax, aMax, correctionTime, kV, kA)
         );
     }
 
@@ -180,6 +181,71 @@ public class PIDDrive {
         robot.update();
     }
 
+    public void gotoPoint(MovementCommand movementCommand) {
+
+        Pose currentPose = new Pose();
+        Pose currentVelocity = new Pose();
+
+        Pose error = new Pose();
+
+        ElapsedTime inPositionTime = new ElapsedTime();
+        boolean inPosition = false;
+
+        movementCommand.start();
+
+        while (!robot.stopRequested) {
+            movementCommand.update();
+
+            MovementStateCommand targetState = movementCommand.getTargetState();
+
+            currentPose = robot.odometry.getPose();
+            currentVelocity = robot.odometry.getVelocity();
+
+            error.setX(targetState.getPose().getX() - currentPose.getX());
+            error.setY(targetState.getPose().getY() - currentPose.getY());
+            error.setHeading(
+                    AngleHelper.normDelta(targetState.getPose().getHeading()) - AngleHelper.normDelta(currentPose.getHeading())
+            );
+            if (Math.abs(error.getHeading()) > Math.PI) {
+                error.setHeading(
+                        AngleHelper.norm(targetState.getPose().getHeading()) - AngleHelper.norm(currentPose.getHeading())
+                );
+            }
+
+            double feedbackX = xController.getOutputFromError(error.getX());
+            double feedbackY = yController.getOutputFromError(error.getY());
+
+            robot.drivetrain.fieldCentricDriveFromGamepad(
+                    targetState.feedforwardX + feedbackY,
+                    targetState.feedforwardY + feedbackX,
+                    -MathUtils.clamp(headingController.getOutputFromError(
+                            error.getHeading()
+                    ), -0.75, 0.75)
+            );
+
+            error.abs();
+            currentVelocity.abs();
+
+            if (error.lessThan(threshold) && movementCommand.currentTime > movementCommand.duration) {
+                if (inPosition) {
+                    if (inPositionTime.seconds() >= thresholdTime || currentVelocity.lessThan(threshold)) {
+                        break;
+                    }
+                } else {
+                    inPosition = true;
+                    inPositionTime.reset();
+                }
+            } else if (movementCommand.currentTime > movementCommand.duration + movementCommand.constants.maxCorrectionTime) {
+                break;
+            } else {
+                inPosition = false;
+            }
+
+            robot.update();
+
+        }
+    }
+
 
     public void turnToAngle(double angle, MovementConstants constants) {
         angle = AngleHelper.normDelta(angle);
@@ -248,6 +314,6 @@ public class PIDDrive {
     }
 
     public void turnToAngle(double angle) {
-        turnToAngle(angle, new MovementConstants(0, 0, DriveConstants.MAX_CORRECTION_TIME));
+        turnToAngle(angle, new MovementConstants(0, 0, DriveConstants.MAX_CORRECTION_TIME, 0, 0));
     }
 }

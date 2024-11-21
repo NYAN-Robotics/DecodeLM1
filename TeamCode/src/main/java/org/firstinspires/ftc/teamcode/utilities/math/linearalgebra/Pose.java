@@ -50,10 +50,17 @@ public class Pose {
     }
 
     public void add(Pose other) {
-        this.setX(this.getX() + other.getX());
-        this.setY(this.getY() + other.getY());
-        this.setHeading(this.getHeading() + other.getHeading());
+        x += other.x;
+        y += other.y;
+        heading += other.heading;
     }
+
+    public void subtract(Pose other) {
+        x -= other.x;
+        y -= other.y;
+        heading -= other.heading;
+    }
+
 
     public void rotated(double angle) {
         double x = this.getX();
