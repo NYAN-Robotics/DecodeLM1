@@ -58,6 +58,8 @@ public class MovementCommand {
         stateCache = new HashMap<>();
 
         constants = aConstants;
+
+        cacheStates();
     }
 
     public void start() {
