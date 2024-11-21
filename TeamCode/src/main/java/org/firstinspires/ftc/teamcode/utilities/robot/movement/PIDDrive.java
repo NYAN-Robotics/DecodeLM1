@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.movement;
 
+import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.MAX_CORRECTION_TIME;
+import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD;
+import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD_TIME;
+
 import androidx.core.math.MathUtils;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.util.MathUtil;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,7 +18,6 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.Mot
 import org.firstinspires.ftc.teamcode.utilities.math.AngleHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
-import org.firstinspires.ftc.teamcode.utilities.physics.states.KinematicState;
 import org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.extensions.MotorGroup;
@@ -53,7 +55,7 @@ public class PIDDrive {
     public void gotoPoint(Pose point) {
         this.gotoPoint(
                 point,
-                new MovementConstants(vMax, aMax, DriveConstants.MAX_CORRECTION_TIME, kV, kA)
+                new MovementConstants(vMax, aMax, MAX_CORRECTION_TIME, kV, kA)
         );
     }
 
@@ -183,8 +185,8 @@ public class PIDDrive {
 
     public void gotoPoint(MovementCommand movementCommand) {
 
-        Pose currentPose = new Pose();
-        Pose currentVelocity = new Pose();
+        Pose currentPose;
+        Pose currentVelocity;
 
         Pose error = new Pose();
 
@@ -206,6 +208,8 @@ public class PIDDrive {
             error.setHeading(
                     AngleHelper.normDelta(targetState.getPose().getHeading()) - AngleHelper.normDelta(currentPose.getHeading())
             );
+
+            telemetry.addData("Angle Error initial: ", error.getHeading());
             if (Math.abs(error.getHeading()) > Math.PI) {
                 error.setHeading(
                         AngleHelper.norm(targetState.getPose().getHeading()) - AngleHelper.norm(currentPose.getHeading())
@@ -226,20 +230,33 @@ public class PIDDrive {
             error.abs();
             currentVelocity.abs();
 
-            if (error.lessThan(threshold) && movementCommand.currentTime > movementCommand.duration) {
+            /*
+            telemetry.addData("Current Time: ", movementCommand.currentTime);
+            telemetry.addData("Snap Time: ", Math.round(movementCommand.currentTime / (1/100.0)) * (1/100.0));
+            telemetry.addData("X: ", targetState.feedforwardX + feedbackY);
+            telemetry.addData("Y: ", targetState.feedforwardY + feedbackX);
+            telemetry.addData("Feedforward: ", targetState.feedforwardX);
+            telemetry.addData("bool: ", movementCommand.currentTime > movementCommand.duration + movementCommand.constants.maxCorrectionTime);
+
+
+
+             */
+            if (error.lessThan(THRESHOLD) && movementCommand.theCurrentTime > movementCommand.theDuration) {
                 if (inPosition) {
-                    if (inPositionTime.seconds() >= thresholdTime || currentVelocity.lessThan(threshold)) {
+                    if (inPositionTime.seconds() >= movementCommand.theMovementConstants.maxCorrectionTime || currentVelocity.lessThan(THRESHOLD)) {
                         break;
                     }
                 } else {
                     inPosition = true;
                     inPositionTime.reset();
                 }
-            } else if (movementCommand.currentTime > movementCommand.duration + movementCommand.constants.maxCorrectionTime) {
+            } else if (movementCommand.theCurrentTime > movementCommand.theDuration + movementCommand.theMovementConstants.maxCorrectionTime) {
                 break;
             } else {
                 inPosition = false;
             }
+
+
 
             robot.update();
 
@@ -314,6 +331,6 @@ public class PIDDrive {
     }
 
     public void turnToAngle(double angle) {
-        turnToAngle(angle, new MovementConstants(0, 0, DriveConstants.MAX_CORRECTION_TIME, 0, 0));
+        turnToAngle(angle, new MovementConstants(0, 0, MAX_CORRECTION_TIME, 0, 0));
     }
 }

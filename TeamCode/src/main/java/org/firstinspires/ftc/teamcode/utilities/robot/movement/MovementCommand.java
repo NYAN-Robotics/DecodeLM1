@@ -13,113 +13,114 @@ import java.util.Map;
 public class MovementCommand {
 
     private final double CACHE_INCREMENT = 1/100.0;
-    private Map<Double, MovementStateCommand> stateCache;
+    private Map<Double, MovementStateCommand> theStateCache;
 
-    MovementConstants constants;
+    MovementConstants theMovementConstants;
 
-    MotionProfile motionProfile;
+    MotionProfile theMotionProfile;
 
-    ElapsedTime profileTimer;
+    ElapsedTime theProfileTimer;
 
-    Pose startPose;
-    Pose endPose;
+    Pose theStartPose;
+    Pose theEndPose;
 
-    Pose deltaPose;
+    Pose theDeltaPose;
 
-    double currentTime;
+    double theCurrentTime;
 
-    double displacement;
-    double direction;
+    double theDisplacement;
+    double theDirection;
 
-    double sine;
-    double cosine;
+    double theSine;
+    double theCosine;
 
-    double duration;
+    double theDuration;
 
     public MovementCommand(Pose aInitialPose, Pose aFinalPose, MovementConstants aConstants) {
-        startPose = aInitialPose;
-        endPose = aFinalPose;
+        theStartPose = aInitialPose;
+        theEndPose = aFinalPose;
 
-        deltaPose = (new Pose(aFinalPose));
-        deltaPose.subtract(aInitialPose);
+        theDeltaPose = (new Pose(aFinalPose));
+        theDeltaPose.subtract(aInitialPose);
 
-        displacement = deltaPose.magnitude();
+        theDisplacement = theDeltaPose.magnitude();
 
-        direction = Math.atan2(deltaPose.getY(), deltaPose.getX());
-        sine = Math.sin(direction);
-        cosine = Math.cos(direction);
+        theDirection = Math.atan2(theDeltaPose.getY(), theDeltaPose.getX());
+        theSine = Math.sin(theDirection);
+        theCosine = Math.cos(theDirection);
 
-        motionProfile = new MotionProfile(0, displacement, aConstants.velocityMax, aConstants.accelerationMax);
+        theMotionProfile = new MotionProfile(0, theDisplacement, aConstants.velocityMax, aConstants.accelerationMax);
+        theDuration = theMotionProfile.getDuration();
 
-        profileTimer = new ElapsedTime();
+        theProfileTimer = new ElapsedTime();
+        theStateCache = new HashMap<>();
 
-        currentTime = 0;
-
-        stateCache = new HashMap<>();
-
-        constants = aConstants;
+        theCurrentTime = 0;
+        theMovementConstants = aConstants;
 
         cacheStates();
     }
 
     public void start() {
-        profileTimer.reset();
+        theProfileTimer.reset();
+
+        update();
     }
 
     public void cacheStates() {
-        stateCache.clear();
+        theStateCache.clear();
 
-        for (double time = 0; time <= duration; time += 1/CACHE_INCREMENT) {
-            stateCache.put(time, getMovementStateCommand(time));
+        for (double time = 0; time <= theDuration; time += 1/CACHE_INCREMENT) {
+            theStateCache.put(time, getMovementStateCommand(time));
         }
     }
 
     public MovementStateCommand getTargetState() {
 
         // snap time to the nearest 0.01 number
-        double key = Math.round(currentTime / CACHE_INCREMENT) * CACHE_INCREMENT;;
+        double key = Math.round(theCurrentTime / CACHE_INCREMENT) * CACHE_INCREMENT;;
 
-        if (stateCache.containsKey(key)) {
-            return stateCache.get(key);
+        if (theStateCache.containsKey(key)) {
+            return theStateCache.get(key);
         } else {
 
-            MovementStateCommand targetState = getMovementStateCommand(currentTime);
+            MovementStateCommand targetState = getMovementStateCommand(theCurrentTime);
 
-            stateCache.put(currentTime, targetState);
+            theStateCache.put(theCurrentTime, targetState);
             return targetState;
         }
     }
 
-    private MovementStateCommand getMovementStateCommand(double time) {
-        KinematicState targetState = getKinematicState(time);
+    private MovementStateCommand getMovementStateCommand(double aTime) {
+        KinematicState targetState = getKinematicState(aTime);
 
-        double feedforward = constants.kV * targetState.getVelocity() + constants.kA * targetState.getAcceleration();
+        double feedforward = theMovementConstants.kV * targetState.getVelocity() + theMovementConstants.kA * targetState.getAcceleration();
 
         return new MovementStateCommand(
                 targetState.getPose(),
-                feedforward * sine,
-                feedforward * cosine
+                feedforward * theSine,
+                feedforward * theCosine
         );
     }
 
-    private KinematicState getKinematicState(double time) {
-        Pose targetPose = getTargetPose(time);
-        double velocity = motionProfile.getVelocityFromTime(time);
-        double acceleration = motionProfile.getAccelerationFromTime(time);
+    private KinematicState getKinematicState(double aTime) {
+        Pose targetPose = getTargetPose(aTime);
+        double velocity = theMotionProfile.getVelocityFromTime(aTime);
+        double acceleration = theMotionProfile.getAccelerationFromTime(aTime);
 
         return new KinematicState(targetPose, velocity, acceleration);
     }
 
-    private Pose getTargetPose(double time) {
-        double targetDisplacement = motionProfile.getPositionFromTime(time);
-        double xTarget = cosine * targetDisplacement + startPose.getX();
-        double yTarget = sine * targetDisplacement + startPose.getY();
+    private Pose getTargetPose(double aTime) {
+        double targetDisplacement = theMotionProfile.getPositionFromTime(aTime);
+        double xTarget = theCosine * targetDisplacement + theStartPose.getX();
+        double yTarget = theSine * targetDisplacement + theStartPose.getY();
 
 
         double headingTarget = MathHelper.lerp(
-                startPose.getHeading(),
-                endPose.getHeading(),
-                Math.min(time + 0.05, duration) / duration
+                theStartPose.getHeading(),
+                theEndPose.getHeading(),
+                Math.min(aTime + 0.05, theDuration) / theDuration
         );
 
         return new Pose(
@@ -130,7 +131,7 @@ public class MovementCommand {
     }
 
     public void update() {
-        currentTime = profileTimer.seconds();
+        theCurrentTime = theProfileTimer.seconds();
     }
 
 }

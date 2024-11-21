@@ -56,22 +56,20 @@ public class DriveForward extends LinearOpMode {
 
         MovementCommand initialCommand = new MovementCommand(
                 new Pose(0, 0, Math.PI / 2),
-                new Pose(0, 40, Math.PI / 2),
-                new MovementConstants(PIDDrive.vMax, PIDDrive.aMax, DriveConstants.MAX_CORRECTION_TIME, PIDDrive.kV, PIDDrive.kA)
+                new Pose(0, 40, Math.PI),
+                new MovementConstants()
         );
 
         MovementCommand returnCommand = new MovementCommand(
-                new Pose(0, 40, Math.PI / 2),
+                new Pose(0, 40, Math.PI),
                 new Pose(0, 0, Math.PI / 2),
-                new MovementConstants(PIDDrive.vMax, PIDDrive.aMax, DriveConstants.MAX_CORRECTION_TIME, PIDDrive.kV, PIDDrive.kA)
+                new MovementConstants()
         );
 
 
-        while (!isStopRequested()) {
-            drive.gotoPoint(new Pose(0, 40, Math.PI));
+        drive.gotoPoint(initialCommand);
+        drive.gotoPoint(returnCommand);
 
-            drive.gotoPoint(new Pose(0, 0, Math.PI / 4));
-        }
 
         while (!isStopRequested()) {
             robot.update();
