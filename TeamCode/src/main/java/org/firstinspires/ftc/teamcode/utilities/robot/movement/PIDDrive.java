@@ -237,10 +237,8 @@ public class PIDDrive {
             telemetry.addData("Y: ", targetState.feedforwardY + feedbackX);
             telemetry.addData("Feedforward: ", targetState.feedforwardX);
             telemetry.addData("bool: ", movementCommand.currentTime > movementCommand.duration + movementCommand.constants.maxCorrectionTime);
-
-
-
              */
+
             if (error.lessThan(THRESHOLD) && movementCommand.theCurrentTime > movementCommand.theDuration) {
                 if (inPosition) {
                     if (inPositionTime.seconds() >= movementCommand.theMovementConstants.maxCorrectionTime || currentVelocity.lessThan(THRESHOLD)) {
