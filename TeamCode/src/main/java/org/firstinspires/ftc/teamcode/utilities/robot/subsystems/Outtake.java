@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -96,6 +97,8 @@ public class Outtake implements Subsystem {
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
 
+    DcMotorEx slidesEncoderMotor;
+
     Servo leftOuttakeServo;
     Servo rightOuttakeServo;
 
@@ -105,6 +108,8 @@ public class Outtake implements Subsystem {
     DcMotorEx intakeMotor;
 
     DigitalChannel magneticLimitSwitch;
+
+    AnalogInput outtakeAnalog;
 
     OuttakeServoState currentOuttakeServoState = OuttakeServoState.DEFAULT;
     OuttakeRotationStates currentRotationState = OuttakeRotationStates.DEFAULT;
@@ -141,6 +146,8 @@ public class Outtake implements Subsystem {
         leftLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "leftLiftMotor"), 1e-5);
         rightLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "rightLiftMotor"), 1e-5);
 
+        slidesEncoderMotor = hardwareMap.get(DcMotorEx.class, "rightBackMotor");
+
         leftOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "leftOuttakeServo"), 1e-5);
         rightOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "rightOuttakeServo"), 1e-5);
 
@@ -151,6 +158,7 @@ public class Outtake implements Subsystem {
         intakeMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
         magneticLimitSwitch = hardwareMap.get(DigitalChannel.class, "slidesMagnetic");
+        outtakeAnalog = hardwareMap.get(AnalogInput.class, "outtakeAnalog");
 
         leftOuttakeServo.setDirection(Servo.Direction.FORWARD); // dir
         rightOuttakeServo.setDirection(Servo.Direction.REVERSE); // Dir
@@ -218,11 +226,11 @@ public class Outtake implements Subsystem {
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
 
-        leftOuttakeServo.setPosition(currentOuttakeServoState.position);
-        rightOuttakeServo.setPosition(currentOuttakeServoState.position);
+        // leftOuttakeServo.setPosition(currentOuttakeServoState.position);
+        // rightOuttakeServo.setPosition(currentOuttakeServoState.position);
 
-        rotationOuttakeServo.setPosition(currentRotationState.position);
-        clawServo.setPosition(currentClawState.position);
+        // rotationOuttakeServo.setPosition(currentRotationState.position);
+        // clawServo.setPosition(currentClawState.position);
 
         telemetry.addData("Outtake Servo State: ", currentOuttakeServoState);
         telemetry.addData("Outtake Position: ", currentOuttakeServoState.position);
@@ -232,6 +240,9 @@ public class Outtake implements Subsystem {
         telemetry.addData("Position: ", getCurrentSensorPosition());
         telemetry.addData("Target Position: ", profile.feedforwardProfile.getPositionFromTime(slidesTimer.seconds()));
         telemetry.addData("Magnetic Switch: ", currentSwitchState);
+        telemetry.addData("Analog Position Outtake: ", outtakeAnalog.getVoltage());
+
+        telemetry.addData("leftmotor: ", leftLiftMotor);
         liftPower = 0;
     }
 
@@ -260,7 +271,7 @@ public class Outtake implements Subsystem {
     }
 
     public double getCurrentSensorPosition() {
-        return (double) (leftLiftMotor.getCurrentPosition() + rightLiftMotor.getCurrentPosition()) / 2.00;
+        return -slidesEncoderMotor.getCurrentPosition();
     }
 
     public void setCurrentOuttakeState(OuttakeServoState newState) {

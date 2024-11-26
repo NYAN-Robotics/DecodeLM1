@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -37,7 +40,7 @@ public class Intake implements Subsystem {
     public enum IntakeState {
         PUSH_DOWN(1),
         DEFAULT(0.6),
-        EXTENDED(0.74),
+        EXTENDED(0.72),
         UP(0.45);
 
         public double position;
@@ -53,8 +56,8 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.5),
-        DEFAULT(0.5);
+        EXTENDED(0.53),
+        DEFAULT(0.9);
 
         public double position;
 
@@ -68,8 +71,8 @@ public class Intake implements Subsystem {
     }
 
     public enum LinkageHolderState {
-        CLOSED(0.5),
-        OPEN(0.5);
+        CLOSED(0.18),
+        OPEN(0);
 
         public double position;
 
@@ -99,6 +102,12 @@ public class Intake implements Subsystem {
     Servo holderServo;
 
     Servo linkageLockServo;
+
+    DigitalChannel intakeBreakbeam;
+
+    AnalogInput linkageAnalog;
+
+    RevColorSensorV3 intakeColorSensor;
 
     public static double startLinkagePosition = LinkageStates.DEFAULT.position;
     public static double extendedLinkagePosition = LinkageStates.EXTENDED.position;
@@ -143,6 +152,11 @@ public class Intake implements Subsystem {
         linkageLockServo = new CachingServo(newHardwareMap.get(Servo.class, "linkageLock"), 1e-5);
         activeMotor = new CachingDcMotorEX(newHardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
+        intakeColorSensor = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
+
+        linkageAnalog = newHardwareMap.get(AnalogInput.class, "linkageAnalog");
+        intakeBreakbeam = newHardwareMap.get(DigitalChannel.class, "intakeBreakbeam");
+
         leftServo.setDirection(Servo.Direction.REVERSE);
         rightServo.setDirection(Servo.Direction.REVERSE);
         leftDropdownServo.setDirection(Servo.Direction.REVERSE);
@@ -162,6 +176,12 @@ public class Intake implements Subsystem {
     @Override
     public void onOpmodeStarted() {
         rebuildProfile(currentLinkageState.position);
+
+        /*
+        intakeColorSensor.initialize();
+        intakeColorSensor.enableLed(true);
+         */
+
     }
 
     @Override
@@ -181,9 +201,18 @@ public class Intake implements Subsystem {
 
         double currentTargetPosition = getCurrentPosition();
 
-        telemetry.addData("Current Position!!!:", getCurrentPosition());
-        telemetry.addData("Linkage Position: ", LinkageStates.DEFAULT.position);
-        telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
+
+        // telemetry.addData("Current Position!!!:", getCurrentPosition());
+        // telemetry.addData("Linkage Position: ", LinkageStates.DEFAULT.position);
+        // telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
+        // telemetry.addData("Sample Holder State: ", currentSampleHolderState);
+        // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
+        telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
+        telemetry.addData("Analog: ", linkageAnalog.getVoltage());
+        telemetry.addData("Red: ", intakeColorSensor.red());
+        telemetry.addData("Green: ", intakeColorSensor.green());
+        telemetry.addData("Blue: ", intakeColorSensor.blue());
+        telemetry.addData("Light: ", intakeColorSensor.isLightOn());
 
         if (reverse) {
             activeMotor.setPower(-0.75);
@@ -204,8 +233,8 @@ public class Intake implements Subsystem {
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
-        // holderServo.setPosition(currentSampleHolderState.position);
-        // linkageLockServo.setPosition(currentLinkageHolderState.position);
+        holderServo.setPosition(currentSampleHolderState.position);
+        linkageLockServo.setPosition(currentLinkageHolderState.position);
 
         leftServo.setPosition(currentTargetPosition);
         rightServo.setPosition(currentTargetPosition);

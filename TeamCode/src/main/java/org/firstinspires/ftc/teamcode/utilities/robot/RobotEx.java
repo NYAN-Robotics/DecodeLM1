@@ -64,7 +64,7 @@ public class RobotEx {
     private final Subsystem[] robotSubsystems = new Subsystem[]{
             drivetrain,
             odometry,
-            //outtake,
+            outtake,
             intake,
             limelight
     };

@@ -29,7 +29,7 @@ public class Limelight implements Subsystem {
 
         limelight = newHardwareMap.get(Limelight3A.class, "limelight");
 
-        limelight.setPollRateHz(100);
+        limelight.setPollRateHz(250);
 
         limelight.pipelineSwitch(0);
 
@@ -52,7 +52,8 @@ public class Limelight implements Subsystem {
     public void onCyclePassed() {
         if (limelight == null) return;
 
-        // limelight.updateRobotOrientation(Math.toDegrees(odometry.getPose().getHeading()));
+        double angle = Math.toDegrees(odometry.getPose().getHeading());
+        // limelight.updateRobotOrientation(0);
 
         Pose3D botpose = null;
         LLResult result = limelight.getLatestResult();
