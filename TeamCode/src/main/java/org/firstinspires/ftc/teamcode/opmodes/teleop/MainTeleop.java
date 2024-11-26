@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
-import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
@@ -157,11 +156,11 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
-                robot.intake.setTargetHolderState(Intake.HolderState.DEFAULT);
+                robot.intake.setTargetHolderState(Intake.SampleHolderState.DEFAULT);
             }
 
             if (currentFrameGamepad1.square && !previousFrameGamepad1.square) {
-                robot.intake.setTargetHolderState(Intake.HolderState.EXTENDED);
+                robot.intake.setTargetHolderState(Intake.SampleHolderState.EXTENDED);
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {

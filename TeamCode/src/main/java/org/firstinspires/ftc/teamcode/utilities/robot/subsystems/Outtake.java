@@ -144,7 +144,7 @@ public class Outtake implements Subsystem {
         leftOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "leftOuttakeServo"), 1e-5);
         rightOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "rightOuttakeServo"), 1e-5);
 
-        rotationOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "wrist"), 1e-5);
+        rotationOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "clawRotation"), 1e-5);
 
         clawServo = new CachingServo(hardwareMap.get(Servo.class, "claw"), 1e-5);
 

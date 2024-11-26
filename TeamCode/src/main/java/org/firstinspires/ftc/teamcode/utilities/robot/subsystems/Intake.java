@@ -36,8 +36,8 @@ public class Intake implements Subsystem {
 
     public enum IntakeState {
         PUSH_DOWN(1),
-        DEFAULT(0.56),
-        EXTENDED(0.76),
+        DEFAULT(0.6),
+        EXTENDED(0.74),
         UP(0.45);
 
         public double position;
@@ -52,13 +52,13 @@ public class Intake implements Subsystem {
 
     }
 
-    public enum HolderState {
+    public enum SampleHolderState {
         EXTENDED(0.5),
         DEFAULT(0.5);
 
         public double position;
 
-        HolderState(double position) {
+        SampleHolderState(double position) {
             this.position = position;
         }
 
@@ -67,9 +67,26 @@ public class Intake implements Subsystem {
         }
     }
 
+    public enum LinkageHolderState {
+        CLOSED(0.5),
+        OPEN(0.5);
+
+        public double position;
+
+        LinkageHolderState(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+    }
+
+
     public LinkageStates currentLinkageState = LinkageStates.DEFAULT;
     public IntakeState currentIntakeState = IntakeState.DEFAULT;
-    public HolderState currentHolderState = HolderState.DEFAULT;
+    public SampleHolderState currentSampleHolderState = SampleHolderState.DEFAULT;
+    public LinkageHolderState currentLinkageHolderState = LinkageHolderState.OPEN;
 
     DcMotorEx activeMotor;
 
@@ -81,14 +98,19 @@ public class Intake implements Subsystem {
 
     Servo holderServo;
 
+    Servo linkageLockServo;
+
     public static double startLinkagePosition = LinkageStates.DEFAULT.position;
     public static double extendedLinkagePosition = LinkageStates.EXTENDED.position;
 
     public static double defaultIntakePosition = IntakeState.DEFAULT.position;
     public static double extendedIntakePosition = IntakeState.EXTENDED.position;
 
-    public static double defaultHolderPosition = IntakeState.DEFAULT.position;
-    public static double extendedHolderPosition = IntakeState.EXTENDED.position;
+    public static double defaultLinkageHolderPosition = LinkageHolderState.OPEN.position;
+    public static double extendedLinkageHolderPosition = LinkageHolderState.CLOSED.position;
+
+    public static double defaultSampleHolderPosition = SampleHolderState.DEFAULT.position;
+    public static double extendedSampleHolderPosition = SampleHolderState.EXTENDED.position;
 
     private double targetPosition = startLinkagePosition;
 
@@ -113,12 +135,12 @@ public class Intake implements Subsystem {
 
     @Override
     public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
-        leftServo = new CachingServo(newHardwareMap.get(Servo.class, "leftIntakeServo"), 1e-5);
-        rightServo = new CachingServo(newHardwareMap.get(Servo.class, "rightIntakeServo"), 1e-5);
-        leftDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "leftDropdownServo"), 1e-5);
-        rightDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "rightDropdownServo"), 1e-5);
-        holderServo = new CachingServo(newHardwareMap.get(Servo.class, "holderServo"), 1e-5);
-
+        leftServo = new CachingServo(newHardwareMap.get(Servo.class, "leftIntakeLinkageServo"), 1e-5);
+        rightServo = new CachingServo(newHardwareMap.get(Servo.class, "rightIntakeLinkageServo"), 1e-5);
+        leftDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "leftIntakeDropdownServo"), 1e-5);
+        rightDropdownServo = new CachingServo(newHardwareMap.get(Servo.class, "rightIntakeDropdownServo"), 1e-5);
+        holderServo = new CachingServo(newHardwareMap.get(Servo.class, "intakeHolderServo"), 1e-5);
+        linkageLockServo = new CachingServo(newHardwareMap.get(Servo.class, "linkageLock"), 1e-5);
         activeMotor = new CachingDcMotorEX(newHardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
         leftServo.setDirection(Servo.Direction.REVERSE);
@@ -151,8 +173,11 @@ public class Intake implements Subsystem {
         IntakeState.DEFAULT.setPosition(defaultIntakePosition);
         IntakeState.EXTENDED.setPosition(extendedIntakePosition);
 
-        HolderState.DEFAULT.setPosition(defaultHolderPosition);
-        HolderState.EXTENDED.setPosition(extendedHolderPosition);
+        SampleHolderState.DEFAULT.setPosition(defaultSampleHolderPosition);
+        SampleHolderState.EXTENDED.setPosition(extendedSampleHolderPosition);
+
+        LinkageHolderState.OPEN.setPosition(defaultLinkageHolderPosition);
+        LinkageHolderState.CLOSED.setPosition(extendedLinkageHolderPosition);
 
         double currentTargetPosition = getCurrentPosition();
 
@@ -161,7 +186,7 @@ public class Intake implements Subsystem {
         telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
 
         if (reverse) {
-            activeMotor.setPower(-0.5);
+            activeMotor.setPower(-0.75);
         } else if (currentIntakeState == IntakeState.EXTENDED && getCurrentPosition()-0.01 > LinkageStates.DEFAULT.position) {
             activeMotor.setPower(1);
         } else if (RobotEx.getInstance().outtake.slidesTimer.seconds() < 1) {
@@ -176,11 +201,12 @@ public class Intake implements Subsystem {
             this.setIntakeState(IntakeState.EXTENDED);
         }
 
-
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
-        holderServo.setPosition(currentHolderState.position);
+        // holderServo.setPosition(currentSampleHolderState.position);
+        // linkageLockServo.setPosition(currentLinkageHolderState.position);
+
         leftServo.setPosition(currentTargetPosition);
         rightServo.setPosition(currentTargetPosition);
 
@@ -228,8 +254,8 @@ public class Intake implements Subsystem {
         currentLinkageState = newState;
     }
 
-    public void setTargetHolderState(HolderState newState) {
-        currentHolderState = newState;
+    public void setTargetHolderState(SampleHolderState newState) {
+        currentSampleHolderState = newState;
     }
 
     public void incrementPositionByVelocity(double amount, double dt) {
