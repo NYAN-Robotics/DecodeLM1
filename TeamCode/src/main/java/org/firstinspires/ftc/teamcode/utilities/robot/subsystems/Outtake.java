@@ -41,10 +41,10 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.625),
+        DEFAULT(0.5),
         BACK_PICKUP(0.95),
         AUTO_DEFAULT(0.37),
-        EXTENDED(0.1);
+        EXTENDED(1);
 
         public double position;
 
@@ -77,9 +77,9 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeClawStates {
-        FULL_DEFAULT(1),
-        DEFAULT(0.85),
-        CLOSED(0.35);
+        FULL_DEFAULT(0),
+        DEFAULT(0.465),
+        CLOSED(0.535);
 
         public double position;
 
@@ -226,11 +226,11 @@ public class Outtake implements Subsystem {
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
 
-        // leftOuttakeServo.setPosition(currentOuttakeServoState.position);
-        // rightOuttakeServo.setPosition(currentOuttakeServoState.position);
+        leftOuttakeServo.setPosition(currentOuttakeServoState.position);
+        rightOuttakeServo.setPosition(currentOuttakeServoState.position);
 
-        // rotationOuttakeServo.setPosition(currentRotationState.position);
-        // clawServo.setPosition(currentClawState.position);
+        rotationOuttakeServo.setPosition(currentRotationState.position);
+        clawServo.setPosition(currentClawState.position);
 
         telemetry.addData("Outtake Servo State: ", currentOuttakeServoState);
         telemetry.addData("Outtake Position: ", currentOuttakeServoState.position);
@@ -242,7 +242,6 @@ public class Outtake implements Subsystem {
         telemetry.addData("Magnetic Switch: ", currentSwitchState);
         telemetry.addData("Analog Position Outtake: ", outtakeAnalog.getVoltage());
 
-        telemetry.addData("leftmotor: ", leftLiftMotor);
         liftPower = 0;
     }
 

@@ -126,7 +126,7 @@ public class Intake implements Subsystem {
     boolean manual = false;
     boolean reverse = false;
 
-    public static double aMax = 2.5;
+    public static double aMax = 1;
     public static double vMax = 5;
 
     public static double velocity = 1;
@@ -209,13 +209,14 @@ public class Intake implements Subsystem {
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
+        /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
         telemetry.addData("Light: ", intakeColorSensor.isLightOn());
-
+         */
         if (reverse) {
-            activeMotor.setPower(-0.75);
+            activeMotor.setPower(-1);
         } else if (currentIntakeState == IntakeState.EXTENDED && getCurrentPosition()-0.01 > LinkageStates.DEFAULT.position) {
             activeMotor.setPower(1);
         } else if (RobotEx.getInstance().outtake.slidesTimer.seconds() < 1) {
