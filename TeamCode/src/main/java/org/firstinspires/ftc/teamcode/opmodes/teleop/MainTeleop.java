@@ -139,13 +139,15 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {
-                if (robot.outtake.getSlidesState() != Outtake.OuttakeSlidesStates.DEFAULT) {
-                    robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.BACK_PICKUP);
-                }
+                robot.outtake.setCurrentPivotState(Outtake.OuttakePivotStates.DOWN);
             }
 
             if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
-                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.EXTENDED);
+                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.BACK_PICKUP);
+            }
+
+            if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
+                robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
             }
 
             if (currentFrameGamepad2.square && !previousFrameGamepad2.square) {
@@ -153,6 +155,7 @@ public class MainTeleop extends LinearOpMode {
                 robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
                 robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
                 robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
+                robot.outtake.setCurrentPivotState(Outtake.OuttakePivotStates.DEFAULT);
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {

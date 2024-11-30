@@ -41,8 +41,8 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.5),
-        BACK_PICKUP(0.95),
+        DEFAULT(0.6),
+        BACK_PICKUP(0.25),
         AUTO_DEFAULT(0.37),
         EXTENDED(1);
 
@@ -78,8 +78,8 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
-        DEFAULT(0.465),
-        CLOSED(0.535);
+        DEFAULT(0.6),
+        CLOSED(0.69);
 
         public double position;
 
@@ -94,6 +94,25 @@ public class Outtake implements Subsystem {
 
     }
 
+    public enum OuttakePivotStates {
+        DEFAULT(0.5),
+        DOWN(0);
+
+        public double position;
+
+        // Constructor
+        OuttakePivotStates(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+
+    }
+
+
+
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
 
@@ -104,6 +123,8 @@ public class Outtake implements Subsystem {
 
     Servo rotationOuttakeServo;
     Servo clawServo;
+
+    Servo clawPivot;
 
     DcMotorEx intakeMotor;
 
@@ -116,6 +137,7 @@ public class Outtake implements Subsystem {
     OuttakeClawStates currentClawState = OuttakeClawStates.DEFAULT;
     OuttakeSlidesStates currentSlideState = OuttakeSlidesStates.DEFAULT;
     OuttakeSlidesStates previousSlideState = OuttakeSlidesStates.DEFAULT;
+    OuttakePivotStates currentPivotState = OuttakePivotStates.DEFAULT;
 
     public static double kP = 0.0025;
     public static double kI = 0;
@@ -154,6 +176,7 @@ public class Outtake implements Subsystem {
         rotationOuttakeServo = new CachingServo(hardwareMap.get(Servo.class, "clawRotation"), 1e-5);
 
         clawServo = new CachingServo(hardwareMap.get(Servo.class, "claw"), 1e-5);
+        clawPivot = new CachingServo(hardwareMap.get(Servo.class, "clawPivot"), 1e-5);
 
         intakeMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
@@ -232,10 +255,13 @@ public class Outtake implements Subsystem {
         rotationOuttakeServo.setPosition(currentRotationState.position);
         clawServo.setPosition(currentClawState.position);
 
+        clawPivot.setPosition(currentPivotState.position);
+
         telemetry.addData("Outtake Servo State: ", currentOuttakeServoState);
         telemetry.addData("Outtake Position: ", currentOuttakeServoState.position);
 
         telemetry.addData("Rotation State: ", currentRotationState);
+        telemetry.addData("Pivot State: ", currentPivotState);
         telemetry.addData("Claw State: ", currentClawState);
         telemetry.addData("Position: ", getCurrentSensorPosition());
         telemetry.addData("Target Position: ", profile.feedforwardProfile.getPositionFromTime(slidesTimer.seconds()));
@@ -279,6 +305,10 @@ public class Outtake implements Subsystem {
 
     public void setCurrentRotationState(OuttakeRotationStates newState) {
         currentRotationState = newState;
+    }
+
+    public void setCurrentPivotState(OuttakePivotStates newState) {
+        currentPivotState = newState;
     }
 
     public void setCurrentClawState(OuttakeClawStates newState) {

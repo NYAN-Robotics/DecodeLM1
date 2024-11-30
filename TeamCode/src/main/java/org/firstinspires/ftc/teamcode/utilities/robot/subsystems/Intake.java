@@ -235,6 +235,7 @@ public class Intake implements Subsystem {
         rightDropdownServo.setPosition(currentIntakeState.position);
 
         holderServo.setPosition(currentSampleHolderState.position);
+
         linkageLockServo.setPosition(currentLinkageHolderState.position);
 
         leftServo.setPosition(currentTargetPosition);
