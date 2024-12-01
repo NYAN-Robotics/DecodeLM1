@@ -12,8 +12,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
+import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
+import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
@@ -85,11 +88,38 @@ public class Intake implements Subsystem {
         }
     }
 
+    public enum IntakeMotorStates {
+        INTAKING(1),
+        HOLD(0.2),
+        STATIONARY(0),
+        SLOW_REVERSE(-0.4),
+        REVERSE(-0.75);
+
+        public double position;
+
+        IntakeMotorStates(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+    }
+
+    public enum SampleContained {
+        NONE,
+        BLUE,
+        RED,
+        YELLOW
+    }
+
 
     public LinkageStates currentLinkageState = LinkageStates.DEFAULT;
     public IntakeState currentIntakeState = IntakeState.DEFAULT;
     public SampleHolderState currentSampleHolderState = SampleHolderState.DEFAULT;
     public LinkageHolderState currentLinkageHolderState = LinkageHolderState.OPEN;
+    public IntakeMotorStates currentIntakeMotorState = IntakeMotorStates.STATIONARY;
+    public SampleContained sampleContained = SampleContained.NONE;
 
     DcMotorEx activeMotor;
 
@@ -125,6 +155,9 @@ public class Intake implements Subsystem {
 
     boolean manual = false;
     boolean reverse = false;
+
+    boolean lastBreakbeamState = false;
+    boolean currentBreakbeamState = false;
 
     public static double aMax = 1;
     public static double vMax = 5;
@@ -163,11 +196,10 @@ public class Intake implements Subsystem {
         rightDropdownServo.setDirection(Servo.Direction.FORWARD);
 
         activeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         activeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         activeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
         telemetry = newTelemetry;
@@ -182,10 +214,16 @@ public class Intake implements Subsystem {
         intakeColorSensor.enableLed(true);
          */
 
+        setIntakeMotorState(IntakeMotorStates.STATIONARY);
+        setTargetLinkageState(LinkageStates.DEFAULT);
+        setIntakeState(IntakeState.DEFAULT);
     }
 
     @Override
     public void onCyclePassed() {
+
+        lastBreakbeamState = currentBreakbeamState;
+        currentBreakbeamState = !intakeBreakbeam.getState();
 
         LinkageStates.DEFAULT.setPosition(startLinkagePosition);
         LinkageStates.EXTENDED.setPosition(extendedLinkagePosition);
@@ -207,14 +245,18 @@ public class Intake implements Subsystem {
         // telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
         // telemetry.addData("Sample Holder State: ", currentSampleHolderState);
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
-        telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
+        telemetry.addData("Breakbeam state: ", currentBreakbeamState);
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
+        telemetry.addData("Possessed Color: ", sampleContained);
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
-        telemetry.addData("Light: ", intakeColorSensor.isLightOn());
+
+
+
          */
+        /*
         if (reverse) {
             activeMotor.setPower(-1);
         } else if (currentIntakeState == IntakeState.EXTENDED && getCurrentPosition()-0.01 > LinkageStates.DEFAULT.position) {
@@ -227,9 +269,32 @@ public class Intake implements Subsystem {
             activeMotor.setPower(0.);
         }
 
-        if (currentLinkageState == LinkageStates.DEFAULT && profile.getDuration() <= linkageTimer.seconds() && currentIntakeState == IntakeState.DEFAULT) {
-            this.setIntakeState(IntakeState.EXTENDED);
+         */
+
+        if (currentBreakbeamState && !lastBreakbeamState) {
+            updatePossessedColor();
+
+            boolean wrongColor = false;
+
+            if (Globals.ALLIANCE == Alliance.RED && sampleContained == SampleContained.BLUE) {
+                wrongColor = true;
+            } else if (Globals.ALLIANCE == Alliance.BLUE && sampleContained == SampleContained.RED) {
+                wrongColor = true;
+
+            }
+
+            if (!wrongColor) {
+                setTargetLinkageState(LinkageStates.DEFAULT);
+                setTargetHolderState(SampleHolderState.EXTENDED);
+                setIntakeState(IntakeState.DEFAULT);
+                setIntakeMotorState(IntakeMotorStates.SLOW_REVERSE);
+            } else {
+                setTargetHolderState(SampleHolderState.DEFAULT);
+                setIntakeMotorState(IntakeMotorStates.REVERSE);
+                setIntakeState(IntakeState.DEFAULT);
+            }
         }
+
 
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
@@ -241,6 +306,9 @@ public class Intake implements Subsystem {
         leftServo.setPosition(currentTargetPosition);
         rightServo.setPosition(currentTargetPosition);
 
+        activeMotor.setPower(currentIntakeMotorState.position);
+
+        telemetry.addData("Intake Motor Current: ", activeMotor.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
@@ -250,7 +318,7 @@ public class Intake implements Subsystem {
     }
 
     public void setTargetPosition(double newPosition) {
-        targetPosition = MathHelper.clamp(newPosition, 0, 1);
+        targetPosition = MathHelper.clamp(newPosition, LinkageStates.DEFAULT.position, LinkageStates.EXTENDED.position);
 
         manual = true;
     }
@@ -290,18 +358,40 @@ public class Intake implements Subsystem {
     }
 
     public void incrementPositionByVelocity(double amount, double dt) {
-        manual = true;
 
-        targetPosition += amount * velocity * dt;
+        targetPosition = getCurrentPosition() + amount * velocity * dt;
 
         targetPosition = MathHelper.clamp(targetPosition, LinkageStates.DEFAULT.position, LinkageStates.EXTENDED.position);
+
+        manual = true;
+
     }
 
     public void setIntakeState(IntakeState newState) {
         currentIntakeState = newState;
     }
 
+    public void setIntakeMotorState(IntakeMotorStates newState) {
+        currentIntakeMotorState = newState;
+    }
+
     public void reverseIntake() {
         reverse = true;
+    }
+
+    public void updatePossessedColor() {
+        int green = intakeColorSensor.green();
+        int red = intakeColorSensor.red();
+        int blue = intakeColorSensor.blue();
+
+        if (green > red && green > blue) {
+            sampleContained = SampleContained.YELLOW;
+        } else if (red > green && red > blue) {
+            sampleContained = SampleContained.RED;
+        } else if (blue > green && blue > red) {
+            sampleContained = SampleContained.BLUE;
+        } else {
+            sampleContained = SampleContained.NONE;
+        }
     }
 }
