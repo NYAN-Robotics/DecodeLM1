@@ -182,6 +182,8 @@ public class Intake implements Subsystem {
 
     Telemetry telemetry;
 
+    RobotEx robot;
+
     @Override
     public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
         leftServo = new CachingServo(newHardwareMap.get(Servo.class, "leftIntakeLinkageServo"), 1e-5);
@@ -222,6 +224,8 @@ public class Intake implements Subsystem {
         setIntakeMotorState(IntakeMotorStates.STATIONARY);
         setTargetLinkageState(LinkageStates.DEFAULT);
         setIntakeState(IntakeState.DEFAULT);
+
+        robot = RobotEx.getInstance();
     }
 
     @Override
@@ -307,21 +311,7 @@ public class Intake implements Subsystem {
                 }
 
                 if (!wrongColor) {
-                    RobotEx.getInstance().commandScheduler.scheduleCommand(
-                            new SequentialCommand(
-                                    new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                                    new YieldCommand(100),
-                                    new ParallelCommand(
-                                            new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.SLOW_REVERSE)),
-                                            new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
-                                            new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))
-                                    ),
-                                    new PrintCommand("Command Finished"),
-                                    new YieldCommand(250),
-                                    new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
-                                    new YieldCommand(100)
-                            )
-                    );
+                    returnSlides();
                 } else {
                     RobotEx.getInstance().commandScheduler.scheduleCommand(
                             new SequentialCommand(
@@ -342,6 +332,12 @@ public class Intake implements Subsystem {
             setTargetHolderState(SampleHolderState.DEFAULT);
         }
 
+        if (linkageAtHome() && !manual) {
+            setLinkageHolderState(LinkageHolderState.CLOSED);
+        } else {
+            setLinkageHolderState(LinkageHolderState.OPEN);
+        }
+
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
@@ -355,6 +351,8 @@ public class Intake implements Subsystem {
         activeMotor.setPower(currentIntakeMotorState.position);
 
         telemetry.addData("Intake State: ", currentLinkageState);
+        telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
+        telemetry.addData("Intake Motor State: ", currentIntakeMotorState);
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Holder State: ", holderServo);
@@ -457,7 +455,35 @@ public class Intake implements Subsystem {
     }
 
     public boolean linkageAtHome() {
-        return Math.abs(getCurrentPosition() - LinkageStates.DEFAULT.position) < 0.01;
+        return  linkageAnalog.getVoltage() < 0.165 && currentLinkageState == LinkageStates.DEFAULT; // linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT;
+    }
+
+    public void setLinkageHolderState(LinkageHolderState newState) {
+        currentLinkageHolderState = newState;
+    }
+
+    public boolean linkageAtTargetPosition() {
+        return profile.getDuration() < linkageTimer.seconds();
+    }
+
+    public void returnSlides() {
+        robot.commandScheduler.scheduleCommand(
+                new SequentialCommand(
+                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
+                        new YieldCommand(100),
+                        new ParallelCommand(
+                                new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
+                                new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                                new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))
+                        ),
+                        new YieldCommand(1000),
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
+                        new OneTimeCommand(() -> robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
+                        new YieldCommand(500),
+                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
+                )
+        );
+
     }
 
 }

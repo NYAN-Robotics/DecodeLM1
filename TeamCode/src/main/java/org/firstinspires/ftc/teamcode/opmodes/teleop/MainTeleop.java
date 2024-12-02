@@ -9,6 +9,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
@@ -89,8 +93,7 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad1.left_bumper && !previousFrameGamepad1.left_bumper) {
-                robot.intake.setTargetLinkageState(Intake.LinkageStates.DEFAULT);
-                robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
+                robot.intake.returnSlides();
             }
 
             if (currentFrameGamepad1.right_bumper && !previousFrameGamepad1.right_bumper) {
@@ -140,9 +143,10 @@ public class MainTeleop extends LinearOpMode {
                 robot.outtake.setCurrentPivotState(Outtake.OuttakePivotStates.DOWN);
             }
 
+            /*
             if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
                 robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.BACK_PICKUP);
-            }
+            }*/
 
             if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
                 robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);

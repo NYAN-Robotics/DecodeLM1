@@ -21,7 +21,7 @@ public class OneTimeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        theInitializationCommand.initialize();
+
     }
 
     @Override
@@ -36,6 +36,7 @@ public class OneTimeCommand extends CommandBase {
 
     @Override
     public void onFinish() {
-
+        theInitializationCommand.initialize();
+        System.out.println("OneTimeCommand Running");
     }
 }

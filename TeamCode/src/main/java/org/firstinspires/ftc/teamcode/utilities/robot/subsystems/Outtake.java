@@ -41,7 +41,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.6),
+        DEFAULT(0.66),
         BACK_PICKUP(0.25),
         AUTO_DEFAULT(0.37),
         EXTENDED(1);
@@ -249,8 +249,8 @@ public class Outtake implements Subsystem {
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
 
-        // leftOuttakeServo.setPosition(currentOuttakeServoState.position);
-        // rightOuttakeServo.setPosition(currentOuttakeServoState.position);
+        leftOuttakeServo.setPosition(currentOuttakeServoState.position);
+        rightOuttakeServo.setPosition(currentOuttakeServoState.position);
 
         rotationOuttakeServo.setPosition(currentRotationState.position);
         clawServo.setPosition(currentClawState.position);
