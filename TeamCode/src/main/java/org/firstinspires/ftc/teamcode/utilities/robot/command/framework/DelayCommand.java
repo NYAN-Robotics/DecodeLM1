@@ -9,6 +9,10 @@ public abstract class DelayCommand extends CommandBase {
         theDelay = aDelay;
     }
 
+    public DelayCommand(long aDuration, Object o) {
+        super();
+    }
+
     @Override
     public void onSchedule() {
         theTargetExecutionTime = System.currentTimeMillis() + theDelay;

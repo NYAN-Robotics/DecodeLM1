@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
 
 public class OneTimeCommand extends CommandBase {
 
-    private AnonymousInitializationCommand theInitializationCommand;
+    private AnonymousRunFunction theInitializationCommand;
 
-    public OneTimeCommand(AnonymousInitializationCommand aCommand) {
+    public OneTimeCommand(AnonymousRunFunction aCommand) {
         theInitializationCommand = aCommand;
     }
 
@@ -36,7 +36,7 @@ public class OneTimeCommand extends CommandBase {
 
     @Override
     public void onFinish() {
-        theInitializationCommand.initialize();
+        theInitializationCommand.execute();
         System.out.println("OneTimeCommand Running");
     }
 }

@@ -70,5 +70,4 @@ public class MotionProfiledMotion {
         return timer.seconds() >= feedforwardProfile.getDuration();
     }
 
-
 }

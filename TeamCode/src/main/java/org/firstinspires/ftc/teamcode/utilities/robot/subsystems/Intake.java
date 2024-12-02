@@ -455,7 +455,7 @@ public class Intake implements Subsystem {
     }
 
     public boolean linkageAtHome() {
-        return  linkageAnalog.getVoltage() < 0.165 && currentLinkageState == LinkageStates.DEFAULT; // linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT;
+        return linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT; // linkageAnalog.getVoltage() < 0.165 && currentLinkageState == LinkageStates.DEFAULT; // linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT;
     }
 
     public void setLinkageHolderState(LinkageHolderState newState) {

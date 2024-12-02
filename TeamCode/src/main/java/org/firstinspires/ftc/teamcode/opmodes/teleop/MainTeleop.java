@@ -126,9 +126,13 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
-                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.HOVER);
-                robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED);
-                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.FULL_DEFAULT);
+                robot.commandScheduler.scheduleCommand(
+                        new SequentialCommand(
+                                new OneTimeCommand(() -> robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
+                                new YieldCommand(2000, () -> robot.outtake.atTargetPosition())
+
+                        )
+                );
             }
 
             if (currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) {

@@ -41,7 +41,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.66),
+        DEFAULT(0.425),
         BACK_PICKUP(0.25),
         AUTO_DEFAULT(0.37),
         EXTENDED(1);
@@ -112,6 +112,11 @@ public class Outtake implements Subsystem {
     }
 
 
+    public static double defaultPivotPosition = OuttakePivotStates.DEFAULT.position;
+    public static double extendedPivotPosition = OuttakePivotStates.DOWN.position;
+
+    public static double defaultOuttakeRotationPosition = OuttakeServoState.DEFAULT.position;
+    public static double rotatedOuttakeRotationPosition = OuttakeServoState.EXTENDED.position;
 
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
@@ -206,6 +211,12 @@ public class Outtake implements Subsystem {
 
     @Override
     public void onCyclePassed() {
+
+        OuttakePivotStates.DEFAULT.position = defaultPivotPosition;
+        OuttakePivotStates.DOWN.position = extendedPivotPosition;
+
+        OuttakeServoState.DEFAULT.position = defaultOuttakeRotationPosition;
+        OuttakeServoState.EXTENDED.position = rotatedOuttakeRotationPosition;
 
         profile.setPIDCoefficients(kP, kI, kD, kF);
         profile.setProfileCoefficients(kV, kA, vMax, aMax);
