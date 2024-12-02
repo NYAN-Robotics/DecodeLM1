@@ -12,12 +12,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.PrintCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
@@ -41,10 +46,8 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        PUSH_DOWN(1),
         DEFAULT(0.6),
-        EXTENDED(0.72),
-        UP(0.45);
+        EXTENDED(0.72);
 
         public double position;
 
@@ -159,6 +162,10 @@ public class Intake implements Subsystem {
     boolean lastBreakbeamState = false;
     boolean currentBreakbeamState = false;
 
+    ElapsedTime containedTimer = new ElapsedTime();
+
+    boolean scheduledAutomation = false;
+
     public static double aMax = 1;
     public static double vMax = 5;
 
@@ -209,10 +216,8 @@ public class Intake implements Subsystem {
     public void onOpmodeStarted() {
         rebuildProfile(currentLinkageState.position);
 
-        /*
-        intakeColorSensor.initialize();
-        intakeColorSensor.enableLed(true);
-         */
+        leftServo.setPosition(leftServo.getPosition() + 0.01);
+        rightServo.setPosition(rightServo.getPosition() + 0.01);
 
         setIntakeMotorState(IntakeMotorStates.STATIONARY);
         setTargetLinkageState(LinkageStates.DEFAULT);
@@ -223,7 +228,7 @@ public class Intake implements Subsystem {
     public void onCyclePassed() {
 
         lastBreakbeamState = currentBreakbeamState;
-        currentBreakbeamState = !intakeBreakbeam.getState();
+        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 1; // !intakeBreakbeam.getState();
 
         LinkageStates.DEFAULT.setPosition(startLinkagePosition);
         LinkageStates.EXTENDED.setPosition(extendedLinkagePosition);
@@ -247,6 +252,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Breakbeam state: ", currentBreakbeamState);
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
+        telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
@@ -271,30 +277,70 @@ public class Intake implements Subsystem {
 
          */
 
+        if (manual) {
+            setIntakeMotorState(IntakeMotorStates.INTAKING);
+            setIntakeState(IntakeState.EXTENDED);
+        }
+
         if (currentBreakbeamState && !lastBreakbeamState) {
-            updatePossessedColor();
+            containedTimer.reset();
+            scheduledAutomation = true;
+        }
 
-            boolean wrongColor = false;
-
-            if (Globals.ALLIANCE == Alliance.RED && sampleContained == SampleContained.BLUE) {
-                wrongColor = true;
-            } else if (Globals.ALLIANCE == Alliance.BLUE && sampleContained == SampleContained.RED) {
-                wrongColor = true;
-
+        if (scheduledAutomation) {
+            if (!currentBreakbeamState) {
+                scheduledAutomation = false;
             }
 
-            if (!wrongColor) {
-                setTargetLinkageState(LinkageStates.DEFAULT);
-                setTargetHolderState(SampleHolderState.EXTENDED);
-                setIntakeState(IntakeState.DEFAULT);
-                setIntakeMotorState(IntakeMotorStates.SLOW_REVERSE);
-            } else {
-                setTargetHolderState(SampleHolderState.DEFAULT);
-                setIntakeMotorState(IntakeMotorStates.REVERSE);
-                setIntakeState(IntakeState.DEFAULT);
+            if (containedTimer.seconds() > 0.05) {
+                scheduledAutomation = false;
+
+                updatePossessedColor();
+
+                boolean wrongColor = false;
+
+                if (Globals.ALLIANCE == Alliance.RED && sampleContained == SampleContained.BLUE) {
+                    wrongColor = true;
+                } else if (Globals.ALLIANCE == Alliance.BLUE && sampleContained == SampleContained.RED) {
+                    wrongColor = true;
+
+                }
+
+                if (!wrongColor) {
+                    RobotEx.getInstance().commandScheduler.scheduleCommand(
+                            new SequentialCommand(
+                                    new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
+                                    new YieldCommand(100),
+                                    new ParallelCommand(
+                                            new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.SLOW_REVERSE)),
+                                            new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                                            new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))
+                                    ),
+                                    new PrintCommand("Command Finished"),
+                                    new YieldCommand(250),
+                                    new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
+                                    new YieldCommand(100)
+                            )
+                    );
+                } else {
+                    RobotEx.getInstance().commandScheduler.scheduleCommand(
+                            new SequentialCommand(
+                                    new OneTimeCommand(this::reverseIntake),
+                                    new YieldCommand(1000),
+                                    new ParallelCommand(
+                                            new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
+                                            new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.INTAKING))
+                            )
+                        )
+                    );
+                }
             }
         }
 
+
+        if (!currentBreakbeamState) {
+            setTargetHolderState(SampleHolderState.DEFAULT);
+        }
 
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
@@ -308,7 +354,6 @@ public class Intake implements Subsystem {
 
         activeMotor.setPower(currentIntakeMotorState.position);
 
-        telemetry.addData("Intake Motor Current: ", activeMotor.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
@@ -333,7 +378,6 @@ public class Intake implements Subsystem {
 
     private void rebuildProfile(double targetPosition) {
 
-        manual = false;
 
 
         profile = new MotionProfile(
@@ -342,6 +386,8 @@ public class Intake implements Subsystem {
                 vMax,
                 aMax
         );
+
+        manual = false;
 
         linkageTimer.reset();
 
@@ -376,7 +422,18 @@ public class Intake implements Subsystem {
     }
 
     public void reverseIntake() {
-        reverse = true;
+        RobotEx.getInstance().commandScheduler.scheduleCommand(
+        new SequentialCommand(
+                new ParallelCommand(
+                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
+                        new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT))
+                ),
+                new YieldCommand(200),
+                new ParallelCommand(
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE))
+                )
+        )
+        );
     }
 
     public void updatePossessedColor() {
@@ -394,4 +451,13 @@ public class Intake implements Subsystem {
             sampleContained = SampleContained.NONE;
         }
     }
+
+    public boolean getCurrentPositionFromAnalog() {
+        return linkageAnalog.getVoltage() > 1.5;
+    }
+
+    public boolean linkageAtHome() {
+        return Math.abs(getCurrentPosition() - LinkageStates.DEFAULT.position) < 0.01;
+    }
+
 }

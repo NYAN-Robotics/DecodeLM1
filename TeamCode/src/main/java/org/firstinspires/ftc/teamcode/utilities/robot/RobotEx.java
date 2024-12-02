@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.utilities.robot;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,6 +10,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.CommandScheduler;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Limelight;
@@ -50,6 +50,8 @@ public class RobotEx {
     private static RobotEx robotInstance = null;
 
     List<LynxModule> allHubs;
+
+    public CommandScheduler commandScheduler = CommandScheduler.getInstance();
 
     public Drivetrain drivetrain = new Drivetrain();
     public OpticalOdometry odometry = new OpticalOdometry();
@@ -175,6 +177,7 @@ public class RobotEx {
 
         telemetry.addData("End Cache Clear time: ", frameTimer.milliseconds() - startTime);
 
+        commandScheduler.update();
 
         for (Subsystem subsystem : robotSubsystems) {
             subsystem.onCyclePassed();

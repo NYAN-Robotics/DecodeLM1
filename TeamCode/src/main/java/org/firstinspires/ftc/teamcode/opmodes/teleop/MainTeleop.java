@@ -104,12 +104,8 @@ public class MainTeleop extends LinearOpMode {
                 }
             }
 
-            if (currentFrameGamepad1.circle) {
-                robot.intake.setIntakeState(Intake.IntakeState.DEFAULT);
-                robot.intake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE);
-                robot.intake.setTargetHolderState(Intake.SampleHolderState.DEFAULT);
-            } else if (previousFrameGamepad1.circle && !currentFrameGamepad1.circle) {
-                robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
+            if (currentFrameGamepad1.circle && !previousFrameGamepad1.circle) {
+                robot.intake.reverseIntake();
             }
 
             if (currentFrameGamepad2.dpad_up && !previousFrameGamepad2.dpad_up) {
