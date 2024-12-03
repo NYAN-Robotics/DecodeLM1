@@ -77,8 +77,8 @@ public class Intake implements Subsystem {
     }
 
     public enum LinkageHolderState {
-        CLOSED(0.18),
-        OPEN(0);
+        CLOSED(0.5),
+        OPEN(0.5);
 
         public double position;
 
