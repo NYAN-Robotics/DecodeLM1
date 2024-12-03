@@ -9,11 +9,15 @@ public class YieldCommand extends DelayCommand {
 
 
     public YieldCommand(long aDuration) {
-        super(aDuration);
+        super(0);
+
+        theDuration = aDuration;
     }
 
     public YieldCommand(long aDuration, AnonymousIsFinishedFunction aFunction) {
-        super(aDuration);
+        super(0);
+
+        theDuration = aDuration;
 
         theExhaustFunction = aFunction;
     }
@@ -35,7 +39,8 @@ public class YieldCommand extends DelayCommand {
         boolean overTimeAllotted = System.currentTimeMillis() - theStartTime >= theDuration;
 
         if (theExhaustFunction != null) {
-            return overTimeAllotted && theExhaustFunction.isFinished();
+            System.out.println(theExhaustFunction.isFinished());
+            return overTimeAllotted || theExhaustFunction.isFinished();
         }
 
         return overTimeAllotted;

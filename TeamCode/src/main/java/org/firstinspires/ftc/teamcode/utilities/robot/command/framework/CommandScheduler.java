@@ -8,8 +8,8 @@ public class CommandScheduler {
 
     private static final CommandScheduler INSTANCE = new CommandScheduler();
 
-    private final ArrayList<CommandBase> scheduledCommands = new ArrayList<>();
-    private final Queue<CommandBase> executingCommands = new LinkedList<>();
+    private final ArrayList<CommandBase> theScheduledCommands = new ArrayList<>();
+    private final Queue<CommandBase> theExecutingCommands = new LinkedList<>();
 
     private CommandScheduler() {} // Private constructor to enforce singleton
 
@@ -17,38 +17,34 @@ public class CommandScheduler {
         return INSTANCE;
     }
 
-    public void scheduleCommand(CommandBase command) {
-        command.onSchedule();
-        scheduledCommands.add(command);
+    public void scheduleCommand(CommandBase aCommand) {
+        aCommand.onSchedule();
+        theScheduledCommands.add(aCommand);
     }
 
     public void update() {
 
         ArrayList<CommandBase> commandsToRemove = new ArrayList<>();
 
-        long currentTime = System.currentTimeMillis();
-
-        // Move commands with exhausted delays to executing queue
-
-        for (CommandBase command : scheduledCommands) {
+        for (CommandBase command : theScheduledCommands) {
             if (command.readyToExecute()) {
                 command.initialize();
-                executingCommands.add(command);
+                theExecutingCommands.add(command);
                 commandsToRemove.add(command);
             }
         }
 
         for (CommandBase command : commandsToRemove) {
-            scheduledCommands.remove(command);
+            theScheduledCommands.remove(command);
         }
-        // Execute commands in the executing queue
+
         executeCommands();
     }
 
     private void executeCommands() {
         ArrayList<CommandBase> commandsToRemove = new ArrayList<>();
 
-        for (CommandBase command : executingCommands) {
+        for (CommandBase command : theExecutingCommands) {
             command.update();
             if (command.isFinished()) {
                 command.onFinish();
@@ -57,7 +53,7 @@ public class CommandScheduler {
         }
 
         for (CommandBase command : commandsToRemove) {
-            executingCommands.remove(command);
+            theExecutingCommands.remove(command);
         }
 
     }

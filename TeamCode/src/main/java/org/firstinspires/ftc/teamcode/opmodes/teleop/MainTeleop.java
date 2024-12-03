@@ -118,19 +118,33 @@ public class MainTeleop extends LinearOpMode {
 
             if (currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left) {
                 robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
-                robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
             }
 
             if (currentFrameGamepad2.dpad_right && !previousFrameGamepad2.dpad_right) {
-                robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
+
+                if (robot.outtake.getSlidesState() != Outtake.OuttakeSlidesStates.HANG) {
+                    robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.HANG);
+                } else {
+                    robot.commandScheduler.scheduleCommand(
+                            new SequentialCommand(
+                                    new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_INITIAL)),
+                                    new YieldCommand(2000),
+                                    new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_FINAL)),
+                                    new YieldCommand(2000),
+                                    new OneTimeCommand(() -> robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS))
+                            )
+                    );
+                }
             }
 
             if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
                 robot.commandScheduler.scheduleCommand(
                         new SequentialCommand(
-                                new OneTimeCommand(() -> robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-                                new YieldCommand(2000, () -> robot.outtake.atTargetPosition())
-
+                                new OneTimeCommand(() -> robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP)),
+                                new YieldCommand(2000, robot.outtake::atTargetPosition),
+                                new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
+                                new OneTimeCommand(() -> robot.outtake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
+                                new OneTimeCommand(() -> robot.outtake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED))
                         )
                 );
             }

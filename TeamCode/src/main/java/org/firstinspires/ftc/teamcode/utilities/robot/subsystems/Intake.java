@@ -46,8 +46,8 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        DEFAULT(0.6),
-        EXTENDED(0.72);
+        DEFAULT(0.58),
+        EXTENDED(0.73);
 
         public double position;
 
@@ -77,8 +77,8 @@ public class Intake implements Subsystem {
     }
 
     public enum LinkageHolderState {
-        CLOSED(0.5),
-        OPEN(0.5);
+        CLOSED(0.51),
+        OPEN(0.46);
 
         public double position;
 
@@ -166,8 +166,8 @@ public class Intake implements Subsystem {
 
     boolean scheduledAutomation = false;
 
-    public static double aMax = 1;
-    public static double vMax = 5;
+    public static double aMax = 5;
+    public static double vMax = 10;
 
     public static double velocity = 1;
 
@@ -457,7 +457,7 @@ public class Intake implements Subsystem {
     }
 
     public boolean linkageAtTargetPosition() {
-        return profile.getDuration() < linkageTimer.seconds();
+        return profile.getDuration() < linkageTimer.seconds()+0.1;
     }
 
     public void returnSlides() {

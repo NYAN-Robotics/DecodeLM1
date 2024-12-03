@@ -23,8 +23,10 @@ public class Outtake implements Subsystem {
     public enum OuttakeSlidesStates {
         DEFAULT(0),
         SAMPLES(2250),
+        HANG(2100),
         SPECIMENS(700),
         SPECIMENS_DROP(190),
+        SPECIMEN_PICKUP (400),
         HOVER(350);
 
         public double position;
@@ -41,10 +43,13 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.425),
+        DEFAULT(0.44),
         BACK_PICKUP(0.25),
         AUTO_DEFAULT(0.37),
-        EXTENDED(1);
+        HANG_INITIAL(0.60),
+        HANG_FINAL(0.7),
+        EXTENDED(0.86),
+        SPECIMEN_PICKUP(0.28);
 
         public double position;
 
@@ -78,7 +83,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
-        DEFAULT(0.6),
+        DEFAULT(0.55),
         CLOSED(0.69);
 
         public double position;
@@ -95,7 +100,8 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.5),
+        DEFAULT(0.70),
+        SPECIMEN_PICKUP(0.2),
         DOWN(0);
 
         public double position;
@@ -245,7 +251,7 @@ public class Outtake implements Subsystem {
         if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition() && !outtakeReset) {
             if (currentSlideState == OuttakeSlidesStates.HOVER) {
                 setCurrentOuttakeState(OuttakeServoState.BACK_PICKUP);
-            } else {
+            } else if (currentSlideState != OuttakeSlidesStates.SPECIMEN_PICKUP){
                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.DEFAULT);
             }
