@@ -317,11 +317,9 @@ public class Intake implements Subsystem {
                             new SequentialCommand(
                                     new OneTimeCommand(this::reverseIntake),
                                     new YieldCommand(1000),
-                                    new ParallelCommand(
-                                            new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
-                                            new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.INTAKING))
+                                    new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
+                                    new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.INTAKING))
                             )
-                        )
                     );
                 }
             }
@@ -421,16 +419,12 @@ public class Intake implements Subsystem {
 
     public void reverseIntake() {
         RobotEx.getInstance().commandScheduler.scheduleCommand(
-        new SequentialCommand(
-                new ParallelCommand(
-                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
-                        new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT))
-                ),
-                new YieldCommand(200),
-                new ParallelCommand(
-                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE))
-                )
-        )
+            new SequentialCommand(
+                    new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
+                    new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                    new YieldCommand(200),
+                    new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE))
+            )
         );
     }
 
