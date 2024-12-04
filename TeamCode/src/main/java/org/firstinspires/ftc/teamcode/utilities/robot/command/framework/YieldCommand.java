@@ -9,13 +9,13 @@ public class YieldCommand extends DelayCommand {
 
 
     public YieldCommand(long aDuration) {
-        super(0);
+        super(aDuration);
 
         theDuration = aDuration;
     }
 
     public YieldCommand(long aDuration, AnonymousIsFinishedFunction aFunction) {
-        super(0);
+        super(aDuration);
 
         theDuration = aDuration;
 

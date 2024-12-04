@@ -30,8 +30,8 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0),
-        EXTENDED(0.2);
+        DEFAULT(0.38),
+        EXTENDED(0.61);
 
         public double position;
 
@@ -166,8 +166,8 @@ public class Intake implements Subsystem {
 
     boolean scheduledAutomation = false;
 
-    public static double aMax = 5;
-    public static double vMax = 10;
+    public static double aMax = 1;
+    public static double vMax = 1;
 
     public static double velocity = 1;
 
@@ -414,6 +414,11 @@ public class Intake implements Subsystem {
     }
 
     public void setIntakeMotorState(IntakeMotorStates newState) {
+
+        if (newState == IntakeMotorStates.REVERSE || newState == IntakeMotorStates.SLOW_REVERSE) {
+            manual = false;
+        }
+
         currentIntakeMotorState = newState;
     }
 

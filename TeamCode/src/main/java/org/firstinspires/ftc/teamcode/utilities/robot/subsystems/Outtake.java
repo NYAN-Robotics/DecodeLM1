@@ -22,7 +22,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(2250),
+        SAMPLES(2000),
         HANG(2100),
         SPECIMENS(700),
         SPECIMENS_DROP(190),
@@ -65,7 +65,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeRotationStates {
-        DEFAULT(0.5),
+        DEFAULT(0.53),
         ROTATED(0.18);
 
         public double position;
@@ -84,7 +84,7 @@ public class Outtake implements Subsystem {
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
         DEFAULT(0.55),
-        CLOSED(0.69);
+        CLOSED(0.76);
 
         public double position;
 
@@ -100,7 +100,9 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.70),
+        DEFAULT(0.83),
+        TRANSFER_POSITION(0.6),
+        SAMPLE_DROP(1),
         SPECIMEN_PICKUP(0.2),
         DOWN(0);
 
@@ -258,9 +260,14 @@ public class Outtake implements Subsystem {
 
             if (currentSlideState == OuttakeSlidesStates.SPECIMENS || currentSlideState == OuttakeSlidesStates.SPECIMENS_DROP || currentSlideState == OuttakeSlidesStates.SAMPLES) {
                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
+                setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
             }
 
             outtakeReset = true;
+        }
+
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() < 0.5) {
+            setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
         }
 
         leftLiftMotor.setPower(liftPower);
@@ -349,5 +356,6 @@ public class Outtake implements Subsystem {
         setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
         setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
         setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
+        setCurrentPivotState(OuttakePivotStates.DEFAULT);
     }
 }
