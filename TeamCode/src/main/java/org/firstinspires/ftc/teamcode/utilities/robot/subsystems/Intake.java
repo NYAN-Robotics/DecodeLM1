@@ -62,8 +62,8 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.53),
-        DEFAULT(0.9);
+        EXTENDED(0.55),
+        DEFAULT(0.88);
 
         public double position;
 
