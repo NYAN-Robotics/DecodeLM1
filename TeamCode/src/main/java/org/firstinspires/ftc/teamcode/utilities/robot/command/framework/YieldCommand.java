@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
 
-public class YieldCommand extends DelayCommand {
+import android.os.health.SystemHealthManager;
+
+public class YieldCommand extends CommandBase {
 
     private long theDuration;
     private long theStartTime;
@@ -9,23 +11,29 @@ public class YieldCommand extends DelayCommand {
 
 
     public YieldCommand(long aDuration) {
-        super(aDuration);
-
         theDuration = aDuration;
     }
 
     public YieldCommand(long aDuration, AnonymousIsFinishedFunction aFunction) {
-        super(aDuration);
-
         theDuration = aDuration;
-
         theExhaustFunction = aFunction;
     }
 
 
     @Override
+    public void onSchedule() {
+
+    }
+
+    @Override
+    public boolean readyToExecute() {
+        return true;
+    }
+
+    @Override
     public void initialize() {
         theStartTime = System.currentTimeMillis();
+        // System.out.print("Initialize called" + theStartTime);
     }
 
     @Override
@@ -38,6 +46,7 @@ public class YieldCommand extends DelayCommand {
 
         boolean overTimeAllotted = System.currentTimeMillis() - theStartTime >= theDuration;
 
+        // System.out.println("Current Time: " + System.currentTimeMillis() + " Start Time: " + theStartTime);
         if (theExhaustFunction != null) {
             System.out.println(theExhaustFunction.isFinished());
             return overTimeAllotted || theExhaustFunction.isFinished();

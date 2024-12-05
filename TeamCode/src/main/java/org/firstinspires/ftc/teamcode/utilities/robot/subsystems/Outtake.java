@@ -14,6 +14,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
+import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
@@ -25,7 +29,7 @@ public class Outtake implements Subsystem {
         SAMPLES(2000),
         HANG(2100),
         SPECIMENS(700),
-        SPECIMENS_DROP(190),
+        SPECIMENS_DROP(0),
         SPECIMEN_PICKUP (400),
         HOVER(350);
 
@@ -49,7 +53,8 @@ public class Outtake implements Subsystem {
         HANG_INITIAL(0.60),
         HANG_FINAL(0.7),
         EXTENDED(0.86),
-        SPECIMEN_PICKUP(0.28);
+        SPECIMEN_DROP(1),
+        SPECIMEN_PICKUP(0.33);
 
         public double position;
 
@@ -176,6 +181,8 @@ public class Outtake implements Subsystem {
 
     Telemetry telemetry;
 
+    RobotEx robot;
+
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
         leftLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "leftLiftMotor"), 1e-5);
@@ -214,7 +221,7 @@ public class Outtake implements Subsystem {
 
     @Override
     public void onOpmodeStarted() {
-
+        robot = RobotEx.getInstance();
     }
 
     @Override
@@ -253,12 +260,12 @@ public class Outtake implements Subsystem {
         if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition() && !outtakeReset) {
             if (currentSlideState == OuttakeSlidesStates.HOVER) {
                 setCurrentOuttakeState(OuttakeServoState.BACK_PICKUP);
-            } else if (currentSlideState != OuttakeSlidesStates.SPECIMEN_PICKUP){
+            } else if (currentSlideState != OuttakeSlidesStates.SPECIMEN_PICKUP && currentSlideState != OuttakeSlidesStates.SPECIMENS_DROP){
                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.DEFAULT);
             }
 
-            if (currentSlideState == OuttakeSlidesStates.SPECIMENS || currentSlideState == OuttakeSlidesStates.SPECIMENS_DROP || currentSlideState == OuttakeSlidesStates.SAMPLES) {
+            if (currentSlideState == OuttakeSlidesStates.SPECIMENS_DROP || currentSlideState == OuttakeSlidesStates.SAMPLES) {
                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
                 setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
             }
@@ -305,7 +312,6 @@ public class Outtake implements Subsystem {
             return;
         }
 
-
         previousSlideState = currentSlideState;
         currentSlideState = newState;
 
@@ -336,6 +342,23 @@ public class Outtake implements Subsystem {
     }
 
     public void setCurrentClawState(OuttakeClawStates newState) {
+
+        if (newState == OuttakeClawStates.CLOSED && currentSlideState == OuttakeSlidesStates.SPECIMEN_PICKUP) {
+
+            robot.commandScheduler.scheduleCommand(
+                    new SequentialCommand(
+                            new YieldCommand(1000),
+                            new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS)),
+                            new YieldCommand(2000, this::atTargetPosition),
+                            new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_DROP)),
+                            new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION)),
+                            new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.ROTATED)),
+                            new YieldCommand(2000),
+                            new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_DROP))
+                    )
+            );
+        }
+
         currentClawState = newState;
     }
 

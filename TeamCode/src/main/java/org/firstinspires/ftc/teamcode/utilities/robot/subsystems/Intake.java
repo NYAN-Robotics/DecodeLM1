@@ -234,6 +234,10 @@ public class Intake implements Subsystem {
         lastBreakbeamState = currentBreakbeamState;
         currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 1; // !intakeBreakbeam.getState();
 
+        /*
+        Add majority decision breakbeam
+         */
+
         LinkageStates.DEFAULT.setPosition(startLinkagePosition);
         LinkageStates.EXTENDED.setPosition(extendedLinkagePosition);
 
@@ -254,7 +258,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
         // telemetry.addData("Sample Holder State: ", currentSampleHolderState);
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
-        telemetry.addData("Breakbeam state: ", currentBreakbeamState);
+        telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);

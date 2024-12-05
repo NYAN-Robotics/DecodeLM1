@@ -5,6 +5,8 @@ public class SequentialCommand extends CommandBase {
     private final CommandBase[] commands;
     private int currentCommandIndex = 0;
 
+    private boolean initializedCurrentCommand = false;
+
     public SequentialCommand(CommandBase... commands) {
         this.commands = commands;
     }
@@ -26,14 +28,19 @@ public class SequentialCommand extends CommandBase {
 
     @Override
     public void update() {
+
         if (!commands[currentCommandIndex].readyToExecute()) {
             return;
+        } else if (!initializedCurrentCommand) {
+            commands[currentCommandIndex].initialize();
+            initializedCurrentCommand = true;
         }
 
         commands[currentCommandIndex].update();
         if (commands[currentCommandIndex].isFinished()) {
             commands[currentCommandIndex].onFinish();
             currentCommandIndex++;
+            initializedCurrentCommand = false;
             if (currentCommandIndex < commands.length) {
                 commands[currentCommandIndex].onSchedule();
             }
