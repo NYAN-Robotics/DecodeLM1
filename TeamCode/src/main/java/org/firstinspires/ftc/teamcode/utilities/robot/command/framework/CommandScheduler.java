@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
 
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.CommandBase;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;

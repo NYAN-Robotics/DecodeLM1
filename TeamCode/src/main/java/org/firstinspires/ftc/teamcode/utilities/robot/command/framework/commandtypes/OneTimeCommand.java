@@ -1,5 +1,7 @@
-package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
+package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes;
 
+
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.AnonymousRunFunction;
 
 public class OneTimeCommand extends CommandBase {
 

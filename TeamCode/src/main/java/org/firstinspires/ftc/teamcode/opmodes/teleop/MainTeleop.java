@@ -9,10 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
@@ -126,7 +125,7 @@ public class MainTeleop extends LinearOpMode {
                     robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.HANG);
                 } else {
                     robot.commandScheduler.scheduleCommand(
-                            new SequentialCommand(
+                            new SequentialCommandGroup(
                                     new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_INITIAL)),
                                     new YieldCommand(2000),
                                     new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_FINAL)),
@@ -139,7 +138,7 @@ public class MainTeleop extends LinearOpMode {
 
             if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
                 robot.commandScheduler.scheduleCommand(
-                        new SequentialCommand(
+                        new SequentialCommandGroup(
                                 new OneTimeCommand(() -> robot.outtake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP)),
                                 new YieldCommand(2000, robot.outtake::atTargetPosition),
                                 new OneTimeCommand(() -> robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),

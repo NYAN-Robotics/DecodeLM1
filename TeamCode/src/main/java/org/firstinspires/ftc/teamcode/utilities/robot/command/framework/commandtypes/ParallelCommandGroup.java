@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
+package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes;
 
-public class ParallelCommand extends InstantCommand {
+public class ParallelCommandGroup extends InstantCommand {
 
         private final CommandBase[] commands;
 
         private boolean[] initialized;
         private boolean[] finished;
 
-        public ParallelCommand(CommandBase... commands) {
+        public ParallelCommandGroup(CommandBase... commands) {
             this.commands = commands;
 
             initialized = new boolean[commands.length];

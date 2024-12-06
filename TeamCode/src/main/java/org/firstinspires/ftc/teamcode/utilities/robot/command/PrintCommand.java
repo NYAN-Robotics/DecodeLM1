@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.command;
 
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.DelayCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.InstantCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.InstantCommand;
 
 public class PrintCommand extends InstantCommand {
 

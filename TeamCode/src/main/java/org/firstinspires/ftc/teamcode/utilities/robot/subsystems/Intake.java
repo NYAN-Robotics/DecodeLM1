@@ -18,11 +18,10 @@ import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.PrintCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
@@ -318,7 +317,7 @@ public class Intake implements Subsystem {
                     returnSlides();
                 } else {
                     RobotEx.getInstance().commandScheduler.scheduleCommand(
-                            new SequentialCommand(
+                            new SequentialCommandGroup(
                                     new OneTimeCommand(this::reverseIntake),
                                     new YieldCommand(1000),
                                     new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
@@ -428,7 +427,7 @@ public class Intake implements Subsystem {
 
     public void reverseIntake() {
         RobotEx.getInstance().commandScheduler.scheduleCommand(
-            new SequentialCommand(
+            new SequentialCommandGroup(
                     new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                     new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                     new YieldCommand(200),
@@ -471,10 +470,10 @@ public class Intake implements Subsystem {
 
     public void returnSlides() {
         robot.commandScheduler.scheduleCommand(
-                new SequentialCommand(
+                new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
                         new YieldCommand(100),
-                        new ParallelCommand(
+                        new ParallelCommandGroup(
                                 new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                                 new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                                 new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))

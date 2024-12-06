@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
+package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes;
 
-public class SequentialCommand extends CommandBase {
+public class SequentialCommandGroup extends CommandBase {
 
     private final CommandBase[] commands;
     private int currentCommandIndex = 0;
 
     private boolean initializedCurrentCommand = false;
 
-    public SequentialCommand(CommandBase... commands) {
+    public SequentialCommandGroup(CommandBase... commands) {
         this.commands = commands;
     }
 
