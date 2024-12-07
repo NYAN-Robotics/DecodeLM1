@@ -13,7 +13,7 @@ public class CommandScheduler {
     private final ArrayList<CommandBase> theScheduledCommands = new ArrayList<>();
     private final Queue<CommandBase> theExecutingCommands = new LinkedList<>();
 
-    private CommandScheduler() {} // Private constructor to enforce singleton
+    private CommandScheduler() {}
 
     public static CommandScheduler getInstance() {
         return INSTANCE;

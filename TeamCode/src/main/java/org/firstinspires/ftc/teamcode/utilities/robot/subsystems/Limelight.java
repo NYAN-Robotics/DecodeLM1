@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -44,7 +42,7 @@ public class Limelight implements Subsystem {
     public void onOpmodeStarted() {
         // if (limelight == null) return;
         limelight.start();
-        odometry = RobotEx.getInstance().odometry;
+        odometry = RobotEx.getInstance().theOpticalOdometry;
         // More setup
     }
 

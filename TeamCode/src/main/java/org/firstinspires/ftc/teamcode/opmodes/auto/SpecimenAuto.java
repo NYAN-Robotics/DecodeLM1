@@ -33,7 +33,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         waitForStart();
 
-        robot.intake.setIntakeState(Intake.IntakeState.EXTENDED);
+        robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED);
         // Notify subsystems before loop
         robot.postStart();
 
@@ -57,7 +57,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(0, 0, -Math.PI / 2));
+        robot.theOpticalOdometry.setPose(new Pose(0, 0, -Math.PI / 2));
 
 
 

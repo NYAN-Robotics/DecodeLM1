@@ -47,35 +47,35 @@ Expansion Hub
 
  */
 public class RobotEx {
-    private static RobotEx robotInstance = null;
+    private static RobotEx theRobotInstance = null;
 
-    List<LynxModule> allHubs;
+    List<LynxModule> theHubs;
 
-    public CommandScheduler commandScheduler = CommandScheduler.getInstance();
+    public CommandScheduler theCommandScheduler = CommandScheduler.getInstance();
 
-    public Drivetrain drivetrain = new Drivetrain();
-    public OpticalOdometry odometry = new OpticalOdometry();
-    public Outtake outtake = new Outtake();
-    public Intake intake = new Intake();
-    public Limelight limelight = new Limelight();
+    public Drivetrain theDrivetrain = new Drivetrain();
+    public OpticalOdometry theOpticalOdometry = new OpticalOdometry();
+    public Outtake theOuttake = new Outtake();
+    public Intake theIntake = new Intake();
+    public Limelight theLimelight = new Limelight();
 
-    public VoltageSensor voltageSensor;
+    public VoltageSensor theVoltageSensor;
 
-    private final ElapsedTime frameTimer = new ElapsedTime();
+    private final ElapsedTime theFrameTimer = new ElapsedTime();
 
-    private final Subsystem[] robotSubsystems = new Subsystem[]{
-            drivetrain,
-            odometry,
-            outtake,
-            intake,
-            limelight
+    private final Subsystem[] theSubsystems = new Subsystem[]{
+            theDrivetrain,
+            theOpticalOdometry,
+            theOuttake,
+            theIntake,
+            theLimelight
     };
 
-    Telemetry telemetry;
+    Telemetry theTelemetry;
 
-    public HardwareMap hardwareMap;
+    public HardwareMap theHardwareMap;
 
-    public LinearOpMode opMode;
+    public LinearOpMode theOpMode;
 
     public boolean stopRequested = false;
     public double runTime = 0;
@@ -87,31 +87,31 @@ public class RobotEx {
 
 
     private RobotEx() {
-        if (RobotEx.robotInstance != null) {
+        if (RobotEx.theRobotInstance != null) {
             throw new IllegalStateException("Robot already instantiated");
         }
     }
 
     public static RobotEx getInstance() {
-        if (RobotEx.robotInstance == null) {
-            RobotEx.robotInstance = new RobotEx();
+        if (RobotEx.theRobotInstance == null) {
+            RobotEx.theRobotInstance = new RobotEx();
         }
 
-        return RobotEx.robotInstance;
+        return RobotEx.theRobotInstance;
     }
 
 
 
     public void init(LinearOpMode opMode, Telemetry telemetry) {
-        this.opMode = opMode;
-        this.hardwareMap = opMode.hardwareMap;
-        this.telemetry = telemetry;
+        this.theOpMode = opMode;
+        this.theHardwareMap = opMode.hardwareMap;
+        this.theTelemetry = telemetry;
 
-        this.voltageSensor = hardwareMap.voltageSensor.iterator().next();
-        this.voltageCompensator = this.voltageSensor.getVoltage();
+        this.theVoltageSensor = theHardwareMap.voltageSensor.iterator().next();
+        this.voltageCompensator = this.theVoltageSensor.getVoltage();
 
-        for (Subsystem subsystem : this.robotSubsystems) {
-            subsystem.onInit(hardwareMap, telemetry);
+        for (Subsystem subsystem : this.theSubsystems) {
+            subsystem.onInit(theHardwareMap, telemetry);
         }
 
         telemetry.update();
@@ -123,13 +123,13 @@ public class RobotEx {
 
     public void postStart() {
 
-        stopRequested = opMode.isStopRequested();
+        stopRequested = theOpMode.isStopRequested();
 
         if (stopRequested) return;
 
-        this.allHubs = hardwareMap.getAll(LynxModule.class);
+        this.theHubs = theHardwareMap.getAll(LynxModule.class);
 
-        for (LynxModule hub : allHubs) {
+        for (LynxModule hub : theHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
             LynxI2cConfigureChannelCommand command = new LynxI2cConfigureChannelCommand(hub, 1, LynxI2cConfigureChannelCommand.SpeedCode.FAST_400K);
 
@@ -142,7 +142,7 @@ public class RobotEx {
         }
 
 
-        for (Subsystem subsystem : this.robotSubsystems) {
+        for (Subsystem subsystem : this.theSubsystems) {
             subsystem.onOpmodeStarted();
         }
 
@@ -151,11 +151,11 @@ public class RobotEx {
     @SuppressLint("")
     public double update() {
 
-        stopRequested = opMode.isStopRequested();
+        stopRequested = theOpMode.isStopRequested();
 
         if (stopRequested) return 0;
 
-        runTime = opMode.getRuntime();
+        runTime = theOpMode.getRuntime();
 
         if (Math.floor(runTime) != lastTime) {
             frames = currentFrames;
@@ -169,28 +169,28 @@ public class RobotEx {
 
         log.reset();
 
-        double startTime = frameTimer.milliseconds();
+        double startTime = theFrameTimer.milliseconds();
 
-        for (LynxModule hub : allHubs) {
+        for (LynxModule hub : theHubs) {
             hub.clearBulkCache();
         }
 
-        telemetry.addData("End Cache Clear time: ", frameTimer.milliseconds() - startTime);
+        theTelemetry.addData("End Cache Clear time: ", theFrameTimer.milliseconds() - startTime);
 
-        commandScheduler.update();
+        theCommandScheduler.update();
 
-        for (Subsystem subsystem : robotSubsystems) {
+        for (Subsystem subsystem : theSubsystems) {
             subsystem.onCyclePassed();
-            telemetry.addData("Subsystem Update: ", frameTimer.milliseconds() - startTime);
+            theTelemetry.addData("Subsystem Update: ", theFrameTimer.milliseconds() - startTime);
         }
 
-        telemetry.addLine("Refresh Rate: " + frames + " hz");
-        telemetry.addData("Run time: ", runTime);
+        theTelemetry.addLine("Refresh Rate: " + frames + " hz");
+        theTelemetry.addData("Run time: ", runTime);
 
-        telemetry.update();
+        theTelemetry.update();
 
-        double frameTime = frameTimer.milliseconds();
-        frameTimer.reset();
+        double frameTime = theFrameTimer.milliseconds();
+        theFrameTimer.reset();
 
         return frameTime;
     }
@@ -205,11 +205,11 @@ public class RobotEx {
     }
 
     public void persistData() {
-        PersistentData.startPose = this.odometry.getPose();
+        PersistentData.startPose = this.theOpticalOdometry.getPose();
     }
 
     public double getVoltage() {
-        return this.voltageSensor.getVoltage();
+        return this.theVoltageSensor.getVoltage();
     }
 
     public double getPowerMultiple() {
@@ -217,7 +217,7 @@ public class RobotEx {
     }
 
     public void destroy() {
-        RobotEx.robotInstance = null;
+        RobotEx.theRobotInstance = null;
     }
 
 

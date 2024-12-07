@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.command
 
 public abstract class CommandBase {
     public abstract void onSchedule();
-    public abstract boolean readyToExecute(); // New function
+    public abstract boolean readyToExecute();
     public abstract void initialize();
     public abstract void update();
     public abstract boolean isFinished();

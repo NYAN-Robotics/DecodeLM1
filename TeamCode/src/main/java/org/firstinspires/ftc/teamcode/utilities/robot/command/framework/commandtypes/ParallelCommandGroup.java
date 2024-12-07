@@ -2,21 +2,21 @@ package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.command
 
 public class ParallelCommandGroup extends InstantCommand {
 
-        private final CommandBase[] commands;
+        private final CommandBase[] theCommands;
 
-        private boolean[] initialized;
-        private boolean[] finished;
+        private boolean[] theInitializedCommands;
+        private boolean[] theFinishedCommands;
 
-        public ParallelCommandGroup(CommandBase... commands) {
-            this.commands = commands;
+        public ParallelCommandGroup(CommandBase... aCommandGroup) {
+            this.theCommands = aCommandGroup;
 
-            initialized = new boolean[commands.length];
-            finished = new boolean[commands.length];
+            theInitializedCommands = new boolean[aCommandGroup.length];
+            theFinishedCommands = new boolean[aCommandGroup.length];
         }
 
         @Override
         public void onSchedule() {
-            for (CommandBase command : commands) {
+            for (CommandBase command : theCommands) {
                 command.onSchedule();
             }
         }
@@ -27,21 +27,21 @@ public class ParallelCommandGroup extends InstantCommand {
 
         @Override
         public void update() {
-            for (int i = 0; i < commands.length; i++) {
-                CommandBase command = commands[i];
+            for (int i = 0; i < theCommands.length; i++) {
+                CommandBase command = theCommands[i];
 
                 if (command.readyToExecute()) {
-                    if (!initialized[i]) {
+                    if (!theInitializedCommands[i]) {
                         command.initialize();
-                        initialized[i] = true;
+                        theInitializedCommands[i] = true;
                     }
 
                     if (!command.isFinished()) {
                         command.update();
                     } else {
-                        if (!finished[i]) {
+                        if (!theFinishedCommands[i]) {
                             command.onFinish();
-                            finished[i] = true;
+                            theFinishedCommands[i] = true;
                         }
                     }
                 }
@@ -50,7 +50,7 @@ public class ParallelCommandGroup extends InstantCommand {
 
         @Override
         public boolean isFinished() {
-            for (CommandBase command : commands) {
+            for (CommandBase command : theCommands) {
                 if (!command.readyToExecute() || !command.isFinished()) {
                     return false;
                 }

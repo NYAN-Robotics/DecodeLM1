@@ -345,7 +345,7 @@ public class Outtake implements Subsystem {
 
         if (newState == OuttakeClawStates.CLOSED && currentSlideState == OuttakeSlidesStates.SPECIMEN_PICKUP) {
 
-            robot.commandScheduler.scheduleCommand(
+            robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
                             new YieldCommand(1000),
                             new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS)),

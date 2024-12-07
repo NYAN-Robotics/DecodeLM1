@@ -316,7 +316,7 @@ public class Intake implements Subsystem {
                 if (!wrongColor) {
                     returnSlides();
                 } else {
-                    RobotEx.getInstance().commandScheduler.scheduleCommand(
+                    RobotEx.getInstance().theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
                                     new OneTimeCommand(this::reverseIntake),
                                     new YieldCommand(1000),
@@ -426,7 +426,7 @@ public class Intake implements Subsystem {
     }
 
     public void reverseIntake() {
-        RobotEx.getInstance().commandScheduler.scheduleCommand(
+        RobotEx.getInstance().theCommandScheduler.scheduleCommand(
             new SequentialCommandGroup(
                     new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                     new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
@@ -469,7 +469,7 @@ public class Intake implements Subsystem {
     }
 
     public void returnSlides() {
-        robot.commandScheduler.scheduleCommand(
+        robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
                         new YieldCommand(100),
@@ -480,7 +480,7 @@ public class Intake implements Subsystem {
                         ),
                         new YieldCommand(1000),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
-                        new OneTimeCommand(() -> robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
+                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                         new YieldCommand(500),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
                 )

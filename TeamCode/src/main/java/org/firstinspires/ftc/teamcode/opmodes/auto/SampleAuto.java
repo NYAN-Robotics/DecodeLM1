@@ -32,8 +32,8 @@ public class SampleAuto extends LinearOpMode {
 
         waitForStart();
 
-        robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-        robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
+        robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+        robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
 
         // Notify subsystems before loop
         robot.postStart();
@@ -60,7 +60,7 @@ public class SampleAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+        robot.theOpticalOdometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
         robot.pause(0.05);
 

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.utilities.robot.movement;
 
 import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.MAX_CORRECTION_TIME;
 import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD;
-import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD_TIME;
 
 import androidx.core.math.MathUtils;
 
@@ -67,7 +66,7 @@ public class PIDDrive {
     }
 
     public void gotoPoint(Pose point, MovementConstants constants) {
-        Pose currentPose = robot.odometry.getPose();
+        Pose currentPose = robot.theOpticalOdometry.getPose();
         Pose currentVelocity = new Pose();
 
         Pose startPosition = new Pose(currentPose.getX(), currentPose.getY(), currentPose.getHeading());
@@ -97,7 +96,7 @@ public class PIDDrive {
 
         while (!robot.stopRequested) {
 
-            currentPose = robot.odometry.getPose();
+            currentPose = robot.theOpticalOdometry.getPose();
             currentProfileTime = profileTime.seconds();
 
             double targetDisplacement = motion.getPositionFromTime(currentProfileTime);
@@ -131,7 +130,7 @@ public class PIDDrive {
             double feedbackX = xController.getOutputFromError(error.getX());
             double feedbackY = yController.getOutputFromError(error.getY());
 
-            robot.drivetrain.fieldCentricDriveFromGamepad(
+            robot.theDrivetrain.fieldCentricDriveFromGamepad(
                     feedforwardX + feedbackY,
                     feedforwardY + feedbackX,
                     -MathUtils.clamp(headingController.getOutputFromError(
@@ -174,7 +173,7 @@ public class PIDDrive {
             robot.update();
         }
 
-        robot.drivetrain.fieldCentricDriveFromGamepad(
+        robot.theDrivetrain.fieldCentricDriveFromGamepad(
                 0,
                 0,
                 0
@@ -200,8 +199,8 @@ public class PIDDrive {
 
             MovementStateCommand targetState = movementCommand.getTargetState();
 
-            currentPose = robot.odometry.getPose();
-            currentVelocity = robot.odometry.getVelocity();
+            currentPose = robot.theOpticalOdometry.getPose();
+            currentVelocity = robot.theOpticalOdometry.getVelocity();
 
             error.setX(targetState.getPose().getX() - currentPose.getX());
             error.setY(targetState.getPose().getY() - currentPose.getY());
@@ -219,7 +218,7 @@ public class PIDDrive {
             double feedbackX = xController.getOutputFromError(error.getX());
             double feedbackY = yController.getOutputFromError(error.getY());
 
-            robot.drivetrain.fieldCentricDriveFromGamepad(
+            robot.theDrivetrain.fieldCentricDriveFromGamepad(
                     targetState.feedforwardX + feedbackY,
                     targetState.feedforwardY + feedbackX,
                     -MathUtils.clamp(headingController.getOutputFromError(
@@ -265,7 +264,7 @@ public class PIDDrive {
     public void turnToAngle(double angle, MovementConstants constants) {
         angle = AngleHelper.normDelta(angle);
 
-        double currentIMUPosition = robot.odometry.getPose().getHeading();
+        double currentIMUPosition = robot.theOpticalOdometry.getPose().getHeading();
         double turnError;
 
         MotionProfile turnProfile = new MotionProfile(currentIMUPosition, angle, DriveConstants.MAX_ANGULAR_VELOCITY, DriveConstants.MAX_ANGULAR_VELOCITY);
@@ -291,18 +290,18 @@ public class PIDDrive {
                 }
             }
 
-            double output = robot.drivetrain.profiledTurningPID.getOutputFromError(
+            double output = robot.theDrivetrain.profiledTurningPID.getOutputFromError(
                     turnError
             );
 
 
-            robot.drivetrain.robotCentricDriveFromGamepad(
+            robot.theDrivetrain.robotCentricDriveFromGamepad(
                     0,
                     0,
                     -Math.min(Math.max(output, -1), 1) + Math.signum(output)
             );
 
-            currentIMUPosition = robot.odometry.getPose().getHeading();
+            currentIMUPosition = robot.theOpticalOdometry.getPose().getHeading();
 
             if (telemetry != null) {
                 telemetry.addData("Target Angle: ", currentTargetAngle);
@@ -314,9 +313,9 @@ public class PIDDrive {
             this.robot.update();
         }
 
-        MotorGroup<DcMotorEx> robotDrivetrain = robot.drivetrain.getDrivetrainMotorGroup();
+        MotorGroup<DcMotorEx> robotDrivetrain = robot.theDrivetrain.getDrivetrainMotorGroup();
 
-        DcMotor.ZeroPowerBehavior currentZeroPowerBehavior = robot.drivetrain.getZeroPowerBehavior();
+        DcMotor.ZeroPowerBehavior currentZeroPowerBehavior = robot.theDrivetrain.getZeroPowerBehavior();
 
         if (currentZeroPowerBehavior != DcMotor.ZeroPowerBehavior.BRAKE) {
             robotDrivetrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

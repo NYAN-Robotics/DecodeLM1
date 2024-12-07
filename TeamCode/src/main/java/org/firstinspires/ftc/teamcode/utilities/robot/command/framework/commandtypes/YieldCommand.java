@@ -14,6 +14,11 @@ public class YieldCommand extends CommandBase {
         theDuration = aDuration;
     }
 
+    public YieldCommand(AnonymousIsFinishedFunction aFunction) {
+        theExhaustFunction = aFunction;
+        theDuration = Long.MAX_VALUE;
+    }
+
     public YieldCommand(long aDuration, AnonymousIsFinishedFunction aFunction) {
         theDuration = aDuration;
         theExhaustFunction = aFunction;
@@ -48,7 +53,7 @@ public class YieldCommand extends CommandBase {
 
         // System.out.println("Current Time: " + System.currentTimeMillis() + " Start Time: " + theStartTime);
         if (theExhaustFunction != null) {
-            System.out.println(theExhaustFunction.isFinished());
+            // System.out.println(theExhaustFunction.isFinished());
             return overTimeAllotted || theExhaustFunction.isFinished();
         }
 
