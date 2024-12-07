@@ -472,16 +472,14 @@ public class Intake implements Subsystem {
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(100),
-                        new ParallelCommandGroup(
-                                new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
-                                new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
-                                new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))
-                        ),
-                        new YieldCommand(1000),
+                        new YieldCommand(100), // Wait for holder servo to fully actuate
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
+                        new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                        new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
+                        new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(500),
+                        new YieldCommand(500), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
                 )
         );
