@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
@@ -47,6 +48,7 @@ public class Intake implements Subsystem {
 
     public enum IntakeState {
         DEFAULT(0.58),
+        EJECT(0.58),
         EXTENDED(0.73);
 
         public double position;
@@ -96,7 +98,7 @@ public class Intake implements Subsystem {
         HOLD(0.2),
         STATIONARY(0),
         SLOW_REVERSE(-0.4),
-        REVERSE(-0.75);
+        REVERSE(-0.6);
 
         public double position;
 
@@ -211,6 +213,8 @@ public class Intake implements Subsystem {
         activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
+
+
         telemetry = newTelemetry;
     }
 
@@ -320,7 +324,7 @@ public class Intake implements Subsystem {
                     RobotEx.getInstance().commandScheduler.scheduleCommand(
                             new SequentialCommand(
                                     new OneTimeCommand(this::reverseIntake),
-                                    new YieldCommand(1000),
+                                    new YieldCommand(1500),
                                     new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
                                     new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.INTAKING))
                             )
@@ -355,6 +359,7 @@ public class Intake implements Subsystem {
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Intake Motor State: ", currentIntakeMotorState);
+        telemetry.addData("Intake Currnet: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Holder State: ", holderServo);
@@ -430,7 +435,7 @@ public class Intake implements Subsystem {
         RobotEx.getInstance().commandScheduler.scheduleCommand(
             new SequentialCommand(
                     new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
-                    new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                    new OneTimeCommand(() -> setIntakeState(IntakeState.EJECT)),
                     new YieldCommand(200),
                     new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE))
             )
@@ -486,6 +491,10 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
                 )
         );
+
+    }
+
+    public void containsSample() {
 
     }
 

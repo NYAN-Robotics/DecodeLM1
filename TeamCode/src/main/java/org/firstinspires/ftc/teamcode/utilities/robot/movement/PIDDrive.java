@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.utilities.robot.movement;
 
 import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.MAX_CORRECTION_TIME;
 import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD;
-import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD_TIME;
 
 import androidx.core.math.MathUtils;
 
@@ -183,7 +182,7 @@ public class PIDDrive {
         robot.update();
     }
 
-    public void gotoPoint(MovementCommand movementCommand) {
+    public void gotoPoint(MovementCommandCache movementCommandCache) {
 
         Pose currentPose;
         Pose currentVelocity;
@@ -193,12 +192,12 @@ public class PIDDrive {
         ElapsedTime inPositionTime = new ElapsedTime();
         boolean inPosition = false;
 
-        movementCommand.start();
+        movementCommandCache.start();
 
         while (!robot.stopRequested) {
-            movementCommand.update();
+            movementCommandCache.update();
 
-            MovementStateCommand targetState = movementCommand.getTargetState();
+            MovementStateCommand targetState = movementCommandCache.getTargetState();
 
             currentPose = robot.odometry.getPose();
             currentVelocity = robot.odometry.getVelocity();
@@ -239,16 +238,16 @@ public class PIDDrive {
             telemetry.addData("bool: ", movementCommand.currentTime > movementCommand.duration + movementCommand.constants.maxCorrectionTime);
              */
 
-            if (error.lessThan(THRESHOLD) && movementCommand.theCurrentTime > movementCommand.theDuration) {
+            if (error.lessThan(THRESHOLD) && movementCommandCache.theCurrentTime > movementCommandCache.theDuration) {
                 if (inPosition) {
-                    if (inPositionTime.seconds() >= movementCommand.theMovementConstants.maxCorrectionTime || currentVelocity.lessThan(THRESHOLD)) {
+                    if (inPositionTime.seconds() >= movementCommandCache.theMovementConstants.maxCorrectionTime || currentVelocity.lessThan(THRESHOLD)) {
                         break;
                     }
                 } else {
                     inPosition = true;
                     inPositionTime.reset();
                 }
-            } else if (movementCommand.theCurrentTime > movementCommand.theDuration + movementCommand.theMovementConstants.maxCorrectionTime) {
+            } else if (movementCommandCache.theCurrentTime > movementCommandCache.theDuration + movementCommandCache.theMovementConstants.maxCorrectionTime) {
                 break;
             } else {
                 inPosition = false;

@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.utilities.physics.states.KinematicState;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MovementCommand {
+public class MovementCommandCache {
 
     private final double CACHE_INCREMENT = 1/100.0;
     private Map<Double, MovementStateCommand> theStateCache;
@@ -26,7 +26,7 @@ public class MovementCommand {
 
     Pose theDeltaPose;
 
-    double theCurrentTime;
+    public double theCurrentTime;
 
     double theDisplacement;
     double theDirection;
@@ -36,7 +36,7 @@ public class MovementCommand {
 
     double theDuration;
 
-    public MovementCommand(Pose aInitialPose, Pose aFinalPose, MovementConstants aConstants) {
+    public MovementCommandCache(Pose aInitialPose, Pose aFinalPose, MovementConstants aConstants) {
         theStartPose = aInitialPose;
         theEndPose = aFinalPose;
 
@@ -132,6 +132,10 @@ public class MovementCommand {
 
     public void update() {
         theCurrentTime = theProfileTimer.seconds();
+    }
+
+    public MotionProfile getTheMotionProfile() {
+        return theMotionProfile;
     }
 
 }

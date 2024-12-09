@@ -47,14 +47,14 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.44),
-        BACK_PICKUP(0.25),
-        AUTO_DEFAULT(0.37),
-        HANG_INITIAL(0.60),
-        HANG_FINAL(0.7),
-        EXTENDED(0.86),
-        SPECIMEN_DROP(1),
-        SPECIMEN_PICKUP(0.33);
+        DEFAULT(0.44+0.02),
+        BACK_PICKUP(0.25+0.02),
+        AUTO_DEFAULT(0.37+0.02),
+        HANG_INITIAL(0.60+0.02),
+        HANG_FINAL(0.7+0.02),
+        EXTENDED(0.86+0.02),
+        SPECIMEN_DROP(1+0.02),
+        SPECIMEN_PICKUP(0.33+0.02);
 
         public double position;
 
@@ -70,7 +70,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeRotationStates {
-        DEFAULT(0.53),
+        DEFAULT(0.51),
         ROTATED(0.18);
 
         public double position;
