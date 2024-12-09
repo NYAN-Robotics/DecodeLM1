@@ -19,11 +19,10 @@ import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.PrintCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
@@ -321,8 +320,8 @@ public class Intake implements Subsystem {
                 if (!wrongColor) {
                     returnSlides();
                 } else {
-                    RobotEx.getInstance().commandScheduler.scheduleCommand(
-                            new SequentialCommand(
+                    RobotEx.getInstance().theCommandScheduler.scheduleCommand(
+                            new SequentialCommandGroup(
                                     new OneTimeCommand(this::reverseIntake),
                                     new YieldCommand(1500),
                                     new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
@@ -432,8 +431,8 @@ public class Intake implements Subsystem {
     }
 
     public void reverseIntake() {
-        RobotEx.getInstance().commandScheduler.scheduleCommand(
-            new SequentialCommand(
+        RobotEx.getInstance().theCommandScheduler.scheduleCommand(
+            new SequentialCommandGroup(
                     new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                     new OneTimeCommand(() -> setIntakeState(IntakeState.EJECT)),
                     new YieldCommand(200),
@@ -475,19 +474,17 @@ public class Intake implements Subsystem {
     }
 
     public void returnSlides() {
-        robot.commandScheduler.scheduleCommand(
-                new SequentialCommand(
+        robot.theCommandScheduler.scheduleCommand(
+                new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(100),
-                        new ParallelCommand(
-                                new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
-                                new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
-                                new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT))
-                        ),
-                        new YieldCommand(1000),
+                        new YieldCommand(100), // Wait for holder servo to fully actuate
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
+                        new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                        new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
+                        new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
-                        new OneTimeCommand(() -> robot.outtake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(500),
+                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
+                        new YieldCommand(500), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
                 )
         );

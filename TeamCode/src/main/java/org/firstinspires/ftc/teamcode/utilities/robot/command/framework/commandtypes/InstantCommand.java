@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
+package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes;
 
 public abstract class InstantCommand extends CommandBase {
 

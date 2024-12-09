@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
+package org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes;
 
-import android.os.health.SystemHealthManager;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.AnonymousIsFinishedFunction;
 
 public class YieldCommand extends CommandBase {
 
@@ -12,6 +12,11 @@ public class YieldCommand extends CommandBase {
 
     public YieldCommand(long aDuration) {
         theDuration = aDuration;
+    }
+
+    public YieldCommand(AnonymousIsFinishedFunction aFunction) {
+        theExhaustFunction = aFunction;
+        theDuration = Long.MAX_VALUE;
     }
 
     public YieldCommand(long aDuration, AnonymousIsFinishedFunction aFunction) {
@@ -48,7 +53,7 @@ public class YieldCommand extends CommandBase {
 
         // System.out.println("Current Time: " + System.currentTimeMillis() + " Start Time: " + theStartTime);
         if (theExhaustFunction != null) {
-            System.out.println(theExhaustFunction.isFinished());
+            // System.out.println(theExhaustFunction.isFinished());
             return overTimeAllotted || theExhaustFunction.isFinished();
         }
 

@@ -78,7 +78,7 @@ public class DriveForward extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.theOpticalOdometry.setPose(new Pose(0, 0, Math.PI / 2));
 
         robot.pause(0.5);
 

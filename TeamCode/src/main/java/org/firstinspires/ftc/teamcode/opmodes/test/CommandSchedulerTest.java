@@ -8,9 +8,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.PrintCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.ParallelCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 
 /**
@@ -48,7 +45,7 @@ public class CommandSchedulerTest extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.odometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.theOpticalOdometry.setPose(new Pose(0, 0, Math.PI / 2));
 
         robot.pause(0.5);
 

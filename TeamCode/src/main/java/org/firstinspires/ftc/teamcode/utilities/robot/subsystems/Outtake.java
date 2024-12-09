@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMoti
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.OneTimeCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.SequentialCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
 
@@ -345,8 +345,8 @@ public class Outtake implements Subsystem {
 
         if (newState == OuttakeClawStates.CLOSED && currentSlideState == OuttakeSlidesStates.SPECIMEN_PICKUP) {
 
-            robot.commandScheduler.scheduleCommand(
-                    new SequentialCommand(
+            robot.theCommandScheduler.scheduleCommand(
+                    new SequentialCommandGroup(
                             new YieldCommand(1000),
                             new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS)),
                             new YieldCommand(2000, this::atTargetPosition),

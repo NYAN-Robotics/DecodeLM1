@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.command.framework;
 
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.CommandBase;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -11,7 +13,7 @@ public class CommandScheduler {
     private final ArrayList<CommandBase> theScheduledCommands = new ArrayList<>();
     private final Queue<CommandBase> theExecutingCommands = new LinkedList<>();
 
-    private CommandScheduler() {} // Private constructor to enforce singleton
+    private CommandScheduler() {}
 
     public static CommandScheduler getInstance() {
         return INSTANCE;
