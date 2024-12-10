@@ -29,7 +29,7 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.setMsTransmissionInterval(10);
+        telemetry.setMsTransmissionInterval(500);
 
         // Initialize the robot
         robot.init(this, telemetry);
@@ -130,7 +130,7 @@ public class MainTeleop extends LinearOpMode {
                                     new YieldCommand(2000),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_FINAL)),
                                     new YieldCommand(2000),
-                                    new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS))
+                                    new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.HANG_FINAL))
                             )
                     );
                 }

@@ -27,7 +27,8 @@ public class Outtake implements Subsystem {
     public enum OuttakeSlidesStates {
         DEFAULT(0),
         SAMPLES(2000),
-        HANG(2100),
+        HANG(2150),
+        HANG_FINAL(1400),
         SPECIMENS(700),
         SPECIMENS_DROP(0),
         SPECIMEN_PICKUP (400),
@@ -242,7 +243,7 @@ public class Outtake implements Subsystem {
             liftPower /= 2;
 
             if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.5) {
-                liftPower = -0.2;
+                liftPower = -0.4;
                 pushingDown = true;
             } else if (pushingDown) {
                 pushingDown = false;
@@ -260,6 +261,8 @@ public class Outtake implements Subsystem {
         if (currentSlideState != OuttakeSlidesStates.DEFAULT && profile.atTargetPosition() && !outtakeReset) {
             if (currentSlideState == OuttakeSlidesStates.HOVER) {
                 setCurrentOuttakeState(OuttakeServoState.BACK_PICKUP);
+            } else if (currentSlideState == OuttakeSlidesStates.HANG) {
+                setCurrentOuttakeState(OuttakeServoState.HANG_INITIAL);
             } else if (currentSlideState != OuttakeSlidesStates.SPECIMEN_PICKUP && currentSlideState != OuttakeSlidesStates.SPECIMENS_DROP){
                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.DEFAULT);

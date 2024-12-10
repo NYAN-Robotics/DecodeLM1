@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingServo;
@@ -265,14 +264,17 @@ public class Intake implements Subsystem {
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
+
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
 
-
-
          */
+
+
+
+
         /*
         if (reverse) {
             activeMotor.setPower(-1);
@@ -296,6 +298,7 @@ public class Intake implements Subsystem {
         if (currentBreakbeamState && !lastBreakbeamState) {
             containedTimer.reset();
             scheduledAutomation = true;
+
         }
 
         if (scheduledAutomation) {
@@ -303,10 +306,10 @@ public class Intake implements Subsystem {
                 scheduledAutomation = false;
             }
 
-            if (containedTimer.seconds() > 0.05) {
-                scheduledAutomation = false;
+            updatePossessedColor();
 
-                updatePossessedColor();
+            if (containedTimer.seconds() > 0.75 || sampleContained != SampleContained.NONE) {
+                scheduledAutomation = false;
 
                 boolean wrongColor = false;
 
@@ -382,8 +385,6 @@ public class Intake implements Subsystem {
 
     private void rebuildProfile(double targetPosition) {
 
-
-
         profile = new MotionProfile(
                 getCurrentPosition(),
                 targetPosition,
@@ -398,6 +399,11 @@ public class Intake implements Subsystem {
     }
 
     public void setTargetLinkageState(LinkageStates newState) {
+
+        if (newState == currentLinkageState && !manual) {
+            return;
+        }
+
         rebuildProfile(newState.position);
 
         currentLinkageState = newState;
@@ -446,6 +452,19 @@ public class Intake implements Subsystem {
         int red = intakeColorSensor.red();
         int blue = intakeColorSensor.blue();
 
+        if ((green + red + blue) < 800) {
+            sampleContained = SampleContained.NONE;
+            return;
+        }
+
+        if (red > green && red > blue) {
+            sampleContained = SampleContained.RED;
+        } else if (blue > green && blue > red) {
+            sampleContained = SampleContained.BLUE;
+        } else {
+            sampleContained = SampleContained.YELLOW;
+        }
+        /*
         if (green > red && green > blue) {
             sampleContained = SampleContained.YELLOW;
         } else if (red > green && red > blue) {
@@ -455,6 +474,8 @@ public class Intake implements Subsystem {
         } else {
             sampleContained = SampleContained.NONE;
         }
+
+         */
     }
 
     public boolean getCurrentPositionFromAnalog() {
@@ -477,22 +498,23 @@ public class Intake implements Subsystem {
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(100), // Wait for holder servo to fully actuate
+                        new YieldCommand(200), // Wait for holder servo to fully actuate
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
+                        new YieldCommand(250),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(500), // Wait for claw to close
+                        new YieldCommand(300), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
                 )
         );
 
     }
 
-    public void containsSample() {
-
+    public boolean containsSample() {
+        return activeMotor.getCurrent(CurrentUnit.MILLIAMPS) > 1000;
     }
 
 }

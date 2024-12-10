@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.Mot
 import org.firstinspires.ftc.teamcode.utilities.math.AngleHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.InstantCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.InstantCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementCommandCache;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementStateCommand;
@@ -61,8 +61,8 @@ public class MovementCommand extends InstantCommand {
         MovementStateCommand targetState = theCache.getTargetState();
         Pose targetPose = targetState.getPose();
 
-        Pose currentPose = theRobot.odometry.getPose();
-        Pose currentVelocity = theRobot.odometry.getVelocity();
+        Pose currentPose = theRobot.theOpticalOdometry.getPose();
+        Pose currentVelocity = theRobot.theOpticalOdometry.getVelocity();
 
         Pose error = new Pose(0, 0, 0);
 
@@ -78,13 +78,13 @@ public class MovementCommand extends InstantCommand {
             );
         }
 
-        double feedbackX = theRobot.drivetrain.xController.getOutputFromError(error.getX());
-        double feedbackY = theRobot.drivetrain.yController.getOutputFromError(error.getY());
+        double feedbackX = theRobot.theDrivetrain.xController.getOutputFromError(error.getX());
+        double feedbackY = theRobot.theDrivetrain.yController.getOutputFromError(error.getY());
 
-        theRobot.drivetrain.fieldCentricDriveFromGamepad(
+        theRobot.theDrivetrain.fieldCentricDriveFromGamepad(
                 targetState.getFeedforwardX() + feedbackY,
                 targetState.getFeedforwardY() + feedbackX,
-                -MathUtils.clamp(theRobot.drivetrain.headingController.getOutputFromError(
+                -MathUtils.clamp(theRobot.theDrivetrain.headingController.getOutputFromError(
                         error.getHeading()
                 ), -0.75, 0.75)
         );
