@@ -109,6 +109,21 @@ public class Intake implements Subsystem {
         }
     }
 
+    public enum CowcatcherStates {
+        ACTIVATED(0.86),
+        DEFAULT(0.33);
+
+        public double position;
+
+        CowcatcherStates(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+    }
+
     public enum SampleContained {
         NONE,
         BLUE,
@@ -123,6 +138,7 @@ public class Intake implements Subsystem {
     public LinkageHolderState currentLinkageHolderState = LinkageHolderState.OPEN;
     public IntakeMotorStates currentIntakeMotorState = IntakeMotorStates.STATIONARY;
     public SampleContained sampleContained = SampleContained.NONE;
+    public CowcatcherStates currentCowcatcherState = CowcatcherStates.DEFAULT;
 
     DcMotorEx activeMotor;
 
@@ -131,6 +147,8 @@ public class Intake implements Subsystem {
 
     Servo leftDropdownServo;
     Servo rightDropdownServo;
+
+    Servo cowcatcherServo;
 
     Servo holderServo;
 
@@ -194,13 +212,18 @@ public class Intake implements Subsystem {
         linkageLockServo = new CachingServo(newHardwareMap.get(Servo.class, "linkageLock"), 1e-5);
         activeMotor = new CachingDcMotorEX(newHardwareMap.get(DcMotorEx.class, "intakeMotor"), 1e-5);
 
+        cowcatcherServo = new CachingServo(newHardwareMap.get(Servo.class, "cowcatcher"), 1e-5);
+
         intakeColorSensor = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
 
         linkageAnalog = newHardwareMap.get(AnalogInput.class, "linkageAnalog");
         intakeBreakbeam = newHardwareMap.get(DigitalChannel.class, "intakeBreakbeam");
 
+        cowcatcherServo.setDirection(Servo.Direction.FORWARD);
+
         leftServo.setDirection(Servo.Direction.REVERSE);
         rightServo.setDirection(Servo.Direction.REVERSE);
+
         leftDropdownServo.setDirection(Servo.Direction.REVERSE);
         rightDropdownServo.setDirection(Servo.Direction.FORWARD);
 
@@ -358,6 +381,8 @@ public class Intake implements Subsystem {
 
         activeMotor.setPower(currentIntakeMotorState.position);
 
+        cowcatcherServo.setPosition(currentCowcatcherState.position);
+
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Intake Motor State: ", currentIntakeMotorState);
@@ -452,7 +477,7 @@ public class Intake implements Subsystem {
         int red = intakeColorSensor.red();
         int blue = intakeColorSensor.blue();
 
-        if ((green + red + blue) < 800) {
+        if ((green + red + blue) < 900) {
             sampleContained = SampleContained.NONE;
             return;
         }
@@ -511,6 +536,10 @@ public class Intake implements Subsystem {
                 )
         );
 
+    }
+
+    public void setCurrentCowcatcherState(CowcatcherStates newState) {
+        currentCowcatcherState = newState;
     }
 
     public boolean containsSample() {

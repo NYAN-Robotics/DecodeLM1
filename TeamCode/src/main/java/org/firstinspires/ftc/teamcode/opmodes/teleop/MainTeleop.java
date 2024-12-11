@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.fasterxml.jackson.databind.ext.SqlBlobSerializer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -126,10 +127,8 @@ public class MainTeleop extends LinearOpMode {
                 } else {
                     robot.theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
-                                    new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_INITIAL)),
-                                    new YieldCommand(2000),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_FINAL)),
-                                    new YieldCommand(2000),
+                                    new YieldCommand(1000),
                                     new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.HANG_FINAL))
                             )
                     );
@@ -139,11 +138,14 @@ public class MainTeleop extends LinearOpMode {
             if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
                 robot.theCommandScheduler.scheduleCommand(
                         new SequentialCommandGroup(
-                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP)),
-                                new YieldCommand(2000, robot.theOuttake::atTargetPosition),
+                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
+                                new YieldCommand(3000, robot.theOuttake::atTargetPosition),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED))
+                                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
+                                new YieldCommand(1000),
+                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
+
                         )
                 );
             }
@@ -153,7 +155,19 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) {
-                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                if (robot.theOuttake.getOuttakeServoState() == Outtake.OuttakeServoState.SPECIMEN_INITIAL) {
+                    robot.theCommandScheduler.scheduleCommand(
+                            new SequentialCommandGroup(
+                                    new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_DROP_FINAL)),
+                                    new YieldCommand(2000),
+                                    new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                                    new YieldCommand(1000),
+                                    new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL))
+                            )
+                    );
+                } else {
+                    robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                }
             }
 
             if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {
@@ -178,15 +192,15 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
-                robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT);
-            }
+                robot.theCommandScheduler.scheduleCommand(
+                        new SequentialCommandGroup(
+                                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
+                                new YieldCommand(400),
+                                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
+                        )
 
-            if (currentFrameGamepad1.square && !previousFrameGamepad1.square) {
-                robot.theIntake.setTargetHolderState(Intake.SampleHolderState.EXTENDED);
-            }
 
-            if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
-                robot.theOpticalOdometry.setPose(robot.theLimelight.getPose());
+                        ;
             }
 
             frameTime = robot.update();
