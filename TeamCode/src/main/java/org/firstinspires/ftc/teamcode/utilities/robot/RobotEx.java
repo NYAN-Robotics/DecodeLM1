@@ -71,7 +71,7 @@ public class RobotEx {
             theLimelight
     };
 
-    Telemetry theTelemetry;
+    public Telemetry theTelemetry;
 
     public HardwareMap theHardwareMap;
 
@@ -113,6 +113,8 @@ public class RobotEx {
         for (Subsystem subsystem : this.theSubsystems) {
             subsystem.onInit(theHardwareMap, telemetry);
         }
+
+        theCommandScheduler.clearCommands();
 
         telemetry.update();
     }

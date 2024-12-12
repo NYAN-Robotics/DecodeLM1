@@ -46,8 +46,8 @@ public class DriveConstants {
     public static double V_MAX = 50; // If doing 1
     public static double A_MAX = 40;
 
-    public static double K_V = 0.0035;
-    public static double K_A = 0.013;
+    public static double K_V = 0.013;
+    public static double K_A = 0.0035;
 
     public static Pose THRESHOLD = new Pose(1, 1, Math.toRadians(1));
     public static double THRESHOLD_TIME = 0.5;

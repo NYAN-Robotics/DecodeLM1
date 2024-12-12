@@ -177,6 +177,8 @@ public class Intake implements Subsystem {
     boolean manual = false;
     boolean reverse = false;
 
+    boolean disableOuttake = false;
+
     boolean lastBreakbeamState = false;
     boolean currentBreakbeamState = false;
 
@@ -232,9 +234,6 @@ public class Intake implements Subsystem {
         activeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         activeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-
-
 
         telemetry = newTelemetry;
     }
@@ -343,7 +342,7 @@ public class Intake implements Subsystem {
 
                 }
 
-                if (!wrongColor) {
+                if (!wrongColor || disableOuttake) {
                     returnSlides();
                 } else {
                     RobotEx.getInstance().theCommandScheduler.scheduleCommand(
@@ -530,6 +529,7 @@ public class Intake implements Subsystem {
                         new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
                         new YieldCommand(250),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
+                        new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                         new YieldCommand(300), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
@@ -544,6 +544,10 @@ public class Intake implements Subsystem {
 
     public boolean containsSample() {
         return activeMotor.getCurrent(CurrentUnit.MILLIAMPS) > 1000;
+    }
+
+    public void setDisableOuttake(boolean disable) {
+        disableOuttake = disable;
     }
 
 }

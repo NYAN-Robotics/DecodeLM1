@@ -7,13 +7,14 @@ import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.physics.states.KinematicState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MovementCommandCache {
 
     private final double CACHE_INCREMENT = 1/100.0;
-    private Map<Double, MovementStateCommand> theStateCache;
+    private ArrayList<MovementStateCommand> theStateCache;
 
     MovementConstants theMovementConstants;
 
@@ -53,7 +54,7 @@ public class MovementCommandCache {
         theDuration = theMotionProfile.getDuration();
 
         theProfileTimer = new ElapsedTime();
-        theStateCache = new HashMap<>();
+        theStateCache = new ArrayList<>((int) (theDuration / CACHE_INCREMENT + 1));
 
         theCurrentTime = 0;
         theMovementConstants = aConstants;
@@ -70,25 +71,37 @@ public class MovementCommandCache {
     public void cacheStates() {
         theStateCache.clear();
 
-        for (double time = 0; time <= theDuration; time += 1/CACHE_INCREMENT) {
-            theStateCache.put(time, getMovementStateCommand(time));
+        for (double time = 0; time <= theDuration; time += CACHE_INCREMENT) {
+            theStateCache.add(getKeyFromTime(time), getMovementStateCommand(time));
+            // System.out.println("Time: " + time + " Duration: " + theDuration + "Key: " + getKeyFromTime(time) + "max: " + theDuration/CACHE_INCREMENT);
         }
     }
 
     public MovementStateCommand getTargetState() {
 
         // snap time to the nearest 0.01 number
-        double key = Math.round(theCurrentTime / CACHE_INCREMENT) * CACHE_INCREMENT;;
+        int key = getKeyFromTime(theCurrentTime); // Math.round(theCurrentTime / CACHE_INCREMENT) * CACHE_INCREMENT;;
 
+        // System.out.println("Key: "+ key);
+        return theStateCache.get(key);
+
+        /*
         if (theStateCache.containsKey(key)) {
             return theStateCache.get(key);
         } else {
+            System.out.println(key + " cache miss");
 
             MovementStateCommand targetState = getMovementStateCommand(theCurrentTime);
 
             theStateCache.put(theCurrentTime, targetState);
             return targetState;
         }
+
+         */
+    }
+
+    public int getKeyFromTime(double time) {
+        return (int) MathHelper.clamp(time / CACHE_INCREMENT, 0, theDuration/CACHE_INCREMENT);
     }
 
     private MovementStateCommand getMovementStateCommand(double aTime) {

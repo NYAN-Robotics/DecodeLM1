@@ -81,7 +81,6 @@ public class DriveForward extends LinearOpMode {
         robot.theOpticalOdometry.setPose(new Pose(0, 0, Math.PI / 2));
 
         robot.pause(0.5);
-
         /*
         MovementCommandCache initialCommand = new MovementCommandCache(
                 new Pose(0, 0, Math.PI / 2),
@@ -95,11 +94,12 @@ public class DriveForward extends LinearOpMode {
                 new MovementConstants()
         );
 
-
         drive.gotoPoint(initialCommand);
         drive.gotoPoint(returnCommand);
 
          */
+
+
 
         robot.theCommandScheduler.scheduleCommand(commands);
 

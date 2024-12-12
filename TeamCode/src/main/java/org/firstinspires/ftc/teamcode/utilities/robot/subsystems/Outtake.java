@@ -112,7 +112,7 @@ public class Outtake implements Subsystem {
     public enum OuttakePivotStates {
         DEFAULT(0.83),
         TRANSFER_POSITION(0.6),
-        SPECIMEN_INITIAL(0.9),
+        SPECIMEN_INITIAL(0.8),
         SPECIMEN_DROP(0.6),
         SAMPLE_DROP(1),
         SPECIMEN_PICKUP(0.14),
@@ -284,6 +284,7 @@ public class Outtake implements Subsystem {
             }
 
             if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+                setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
                 setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
             }
@@ -316,6 +317,7 @@ public class Outtake implements Subsystem {
         telemetry.addData("Target Position: ", profile.feedforwardProfile.getPositionFromTime(slidesTimer.seconds()));
         telemetry.addData("Magnetic Switch: ", currentSwitchState);
         telemetry.addData("Analog Position Outtake: ", outtakeAnalog.getVoltage());
+        telemetry.addData("At position: ", atTargetPosition());
 
         liftPower = 0;
     }

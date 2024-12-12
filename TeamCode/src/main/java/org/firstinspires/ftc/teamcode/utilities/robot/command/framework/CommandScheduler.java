@@ -24,6 +24,11 @@ public class CommandScheduler {
         theScheduledCommands.add(aCommand);
     }
 
+    public void clearCommands() {
+        theScheduledCommands.clear();
+        theExecutingCommands.clear();
+    }
+
     public void update() {
 
         ArrayList<CommandBase> commandsToRemove = new ArrayList<>();

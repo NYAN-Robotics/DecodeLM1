@@ -34,6 +34,7 @@ public class MainTeleop extends LinearOpMode {
 
         // Initialize the robot
         robot.init(this, telemetry);
+        robot.theIntake.setDisableOuttake(false);
 
 
         waitForStart();
@@ -159,9 +160,9 @@ public class MainTeleop extends LinearOpMode {
                     robot.theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_DROP_FINAL)),
-                                    new YieldCommand(2000),
+                                    new YieldCommand(500),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                                    new YieldCommand(1000),
+                                    new YieldCommand(500),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL))
                             )
                     );
