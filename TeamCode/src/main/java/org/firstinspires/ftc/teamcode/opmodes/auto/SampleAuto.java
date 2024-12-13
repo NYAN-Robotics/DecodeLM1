@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
+import org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
@@ -79,7 +80,7 @@ public class SampleAuto extends LinearOpMode {
                             new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                     )
                 ),
-                new YieldCommand(() -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
+                new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
                 new YieldCommand(1000),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
@@ -91,6 +92,8 @@ public class SampleAuto extends LinearOpMode {
                             new MovementConstants()
                         ),
                         new SequentialCommandGroup(
+                                new YieldCommand(1000),
+                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
                         ),
@@ -99,13 +102,9 @@ public class SampleAuto extends LinearOpMode {
                                 new OneTimeCommand(() -> robot.theOuttake.reset())
                         )
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-
 
                 new YieldCommand(500),
-                new SequentialCommandGroup(
+                new ParallelCommandGroup(
                         new MovementCommand(
                                 new Pose(-57.6, -47.8, Math.PI / 2),
                                 new Pose(-54, -55, Math.PI / 4),
@@ -114,21 +113,22 @@ public class SampleAuto extends LinearOpMode {
                         new SequentialCommandGroup(
                                 new YieldCommand(250),
                                 new YieldCommand(robot.theOuttake::atTargetPosition),
-                                new YieldCommand(1000),
+                                new YieldCommand(robot.theIntake::linkageAtHome),
+                                new YieldCommand(100),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                                 new YieldCommand(250),
                                 new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
-                                new YieldCommand(500),
+                                new YieldCommand(250),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                         )
                 ),
-                new YieldCommand(() -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
+                new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
                 new YieldCommand(1000),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new YieldCommand(100),
 
-                new SequentialCommandGroup(
+                new ParallelCommandGroup(
                         new MovementCommand(
                                 new Pose(-54, -55, Math.PI / 4),
                                 new Pose(-40, -27, Math.PI),
@@ -140,13 +140,11 @@ public class SampleAuto extends LinearOpMode {
                         )
                 ),
                 new SequentialCommandGroup(
-                        new YieldCommand(500),
                         new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                        new YieldCommand(100),
                         new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                         new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
                 ),
-                new YieldCommand(1000),
+                new YieldCommand(2000),
                 new ParallelCommandGroup(
                         new MovementCommand(
                                 new Pose(-40, -27, Math.PI),
@@ -156,15 +154,16 @@ public class SampleAuto extends LinearOpMode {
                         new SequentialCommandGroup(
                                 new YieldCommand(250),
                                 new YieldCommand(robot.theOuttake::atTargetPosition),
-                                new YieldCommand(1000),
+                                new YieldCommand(robot.theIntake::linkageAtHome),
+                                new YieldCommand(100),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                                 new YieldCommand(250),
                                 new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
-                                new YieldCommand(500),
+                                new YieldCommand(250),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                         )
                 ),
-                new YieldCommand(() -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
+                new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
                 new YieldCommand(1000),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
@@ -172,15 +171,25 @@ public class SampleAuto extends LinearOpMode {
 
                 new ParallelCommandGroup(
                         new MovementCommand(
-                                new Pose(-54, -55, Math.PI / 4),
-                                new Pose(-40, -5, -Math.PI),
+                                new Pose(-55, -56, Math.PI / 4),
+                                new Pose(-40, -5, 3 * Math.PI / 4),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup(
                                 new YieldCommand(100),
                                 new OneTimeCommand(() -> robot.theOuttake.reset())
                         )
-                )
+                ),
+
+                new MovementCommand(
+                        new Pose(-40, -5, 3 * Math.PI / 4),
+                        new Pose(-10, -5, Math.PI),
+                        new MovementConstants(40, 10, 0, DriveConstants.K_V, DriveConstants.K_A)
+                ),
+
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
+                new YieldCommand(250),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
         );
 
 

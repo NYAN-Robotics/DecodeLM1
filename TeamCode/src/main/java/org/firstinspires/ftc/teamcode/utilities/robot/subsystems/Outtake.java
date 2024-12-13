@@ -59,6 +59,7 @@ public class Outtake implements Subsystem {
         SPECIMEN_INITIAL(0.59),
         SPECIMEN_DROP_FINAL(0.62),
         UP(0.7),
+        AUTO_PARK(0.9),
         SPECIMEN_PICKUP(0.31+0.02);
 
         public double position;
