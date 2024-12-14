@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
+import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
+import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
@@ -36,6 +38,16 @@ public class MainTeleop extends LinearOpMode {
         robot.init(this, telemetry);
         robot.theIntake.setDisableOuttake(false);
 
+        while (opModeInInit()) {
+            if (gamepad1.cross) {
+                Globals.ALLIANCE = Alliance.RED;
+            } else if (gamepad1.square) {
+                Globals.ALLIANCE = Alliance.BLUE;
+            }
+
+            telemetry.addData("Alliance: ", Globals.ALLIANCE);
+            telemetry.update();
+        }
 
         waitForStart();
 
@@ -102,10 +114,20 @@ public class MainTeleop extends LinearOpMode {
                 if (robot.theIntake.currentLinkageState == Intake.LinkageStates.DEFAULT) {
                     robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED);
                     robot.theIntake.setIntakeState(Intake.IntakeState.DEFAULT);
+
+                    if (robot.theOuttake.atTargetPosition() && robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.DEFAULT) {
+                        robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                    }
                 } else {
                     robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED);
                     robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING);
                 }
+            }
+
+            if (currentFrameGamepad1.square && !previousFrameGamepad2.square) {
+                robot.theIntake.setDisableOuttake(true);
+            } else if (currentFrameGamepad1.triangle && !previousFrameGamepad2.triangle) {
+                robot.theIntake.setDisableOuttake(false);
             }
 
             if (currentFrameGamepad1.circle && !previousFrameGamepad1.circle) {
@@ -208,5 +230,7 @@ public class MainTeleop extends LinearOpMode {
 
             telemetry.addData("Frame Time: ", MathHelper.truncate(frameTime, 3));
         }
+
+        robot.theIntake.setDisableOuttake(false);
     }
 }

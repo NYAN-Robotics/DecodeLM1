@@ -289,8 +289,8 @@ public class Outtake implements Subsystem {
         if (atTargetPosition() && this.currentSlideState == OuttakeSlidesStates.DEFAULT) {
             liftPower /= 2;
 
-            if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.5) {
-                liftPower = -0.4;
+            if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.25) {
+                liftPower = -0.1;
                 pushingDown = true;
             } else if (pushingDown) {
                 pushingDown = false;

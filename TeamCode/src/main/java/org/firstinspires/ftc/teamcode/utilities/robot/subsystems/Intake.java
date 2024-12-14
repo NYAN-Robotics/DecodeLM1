@@ -321,7 +321,7 @@ public class Intake implements Subsystem {
             setIntakeState(IntakeState.EXTENDED);
         }
 
-        if (currentBreakbeamState && !lastBreakbeamState) {
+        if (currentBreakbeamState && !lastBreakbeamState && currentIntakeState == IntakeState.EXTENDED) {
             containedTimer.reset();
             scheduledAutomation = true;
 
@@ -531,6 +531,11 @@ public class Intake implements Subsystem {
 
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
+                        new OneTimeCommand(() -> {
+                            if (robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.DEFAULT && robot.theOuttake.atTargetPosition()) {
+                                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                            }
+                        }),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
                         new YieldCommand(200), // Wait for holder servo to fully actuate
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
