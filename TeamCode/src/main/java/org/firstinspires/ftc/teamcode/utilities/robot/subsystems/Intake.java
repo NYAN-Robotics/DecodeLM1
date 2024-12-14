@@ -142,8 +142,8 @@ public class Intake implements Subsystem {
 
     DcMotorEx activeMotor;
 
-    Servo leftServo;
-    Servo rightServo;
+    public Servo leftServo;
+    public Servo rightServo;
 
     Servo leftDropdownServo;
     Servo rightDropdownServo;
@@ -185,6 +185,8 @@ public class Intake implements Subsystem {
     ElapsedTime containedTimer = new ElapsedTime();
 
     boolean scheduledAutomation = false;
+
+    boolean requestedReturn = false;
 
     public static double aMax = 1;
     public static double vMax = 1;
@@ -236,6 +238,8 @@ public class Intake implements Subsystem {
         activeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         telemetry = newTelemetry;
+
+        requestedReturn = false;
     }
 
     @Override
@@ -385,7 +389,7 @@ public class Intake implements Subsystem {
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Intake Motor State: ", currentIntakeMotorState);
-        telemetry.addData("Intake Currnet: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        // telemetry.addData("Intake Currnet: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Holder State: ", holderServo);
@@ -519,6 +523,12 @@ public class Intake implements Subsystem {
     }
 
     public void returnSlides() {
+        if (requestedReturn) {
+            return;
+        }
+
+        requestedReturn = true;
+
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
@@ -532,7 +542,8 @@ public class Intake implements Subsystem {
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                         new YieldCommand(300), // Wait for claw to close
-                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT))
+                        new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
+                        new OneTimeCommand(() -> requestedReturn = false)
                 )
         );
 
@@ -543,7 +554,11 @@ public class Intake implements Subsystem {
     }
 
     public boolean containsSample() {
-        return activeMotor.getCurrent(CurrentUnit.MILLIAMPS) > 1000;
+        return (activeMotor.getCurrent(CurrentUnit.MILLIAMPS) > 1000) || currentBreakbeamState;
+    }
+
+    public boolean containsSampleColorSensor() {
+        return currentBreakbeamState;
     }
 
     public void setDisableOuttake(boolean disable) {

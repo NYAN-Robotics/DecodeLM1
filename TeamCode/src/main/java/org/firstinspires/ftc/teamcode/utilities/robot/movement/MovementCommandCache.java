@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class MovementCommandCache {
 
-    private final double CACHE_INCREMENT = 1/100.0;
+    private final double CACHE_INCREMENT = 1/200.0;
     private ArrayList<MovementStateCommand> theStateCache;
 
     MovementConstants theMovementConstants;
@@ -101,7 +101,7 @@ public class MovementCommandCache {
     }
 
     public int getKeyFromTime(double time) {
-        return (int) MathHelper.clamp(time / CACHE_INCREMENT, 0, theDuration/CACHE_INCREMENT);
+        return (int) MathHelper.clamp(time / CACHE_INCREMENT, 0, theDuration/CACHE_INCREMENT - 1);
     }
 
     private MovementStateCommand getMovementStateCommand(double aTime) {

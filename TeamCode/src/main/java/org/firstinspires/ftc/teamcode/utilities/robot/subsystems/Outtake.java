@@ -50,12 +50,38 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
+        DEFAULT(0.45),
+        BACK_PICKUP(DEFAULT.position - 0.19),
+        AUTO_DEFAULT(DEFAULT.position - 0.07),
+        HANG_INITIAL(DEFAULT.position + 0.16),
+        HANG_FINAL(DEFAULT.position + 0.26),
+        EXTENDED(DEFAULT.position + 0.44),
+        SPECIMEN_INITIAL(DEFAULT.position + 0.13),
+        SPECIMEN_DROP_FINAL(DEFAULT.position + 0.16),
+        UP(DEFAULT.position + 0.26),
+        AUTO_PARK(DEFAULT.position + 0.46),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.15);
+
+        public double position;
+
+
+        // Constructor
+        OuttakeServoState(double position) {
+            this.position = position;
+        }
+
+        public void setPosition(double position) {
+            this.position = position;
+        }
+    }
+    /*
+    public enum OuttakeServoState {
         DEFAULT(0.44+0.02),
         BACK_PICKUP(0.25+0.02),
         AUTO_DEFAULT(0.37+0.02),
         HANG_INITIAL(0.60+0.02),
         HANG_FINAL(0.7+0.02),
-        EXTENDED(0.86+0.02),
+        EXTENDED(0.86+0.02+0.01),
         SPECIMEN_INITIAL(0.59),
         SPECIMEN_DROP_FINAL(0.62),
         UP(0.7),
@@ -74,6 +100,8 @@ public class Outtake implements Subsystem {
         }
 
     }
+
+     */
 
     public enum OuttakeRotationStates {
         DEFAULT(0.51),
@@ -111,12 +139,12 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.83),
-        TRANSFER_POSITION(0.6),
-        SPECIMEN_INITIAL(0.8),
-        SPECIMEN_DROP(0.6),
-        SAMPLE_DROP(1),
-        SPECIMEN_PICKUP(0.14),
+        DEFAULT(0.83-0.04),
+        TRANSFER_POSITION(0.6-0.04),
+        SPECIMEN_INITIAL(0.8-0.04),
+        SPECIMEN_DROP(0.6-0.04),
+        SAMPLE_DROP(1-0.04),
+        SPECIMEN_PICKUP(0.14-0.04),
         DOWN(0);
 
         public double position;
@@ -154,7 +182,7 @@ public class Outtake implements Subsystem {
     Servo rightOuttakeServo;
 
     Servo rotationOuttakeServo;
-    Servo clawServo;
+    public Servo clawServo;
 
     Servo clawPivot;
 
