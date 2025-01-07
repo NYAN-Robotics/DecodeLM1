@@ -326,15 +326,15 @@ public class Outtake implements Subsystem {
         }
 
         leftLiftMotor.setPower(liftPower);
-        rightLiftMotor.setPower(liftPower);
+        // rightLiftMotor.setPower(liftPower);
 
-        leftOuttakeServo.setPosition(currentOuttakeServoState.position);
-        rightOuttakeServo.setPosition(currentOuttakeServoState.position);
+        // leftOuttakeServo.setPosition(currentOuttakeServoState.position);
+        // rightOuttakeServo.setPosition(currentOuttakeServoState.position);
 
-        rotationOuttakeServo.setPosition(currentRotationState.position);
-        clawServo.setPosition(currentClawState.position);
+        // rotationOuttakeServo.setPosition(currentRotationState.position);
+        // clawServo.setPosition(currentClawState.position);
 
-        clawPivot.setPosition(currentPivotState.position);
+        // clawPivot.setPosition(currentPivotState.position);
 
         telemetry.addData("Outtake Servo State: ", currentOuttakeServoState);
         telemetry.addData("Outtake Position: ", currentOuttakeServoState.position);

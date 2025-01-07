@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -108,7 +109,7 @@ public class Drivetrain implements Subsystem {
         rightFrontMotor.setDirection(DcMotorEx.Direction.FORWARD);
         leftFrontMotor.setDirection(DcMotorEx.Direction.REVERSE);
         leftBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        rightBackMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightBackMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
 
         drivetrainMotorGroup = new MotorGroup<>(

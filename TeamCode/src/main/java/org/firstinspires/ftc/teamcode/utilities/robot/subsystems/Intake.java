@@ -29,7 +29,7 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.38),
+        DEFAULT(0.37),
         EXTENDED(0.61);
 
         public double position;
@@ -77,7 +77,7 @@ public class Intake implements Subsystem {
     }
 
     public enum LinkageHolderState {
-        CLOSED(0.51),
+        CLOSED(0.52),
         OPEN(0.46);
 
         public double position;
@@ -188,8 +188,8 @@ public class Intake implements Subsystem {
 
     boolean requestedReturn = false;
 
-    public static double aMax = 1;
-    public static double vMax = 1;
+    public static double aMax = 10;
+    public static double vMax = 10;
 
     public static double velocity = 1;
 
@@ -231,7 +231,7 @@ public class Intake implements Subsystem {
         leftDropdownServo.setDirection(Servo.Direction.REVERSE);
         rightDropdownServo.setDirection(Servo.Direction.FORWARD);
 
-        activeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        activeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         activeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         activeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -375,7 +375,7 @@ public class Intake implements Subsystem {
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
-        holderServo.setPosition(currentSampleHolderState.position);
+        // holderServo.setPosition(currentSampleHolderState.position);
 
         linkageLockServo.setPosition(currentLinkageHolderState.position);
 
@@ -384,7 +384,7 @@ public class Intake implements Subsystem {
 
         activeMotor.setPower(currentIntakeMotorState.position);
 
-        cowcatcherServo.setPosition(currentCowcatcherState.position);
+        // cowcatcherServo.setPosition(currentCowcatcherState.position);
 
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
