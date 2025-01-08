@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPI
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
@@ -29,7 +30,7 @@ public class Outtake implements Subsystem {
         SAMPLES(2000),
         HANG(2150),
         HANG_FINAL(1600),
-        SPECIMENS(650),
+        SPECIMENS(800),
         SPECIMEN_TRANSFER(900),
         SPECIMENS_DROP(0),
         SPECIMEN_INITIAL_PICKUP(400),
@@ -50,14 +51,14 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.45),
+        DEFAULT(0.48),
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.16),
         HANG_FINAL(DEFAULT.position + 0.26),
         EXTENDED(DEFAULT.position + 0.44),
         SPECIMEN_INITIAL(DEFAULT.position + 0.13),
-        SPECIMEN_DROP_FINAL(DEFAULT.position + 0.16),
+        SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
         SPECIMEN_PICKUP(DEFAULT.position - 0.15);
@@ -104,8 +105,8 @@ public class Outtake implements Subsystem {
      */
 
     public enum OuttakeRotationStates {
-        DEFAULT(0.51),
-        ROTATED(0.18);
+        DEFAULT(0.65),
+        ROTATED(0.3);
 
         public double position;
 
@@ -122,8 +123,8 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
-        DEFAULT(0.55),
-        CLOSED(0.76);
+        DEFAULT(0.5),
+        CLOSED(0.32);
 
         public double position;
 
@@ -139,13 +140,13 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.83-0.04),
-        TRANSFER_POSITION(0.6-0.04),
-        SPECIMEN_INITIAL(0.8-0.04),
-        SPECIMEN_DROP(0.6-0.04),
-        SAMPLE_DROP(1-0.04),
-        SPECIMEN_PICKUP(0.14-0.04),
-        DOWN(0);
+        DEFAULT(0.43),
+        TRANSFER_POSITION(DEFAULT.position - .2),
+        SPECIMEN_INITIAL(DEFAULT.position),
+        SPECIMEN_DROP(DEFAULT.position - 0.1),
+        SAMPLE_DROP(DEFAULT.position + 0.04),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.41),
+        DOWN(DEFAULT.position - 0.25);
 
         public double position;
 
@@ -157,7 +158,6 @@ public class Outtake implements Subsystem {
         public void setPosition(double position) {
             this.position = position;
         }
-
     }
 
 
@@ -172,6 +172,10 @@ public class Outtake implements Subsystem {
     public static double rotatedOuttakeRotationPosition = OuttakeServoState.EXTENDED.position;
 
     public static double defaultSpecimenInitialPosition = OuttakePivotStates.SPECIMEN_INITIAL.position;
+
+    public static double defaultOuttakeEffectorRotationPosition = OuttakeRotationStates.DEFAULT.position;
+
+    public static double defaultOuttakeClawStates = OuttakeClawStates.DEFAULT.position;
 
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
@@ -251,8 +255,8 @@ public class Outtake implements Subsystem {
         leftLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -281,6 +285,10 @@ public class Outtake implements Subsystem {
 
         OuttakePivotStates.SPECIMEN_INITIAL.position = defaultSpecimenInitialPosition;
 
+        OuttakeRotationStates.DEFAULT.position = defaultOuttakeEffectorRotationPosition;
+
+        OuttakeClawStates.DEFAULT.position = defaultOuttakeClawStates;
+
         profile.setPIDCoefficients(kP, kI, kD, kF);
         profile.setProfileCoefficients(kV, kA, vMax, aMax);
 
@@ -301,6 +309,7 @@ public class Outtake implements Subsystem {
 
             }
         }
+
         if (liftPower == 0) {
             liftPower = profile.getOutput(getCurrentSensorPosition());
         }
@@ -323,18 +332,27 @@ public class Outtake implements Subsystem {
 
         if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() < 0.5) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
+
+            robot.theCommandScheduler.scheduleCommand(
+                    new SequentialCommandGroup(
+                            new YieldCommand(600),
+                            new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.EXTENDED)),
+                            new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.ROTATED)),
+                            new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP))
+                    )
+            );
         }
 
         leftLiftMotor.setPower(liftPower);
-        // rightLiftMotor.setPower(liftPower);
+        rightLiftMotor.setPower(liftPower);
 
-        // leftOuttakeServo.setPosition(currentOuttakeServoState.position);
-        // rightOuttakeServo.setPosition(currentOuttakeServoState.position);
+        leftOuttakeServo.setPosition(currentOuttakeServoState.position);
+        rightOuttakeServo.setPosition(currentOuttakeServoState.position);
 
-        // rotationOuttakeServo.setPosition(currentRotationState.position);
-        // clawServo.setPosition(currentClawState.position);
+        rotationOuttakeServo.setPosition(currentRotationState.position);
+        clawServo.setPosition(currentClawState.position);
 
-        // clawPivot.setPosition(currentPivotState.position);
+        clawPivot.setPosition(currentPivotState.position);
 
         telemetry.addData("Outtake Servo State: ", currentOuttakeServoState);
         telemetry.addData("Outtake Position: ", currentOuttakeServoState.position);
@@ -375,7 +393,7 @@ public class Outtake implements Subsystem {
     }
 
     public double getCurrentSensorPosition() {
-        return -slidesEncoderMotor.getCurrentPosition();
+        return slidesEncoderMotor.getCurrentPosition();
     }
 
     public void setCurrentOuttakeState(OuttakeServoState newState) {

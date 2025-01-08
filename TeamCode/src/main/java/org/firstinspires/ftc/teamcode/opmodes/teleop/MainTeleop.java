@@ -166,7 +166,7 @@ public class MainTeleop extends LinearOpMode {
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                                new YieldCommand(1000),
+                                new YieldCommand(500),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
 
                         )
@@ -178,19 +178,24 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) {
+                /*
                 if (robot.theOuttake.getOuttakeServoState() == Outtake.OuttakeServoState.SPECIMEN_INITIAL) {
                     robot.theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_DROP_FINAL)),
-                                    new YieldCommand(500),
+                                    new YieldCommand(300),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                                    new YieldCommand(500),
+                                    new YieldCommand(150),
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL))
                             )
                     );
                 } else {
                     robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
                 }
+
+                 */
+                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+
             }
 
             if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {

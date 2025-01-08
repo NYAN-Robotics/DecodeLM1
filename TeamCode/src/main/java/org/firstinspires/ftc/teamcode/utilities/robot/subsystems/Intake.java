@@ -45,9 +45,9 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        DEFAULT(0.58),
-        EJECT(0.58),
-        EXTENDED(0.73);
+        DEFAULT(0.6),
+        EJECT(0.6),
+        EXTENDED(0.74);
 
         public double position;
 
@@ -291,12 +291,11 @@ public class Intake implements Subsystem {
         telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
 
-        /*
+
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
 
-         */
 
 
 
@@ -375,7 +374,7 @@ public class Intake implements Subsystem {
         leftDropdownServo.setPosition(currentIntakeState.position);
         rightDropdownServo.setPosition(currentIntakeState.position);
 
-        // holderServo.setPosition(currentSampleHolderState.position);
+        holderServo.setPosition(currentSampleHolderState.position);
 
         linkageLockServo.setPosition(currentLinkageHolderState.position);
 
@@ -542,7 +541,7 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
-                        new YieldCommand(250),
+                        new YieldCommand(500),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
