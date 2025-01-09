@@ -110,8 +110,8 @@ public class Intake implements Subsystem {
     }
 
     public enum CowcatcherStates {
-        ACTIVATED(0.86),
-        DEFAULT(0.33);
+        ACTIVATED(0.98),
+        DEFAULT(0.67);
 
         public double position;
 
@@ -223,7 +223,7 @@ public class Intake implements Subsystem {
         linkageAnalog = newHardwareMap.get(AnalogInput.class, "linkageAnalog");
         intakeBreakbeam = newHardwareMap.get(DigitalChannel.class, "intakeBreakbeam");
 
-        cowcatcherServo.setDirection(Servo.Direction.FORWARD);
+        cowcatcherServo.setDirection(Servo.Direction.REVERSE);
 
         leftServo.setDirection(Servo.Direction.REVERSE);
         rightServo.setDirection(Servo.Direction.REVERSE);
@@ -291,10 +291,14 @@ public class Intake implements Subsystem {
         telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
 
+        telemetry.addData("Servo latch position:", holderServo.getPosition());
 
+        /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
+
+         */
 
 
 
@@ -383,7 +387,7 @@ public class Intake implements Subsystem {
 
         activeMotor.setPower(currentIntakeMotorState.position);
 
-        // cowcatcherServo.setPosition(currentCowcatcherState.position);
+        cowcatcherServo.setPosition(currentCowcatcherState.position);
 
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
@@ -391,6 +395,8 @@ public class Intake implements Subsystem {
         // telemetry.addData("Intake Currnet: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
+        telemetry.addData("Cowcatcher State: ", currentCowcatcherState);
+        telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());
         telemetry.addData("Holder State: ", holderServo);
 
         reverse = false;
@@ -536,10 +542,11 @@ public class Intake implements Subsystem {
                             }
                         }),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(200), // Wait for holder servo to fully actuate
+                        new YieldCommand(250), // Wait for holder servo to fully actuate
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
+                        new YieldCommand(100),
                         new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
                         new YieldCommand(500),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
