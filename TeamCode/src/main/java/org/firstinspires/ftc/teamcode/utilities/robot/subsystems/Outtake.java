@@ -30,11 +30,11 @@ public class Outtake implements Subsystem {
         SAMPLES(2000),
         HANG(2150),
         HANG_FINAL(1600),
-        SPECIMENS(800),
-        SPECIMEN_TRANSFER(900),
+        SPECIMENS(1250),
+        SPECIMEN_TRANSFER(1100),
         SPECIMENS_DROP(0),
-        SPECIMEN_INITIAL_PICKUP(400),
-        SPECIMEN_PICKUP(340),
+        SPECIMEN_INITIAL_PICKUP(550),
+        SPECIMEN_PICKUP(550),
         HOVER(350);
 
         public double position;
@@ -61,7 +61,8 @@ public class Outtake implements Subsystem {
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.15);
+        SPECIMEN_PICKUP(DEFAULT.position - 0.125),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.18);
 
         public double position;
 
@@ -106,6 +107,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeRotationStates {
         DEFAULT(0.65),
+        SPECIMEN_ROTATED(0.96),
         ROTATED(0.3);
 
         public double position;
@@ -124,7 +126,7 @@ public class Outtake implements Subsystem {
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
         DEFAULT(0.6),
-        CLOSED(0.4);
+        CLOSED(0.42);
 
         public double position;
 
@@ -145,7 +147,7 @@ public class Outtake implements Subsystem {
         SPECIMEN_INITIAL(DEFAULT.position),
         SPECIMEN_DROP(DEFAULT.position - 0.1),
         SAMPLE_DROP(DEFAULT.position + 0.04),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.41),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.46),
         DOWN(DEFAULT.position - 0.25);
 
         public double position;
@@ -176,6 +178,8 @@ public class Outtake implements Subsystem {
     public static double defaultOuttakeEffectorRotationPosition = OuttakeRotationStates.DEFAULT.position;
 
     public static double defaultOuttakeClawStates = OuttakeClawStates.DEFAULT.position;
+
+    public static double specimenPivotClawPosition = OuttakePivotStates.SPECIMEN_DROP.position;
 
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
@@ -289,6 +293,8 @@ public class Outtake implements Subsystem {
 
         OuttakeClawStates.DEFAULT.position = defaultOuttakeClawStates;
 
+        OuttakePivotStates.SPECIMEN_DROP.position = specimenPivotClawPosition;
+
         profile.setPIDCoefficients(kP, kI, kD, kF);
         profile.setProfileCoefficients(kV, kA, vMax, aMax);
 
@@ -336,9 +342,12 @@ public class Outtake implements Subsystem {
             robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
                             new YieldCommand(600),
-                            new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.EXTENDED)),
-                            new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.ROTATED)),
-                            new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP))
+                            new OneTimeCommand(() ->
+                            { if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+                                setCurrentOuttakeState(OuttakeServoState.EXTENDED);
+                                setCurrentRotationState(OuttakeRotationStates.ROTATED);
+                                setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+                            }})
                     )
             );
         }
@@ -414,14 +423,17 @@ public class Outtake implements Subsystem {
 
             robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
-                            new YieldCommand(1000),
+                            new YieldCommand(500),
+                            new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_PICKUP_2)),
+                            new YieldCommand(250),
                             new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMEN_TRANSFER)),
                             new YieldCommand(2000, this::atTargetPosition),
                             new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_INITIAL)),
-                            new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SPECIMEN_INITIAL)),
+                            new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SPECIMEN_DROP)),
                             new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.ROTATED)),
                             new YieldCommand(500),
-                            new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS))
+                            new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS)),
+                            new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.SPECIMEN_ROTATED))
 
                     )
             );
