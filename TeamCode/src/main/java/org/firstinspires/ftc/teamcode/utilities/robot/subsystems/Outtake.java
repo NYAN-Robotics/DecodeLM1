@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.State;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
@@ -30,11 +31,11 @@ public class Outtake implements Subsystem {
         SAMPLES(2000),
         HANG(2150),
         HANG_FINAL(1600),
-        SPECIMENS(1250),
-        SPECIMEN_TRANSFER(1100),
+        SPECIMENS(1150),
+        SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
-        SPECIMEN_INITIAL_PICKUP(550),
-        SPECIMEN_PICKUP(550),
+        SPECIMEN_INITIAL_PICKUP(570),
+        SPECIMEN_PICKUP(570),
         HOVER(350);
 
         public double position;
@@ -61,7 +62,7 @@ public class Outtake implements Subsystem {
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.125),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.11),
         SPECIMEN_PICKUP_2(DEFAULT.position - 0.18);
 
         public double position;
@@ -126,6 +127,7 @@ public class Outtake implements Subsystem {
     public enum OuttakeClawStates {
         FULL_DEFAULT(0),
         DEFAULT(0.6),
+        SPECIMEN_PICKUP(0.52),
         CLOSED(0.42);
 
         public double position;
@@ -229,6 +231,8 @@ public class Outtake implements Subsystem {
     boolean pushingDown = false;
     boolean outtakeReset = false;
 
+    boolean waitingForIntake = false;
+
     Telemetry telemetry;
 
     RobotEx robot;
@@ -300,6 +304,7 @@ public class Outtake implements Subsystem {
 
         currentSwitchState = !magneticLimitSwitch.getState();
 
+
         if (atTargetPosition() && this.currentSlideState == OuttakeSlidesStates.DEFAULT) {
             liftPower /= 2;
 
@@ -344,13 +349,18 @@ public class Outtake implements Subsystem {
                             new YieldCommand(600),
                             new OneTimeCommand(() ->
                             { if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+                                /*
                                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
                                 setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+
+                                 */
                             }})
                     )
             );
         }
+
+        telemetry.addData("Power: ", liftPower);
 
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
@@ -388,6 +398,19 @@ public class Outtake implements Subsystem {
             return;
         }
 
+        if (newState == OuttakeSlidesStates.SAMPLES && robot.theIntake.requestedReturn && robot.theIntake.sampleContained != Intake.SampleContained.NONE) {
+            robot.theCommandScheduler.scheduleCommand(
+                    new SequentialCommandGroup(
+                            new YieldCommand(() -> !robot.theIntake.isReturnRequested()),
+                            new OneTimeCommand(() -> updateSlideState(newState))
+                    )
+            );
+        } else {
+            updateSlideState(newState);
+        }
+    }
+
+    private void updateSlideState(OuttakeSlidesStates newState) {
         previousSlideState = currentSlideState;
         currentSlideState = newState;
 

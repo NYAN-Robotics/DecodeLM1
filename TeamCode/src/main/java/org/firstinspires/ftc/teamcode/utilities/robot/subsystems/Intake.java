@@ -292,7 +292,7 @@ public class Intake implements Subsystem {
         telemetry.addData("Possessed Color: ", sampleContained);
 
         telemetry.addData("Servo latch position:", holderServo.getPosition());
-
+        telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
@@ -350,6 +350,8 @@ public class Intake implements Subsystem {
                 }
 
                 if (!wrongColor || disableOuttake) {
+                    robot.theOpMode.gamepad1.rumble(250);
+                    robot.theOpMode.gamepad2.rumble(250);
                     returnSlides();
                 } else {
                     RobotEx.getInstance().theCommandScheduler.scheduleCommand(
@@ -365,9 +367,11 @@ public class Intake implements Subsystem {
         }
 
 
+        /*
         if (!currentBreakbeamState) {
             setTargetHolderState(SampleHolderState.DEFAULT);
         }
+         */
 
         if (linkageAtHome() && !manual) {
             setLinkageHolderState(LinkageHolderState.CLOSED);
@@ -576,4 +580,7 @@ public class Intake implements Subsystem {
         disableOuttake = disable;
     }
 
+    public boolean isReturnRequested() {
+        return requestedReturn;
+    }
 }

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
+import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
@@ -38,6 +39,8 @@ public class MainTeleop extends LinearOpMode {
         robot.init(this, telemetry);
         robot.theIntake.setDisableOuttake(false);
 
+        boolean oneDriver = false;
+
         while (opModeInInit()) {
             if (gamepad1.cross) {
                 Globals.ALLIANCE = Alliance.RED;
@@ -45,7 +48,14 @@ public class MainTeleop extends LinearOpMode {
                 Globals.ALLIANCE = Alliance.BLUE;
             }
 
+            if (gamepad1.triangle) {
+                oneDriver = true;
+            } else if (gamepad1.circle) {
+                oneDriver = false;
+            }
+
             telemetry.addData("Alliance: ", Globals.ALLIANCE);
+            telemetry.addData("One Driver: ", oneDriver);
             telemetry.update();
         }
 
@@ -72,6 +82,8 @@ public class MainTeleop extends LinearOpMode {
         // robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
 
 
+        robot.theOpticalOdometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
         double frameTime = 0;
@@ -94,9 +106,9 @@ public class MainTeleop extends LinearOpMode {
             );
 
             if (currentFrameGamepad2.right_trigger > 0) {
-                robot.theOuttake.setLiftPower(currentFrameGamepad2.right_trigger);
-            } else {
-                robot.theOuttake.setLiftPower(-currentFrameGamepad2.left_trigger);
+                robot.theOuttake.setLiftPower(currentFrameGamepad2.right_trigger / 3 + Outtake.kF);
+            } else if (currentFrameGamepad2.left_trigger > 0) {
+                robot.theOuttake.setLiftPower(-currentFrameGamepad2.left_trigger + Outtake.kF);
             }
 
             if (currentFrameGamepad1.right_trigger > 0.05) {
@@ -124,26 +136,28 @@ public class MainTeleop extends LinearOpMode {
                 }
             }
 
+            /*
             if (currentFrameGamepad1.square && !previousFrameGamepad2.square) {
                 robot.theIntake.setDisableOuttake(true);
             } else if (currentFrameGamepad1.triangle && !previousFrameGamepad2.triangle) {
                 robot.theIntake.setDisableOuttake(false);
             }
 
+             */
+
             if (currentFrameGamepad1.circle && !previousFrameGamepad1.circle) {
                 robot.theIntake.reverseIntake();
             }
 
-            if (currentFrameGamepad2.dpad_up && !previousFrameGamepad2.dpad_up) {
+            if ((currentFrameGamepad2.dpad_up && !previousFrameGamepad2.dpad_up) || (oneDriver && (currentFrameGamepad1.dpad_up && !previousFrameGamepad1.dpad_up))) {
                 robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
-                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
             }
 
             if (currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left) {
                 robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
             }
 
-            if (currentFrameGamepad2.dpad_right && !previousFrameGamepad2.dpad_right) {
+            if ((currentFrameGamepad2.dpad_right && !previousFrameGamepad2.dpad_right) || (oneDriver && (currentFrameGamepad1.dpad_right && !previousFrameGamepad1.dpad_right))) {
 
                 if (robot.theOuttake.getSlidesState() != Outtake.OuttakeSlidesStates.HANG) {
                     robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.HANG);
@@ -158,7 +172,7 @@ public class MainTeleop extends LinearOpMode {
                 }
             }
 
-            if (currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) {
+            if ((currentFrameGamepad2.dpad_down && !previousFrameGamepad2.dpad_down) || (oneDriver && (currentFrameGamepad1.dpad_down && !previousFrameGamepad1.dpad_down))) {
                 robot.theCommandScheduler.scheduleCommand(
                         new SequentialCommandGroup(
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
@@ -166,7 +180,7 @@ public class MainTeleop extends LinearOpMode {
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
                                 new YieldCommand(500),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
 
@@ -174,11 +188,11 @@ public class MainTeleop extends LinearOpMode {
                 );
             }
 
-            if (currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) {
+            if ((currentFrameGamepad2.right_bumper && !previousFrameGamepad2.right_bumper) || (oneDriver && (currentFrameGamepad1.triangle && !previousFrameGamepad1.triangle))) {
                 robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
             }
 
-            if (currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) {
+            if ((currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) || (oneDriver && (currentFrameGamepad1.cross && !previousFrameGamepad1.cross))) {
                 /*
                 if (robot.theOuttake.getOuttakeServoState() == Outtake.OuttakeServoState.SPECIMEN_INITIAL) {
                     robot.theCommandScheduler.scheduleCommand(
@@ -212,7 +226,7 @@ public class MainTeleop extends LinearOpMode {
                 robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
             }
 
-            if (currentFrameGamepad2.square && !previousFrameGamepad2.square) {
+            if ((currentFrameGamepad2.square && !previousFrameGamepad2.square) || (oneDriver && (currentFrameGamepad1.dpad_up && !previousFrameGamepad1.dpad_up))) {
                 robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);
                 robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
                 robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
@@ -226,11 +240,11 @@ public class MainTeleop extends LinearOpMode {
                                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
                                 new YieldCommand(1000),
                                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
-                        )
-
-
-                        ;
+                        );
             }
+
+
+
 
             frameTime = robot.update();
 
