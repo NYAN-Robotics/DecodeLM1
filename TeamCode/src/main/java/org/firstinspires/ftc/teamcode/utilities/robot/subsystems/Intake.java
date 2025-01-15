@@ -288,6 +288,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
+        telemetry.addData("At home: ", linkageAtHomeAnalog());
         telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
 
@@ -401,7 +402,8 @@ public class Intake implements Subsystem {
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Cowcatcher State: ", currentCowcatcherState);
         telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());
-        telemetry.addData("Holder State: ", holderServo);
+        telemetry.addData("Holder State: ", currentSampleHolderState);
+        telemetry.addData("Servo position: ", holderServo.getPosition());
 
         reverse = false;
     }
@@ -523,6 +525,10 @@ public class Intake implements Subsystem {
         return linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT; // linkageAnalog.getVoltage() < 0.165 && currentLinkageState == LinkageStates.DEFAULT; // linkageAtTargetPosition() && currentLinkageState == LinkageStates.DEFAULT;
     }
 
+    public boolean linkageAtHomeAnalog() {
+        return linkageAnalog.getVoltage() < 1.33 && currentLinkageState == LinkageStates.DEFAULT;
+    }
+
     public void setLinkageHolderState(LinkageHolderState newState) {
         currentLinkageHolderState = newState;
     }
@@ -550,9 +556,8 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
-                        new YieldCommand(100),
-                        new YieldCommand(1000, this::linkageAtTargetPosition), // Wait for slides to return
-                        new YieldCommand(500),
+                        new YieldCommand(2000, this::linkageAtHomeAnalog), // Wait for slides to return
+                        new YieldCommand(150),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
