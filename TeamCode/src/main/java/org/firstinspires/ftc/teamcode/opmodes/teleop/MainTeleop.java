@@ -41,6 +41,8 @@ public class MainTeleop extends LinearOpMode {
 
         boolean oneDriver = false;
 
+        Globals.inTeleop = true;
+
         while (opModeInInit()) {
             if (gamepad1.cross) {
                 Globals.ALLIANCE = Alliance.RED;
@@ -235,12 +237,7 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
-                robot.theCommandScheduler.scheduleCommand(
-                        new SequentialCommandGroup(
-                                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
-                                new YieldCommand(1000),
-                                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
-                        );
+                robot.theIntake.triggerCowcatcher();
             }
 
 
@@ -252,5 +249,7 @@ public class MainTeleop extends LinearOpMode {
         }
 
         robot.theIntake.setDisableOuttake(false);
+
+        Globals.inTeleop = false;
     }
 }

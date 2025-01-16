@@ -30,6 +30,12 @@ public class MovementConstants {
         this.kA = kA;
     }
 
+    public MovementConstants(
+            double maxCorrectionTime
+    ) {
+        this(V_MAX, A_MAX, maxCorrectionTime, K_V, K_A);
+    }
+
     public MovementConstants() {
         this(V_MAX, A_MAX, MAX_CORRECTION_TIME, K_V, K_A);
     }

@@ -30,6 +30,7 @@ public class Intake implements Subsystem {
 
     public enum LinkageStates {
         DEFAULT(0.37),
+        AUTO_EXTENSION(0.45),
         EXTENDED(0.61);
 
         public double position;
@@ -111,7 +112,7 @@ public class Intake implements Subsystem {
 
     public enum CowcatcherStates {
         ACTIVATED(0.98),
-        DEFAULT(0.67);
+        DEFAULT(0.65);
 
         public double position;
 
@@ -289,11 +290,11 @@ public class Intake implements Subsystem {
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("At home: ", linkageAtHomeAnalog());
-        telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Possessed Color: ", sampleContained);
 
-        telemetry.addData("Servo latch position:", holderServo.getPosition());
-        telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Servo latch position:", holderServo.getPosition());
+        // telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
@@ -325,7 +326,7 @@ public class Intake implements Subsystem {
             setIntakeState(IntakeState.EXTENDED);
         }
 
-        if (currentBreakbeamState && !lastBreakbeamState && currentIntakeState == IntakeState.EXTENDED) {
+        if (currentBreakbeamState && !lastBreakbeamState && currentIntakeState != IntakeState.DEFAULT && linkageTimer.seconds() > 0.25) {
             containedTimer.reset();
             scheduledAutomation = true;
 
@@ -401,9 +402,9 @@ public class Intake implements Subsystem {
         telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Cowcatcher State: ", currentCowcatcherState);
-        telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());
+        // telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());
         telemetry.addData("Holder State: ", currentSampleHolderState);
-        telemetry.addData("Servo position: ", holderServo.getPosition());
+        // telemetry.addData("Servo position: ", holderServo.getPosition());
 
         reverse = false;
     }
@@ -561,7 +562,7 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(300), // Wait for claw to close
+                        new YieldCommand(200), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                         new OneTimeCommand(() -> requestedReturn = false)
                 )
@@ -587,5 +588,14 @@ public class Intake implements Subsystem {
 
     public boolean isReturnRequested() {
         return requestedReturn;
+    }
+
+    public void triggerCowcatcher() {
+        robot.theCommandScheduler.scheduleCommand(
+                new SequentialCommandGroup(
+                        new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
+                        new YieldCommand(300),
+                        new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
+        );
     }
 }

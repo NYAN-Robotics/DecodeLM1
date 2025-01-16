@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
+import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
@@ -34,8 +35,8 @@ public class Outtake implements Subsystem {
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
-        SPECIMEN_INITIAL_PICKUP(570),
-        SPECIMEN_PICKUP(570),
+        SPECIMEN_INITIAL_PICKUP(610),
+        SPECIMEN_PICKUP(580),
         HOVER(350);
 
         public double position;
@@ -52,18 +53,19 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.48),
+        DEFAULT(0.51),
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.16),
         HANG_FINAL(DEFAULT.position + 0.26),
         EXTENDED(DEFAULT.position + 0.44),
+        EXTENDED_INITIAL(DEFAULT.position + 0.3),
         SPECIMEN_INITIAL(DEFAULT.position + 0.13),
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.11),
-        SPECIMEN_PICKUP_2(DEFAULT.position - 0.18);
+        SPECIMEN_PICKUP(DEFAULT.position - 0.14),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.22);
 
         public double position;
 
@@ -144,7 +146,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.46),
+        DEFAULT(0.44),
         TRANSFER_POSITION(DEFAULT.position - .2),
         SPECIMEN_INITIAL(DEFAULT.position),
         SPECIMEN_DROP(DEFAULT.position - 0.1),
@@ -231,6 +233,8 @@ public class Outtake implements Subsystem {
     boolean pushingDown = false;
     boolean outtakeReset = false;
 
+    boolean sampleServoRotatedRequested = false;
+
     boolean waitingForIntake = false;
 
     Telemetry telemetry;
@@ -309,7 +313,7 @@ public class Outtake implements Subsystem {
             liftPower /= 2;
 
             if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.25) {
-                liftPower = -0.1;
+                liftPower = -0.2;
                 pushingDown = true;
             } else if (pushingDown) {
                 pushingDown = false;
@@ -341,23 +345,29 @@ public class Outtake implements Subsystem {
             outtakeReset = true;
         }
 
-        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() < 0.5) {
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
-            robot.theCommandScheduler.scheduleCommand(
-                    new SequentialCommandGroup(
-                            new YieldCommand(600),
-                            new OneTimeCommand(() ->
-                            { if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
-                                /*
-                                setCurrentOuttakeState(OuttakeServoState.EXTENDED);
-                                setCurrentRotationState(OuttakeRotationStates.ROTATED);
-                                setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
 
-                                 */
-                            }})
-                    )
-            );
+            if (!Globals.inTeleop) {
+                sampleServoRotatedRequested = true;
+
+                robot.theCommandScheduler.scheduleCommand(
+                        new SequentialCommandGroup(
+                                new YieldCommand(300),
+                                new OneTimeCommand(() ->
+                                {
+                                    if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+
+                                        setCurrentOuttakeState(OuttakeServoState.EXTENDED_INITIAL);
+                                        setCurrentRotationState(OuttakeRotationStates.ROTATED);
+                                        setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+                                    }
+                                    sampleServoRotatedRequested = false;
+                                })
+                        )
+                );
+            }
         }
 
         telemetry.addData("Power: ", liftPower);
