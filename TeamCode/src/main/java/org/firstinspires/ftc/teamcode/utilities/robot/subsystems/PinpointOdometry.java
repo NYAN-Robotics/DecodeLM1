@@ -70,16 +70,6 @@ public class PinpointOdometry extends Localizer {
                 vel.getHeading(AngleUnit.RADIANS)
         );
 
-        /*
-        currentVelocity = new Pose(
-                (currentPose.getX() - lastPose.getX()) / poseTimer.seconds(),
-                (currentPose.getY() - lastPose.getY()) / poseTimer.seconds(),
-                (currentPose.getHeading() - lastPose.getHeading()) / poseTimer.seconds()
-        );
-
-         */
-
-
         telemetry.addLine("---Pinpoint---");
 
         telemetry.addData("x pos: ", currentPose.getX());
@@ -88,8 +78,11 @@ public class PinpointOdometry extends Localizer {
 
         telemetry.addData("x vel: ", currentVelocity.getX());
         telemetry.addData("y vel: ", currentVelocity.getY());
+
         telemetry.addData("heading vel", currentVelocity.getHeading());
         telemetry.addData("frequency", pinpoint.getFrequency());
+
+        telemetry.addLine("-------------");
 
         poseTimer.reset();
 
