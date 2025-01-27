@@ -241,6 +241,15 @@ public class Intake implements Subsystem {
         telemetry = newTelemetry;
 
         requestedReturn = false;
+
+        manual = false;
+        reverse = false;
+
+        disableOuttake = false;
+
+        lastBreakbeamState = false;
+        currentBreakbeamState = false;
+
     }
 
     @Override
@@ -557,7 +566,7 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
-                        new YieldCommand(2000, this::linkageAtHomeAnalog), // Wait for slides to return
+                        new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
                         new YieldCommand(150),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
@@ -598,4 +607,5 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
         );
     }
+
 }
