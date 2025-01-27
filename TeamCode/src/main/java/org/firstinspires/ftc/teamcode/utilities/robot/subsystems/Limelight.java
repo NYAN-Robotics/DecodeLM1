@@ -42,7 +42,7 @@ public class Limelight implements Subsystem {
     public void onOpmodeStarted() {
         // if (limelight == null) return;
         limelight.start();
-        odometry = RobotEx.getInstance().theOpticalOdometry;
+        odometry = RobotEx.getInstance().theLocalizer;
         // More setup
     }
 

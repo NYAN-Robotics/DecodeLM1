@@ -45,7 +45,7 @@ public class CommandSchedulerTest extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theOpticalOdometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(0, 0, Math.PI / 2));
 
         robot.pause(0.5);
 

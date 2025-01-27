@@ -241,7 +241,7 @@ public class SampleAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theOpticalOdometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
         robot.pause(0.05);
 

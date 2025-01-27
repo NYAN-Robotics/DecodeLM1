@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandt
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementCommandCache;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
@@ -78,7 +77,7 @@ public class DriveForward extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theOpticalOdometry.setPose(new Pose(0, 0, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(0, 0, Math.PI / 2));
 
         robot.pause(0.5);
         /*

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.fasterxml.jackson.databind.ext.SqlBlobSerializer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -84,7 +83,7 @@ public class MainTeleop extends LinearOpMode {
         // robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
 
 
-        robot.theOpticalOdometry.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 

@@ -66,7 +66,7 @@ public class PIDDrive {
     }
 
     public void gotoPoint(Pose point, MovementConstants constants) {
-        Pose currentPose = robot.theOpticalOdometry.getPose();
+        Pose currentPose = robot.theLocalizer.getPose();
         Pose currentVelocity = new Pose();
 
         Pose startPosition = new Pose(currentPose.getX(), currentPose.getY(), currentPose.getHeading());
@@ -96,7 +96,7 @@ public class PIDDrive {
 
         while (!robot.stopRequested) {
 
-            currentPose = robot.theOpticalOdometry.getPose();
+            currentPose = robot.theLocalizer.getPose();
             currentProfileTime = profileTime.seconds();
 
             double targetDisplacement = motion.getPositionFromTime(currentProfileTime);
@@ -199,8 +199,8 @@ public class PIDDrive {
 
             MovementStateCommand targetState = movementCommandCache.getTargetState();
 
-            currentPose = robot.theOpticalOdometry.getPose();
-            currentVelocity = robot.theOpticalOdometry.getVelocity();
+            currentPose = robot.theLocalizer.getPose();
+            currentVelocity = robot.theLocalizer.getVelocity();
 
             error.setX(targetState.getPose().getX() - currentPose.getX());
             error.setY(targetState.getPose().getY() - currentPose.getY());
@@ -264,7 +264,7 @@ public class PIDDrive {
     public void turnToAngle(double angle, MovementConstants constants) {
         angle = AngleHelper.normDelta(angle);
 
-        double currentIMUPosition = robot.theOpticalOdometry.getPose().getHeading();
+        double currentIMUPosition = robot.theLocalizer.getPose().getHeading();
         double turnError;
 
         MotionProfile turnProfile = new MotionProfile(currentIMUPosition, angle, DriveConstants.MAX_ANGULAR_VELOCITY, DriveConstants.MAX_ANGULAR_VELOCITY);
@@ -301,7 +301,7 @@ public class PIDDrive {
                     -Math.min(Math.max(output, -1), 1) + Math.signum(output)
             );
 
-            currentIMUPosition = robot.theOpticalOdometry.getPose().getHeading();
+            currentIMUPosition = robot.theLocalizer.getPose().getHeading();
 
             if (telemetry != null) {
                 telemetry.addData("Target Angle: ", currentTargetAngle);

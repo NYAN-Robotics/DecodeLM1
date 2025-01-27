@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -191,7 +190,7 @@ public class Drivetrain implements Subsystem {
     }
 
     public void fieldCentricDriveFromGamepad(double leftJoystickY, double leftJoystickX, double rightJoystickX) {
-        double currentRobotOrientation = robotInstance.theOpticalOdometry.currentPose.getHeading() - Math.PI / 2;
+        double currentRobotOrientation = robotInstance.theLocalizer.currentPose.getHeading() - Math.PI / 2;
 
         this.robotCentricDriveFromGamepad(
                 Math.sin(-currentRobotOrientation) * leftJoystickX + Math.cos(-currentRobotOrientation) * leftJoystickY,

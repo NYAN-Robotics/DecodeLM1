@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 
-public class OpticalOdometry implements Subsystem {
+public class OpticalOdometry extends Localizer {
 
     SparkFunOTOS otos;
 
@@ -91,13 +91,6 @@ public class OpticalOdometry implements Subsystem {
 
     }
 
-    public Pose getPose() {
-        return currentPose;
-    }
-
-    public Pose getVelocity() {
-        return currentVelocity;
-    }
     public void setPose(Pose newPose) {
         otos.setPosition(new SparkFunOTOS.Pose2D(
                 newPose.getX(),

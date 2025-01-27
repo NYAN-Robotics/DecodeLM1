@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.command.movement;
 
-import static org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants.THRESHOLD;
-
 import androidx.core.math.MathUtils;
 
 import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.MotionProfile;
@@ -61,8 +59,8 @@ public class MovementCommand extends InstantCommand {
         MovementStateCommand targetState = theCache.getTargetState();
         Pose targetPose = targetState.getPose();
 
-        Pose currentPose = theRobot.theOpticalOdometry.getPose();
-        Pose currentVelocity = theRobot.theOpticalOdometry.getVelocity();
+        Pose currentPose = theRobot.theLocalizer.getPose();
+        Pose currentVelocity = theRobot.theLocalizer.getVelocity();
 
         Pose error = new Pose(0, 0, 0);
 

@@ -61,7 +61,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theOpticalOdometry.setPose(new Pose(9.3, -62.2, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(9.3, -62.2, Math.PI / 2));
 
         // Points to go to
         // (1.77, -32.1, Math.PI / 2)

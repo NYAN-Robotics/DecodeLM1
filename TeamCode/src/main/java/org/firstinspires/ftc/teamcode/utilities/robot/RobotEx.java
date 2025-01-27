@@ -14,8 +14,10 @@ import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.CommandS
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Limelight;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Localizer;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.OpticalOdometry;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.PinpointOdometry;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Subsystem;
 
 
@@ -54,7 +56,7 @@ public class RobotEx {
     public CommandScheduler theCommandScheduler = CommandScheduler.getInstance();
 
     public Drivetrain theDrivetrain = new Drivetrain();
-    public OpticalOdometry theOpticalOdometry = new OpticalOdometry();
+    public Localizer theLocalizer = new PinpointOdometry();
     public Outtake theOuttake = new Outtake();
     public Intake theIntake = new Intake();
     public Limelight theLimelight = new Limelight();
@@ -65,7 +67,7 @@ public class RobotEx {
 
     private final Subsystem[] theSubsystems = new Subsystem[]{
             theDrivetrain,
-            theOpticalOdometry,
+            theLocalizer,
             theOuttake,
             theIntake,
             theLimelight
@@ -207,7 +209,7 @@ public class RobotEx {
     }
 
     public void persistData() {
-        PersistentData.startPose = this.theOpticalOdometry.getPose();
+        PersistentData.startPose = this.theLocalizer.getPose();
     }
 
     public double getVoltage() {
