@@ -109,7 +109,7 @@ public class MainTeleop extends LinearOpMode {
             if (currentFrameGamepad2.right_trigger > 0) {
                 robot.theOuttake.setLiftPower(currentFrameGamepad2.right_trigger / 3 + Outtake.kF);
             } else if (currentFrameGamepad2.left_trigger > 0) {
-                robot.theOuttake.setLiftPower(-currentFrameGamepad2.left_trigger + Outtake.kF);
+                robot.theOuttake.setLiftPower(-currentFrameGamepad2.left_trigger);
             }
 
             if (currentFrameGamepad1.right_trigger > 0.05) {
