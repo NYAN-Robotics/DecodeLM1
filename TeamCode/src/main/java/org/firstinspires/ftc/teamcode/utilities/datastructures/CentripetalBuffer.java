@@ -6,6 +6,19 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class CentripetalBuffer {
+
+    public static final int DEFAULT_CAPACITY = 3;
+    // implement singleton
+    private static CentripetalBuffer instance;
+
+    public static CentripetalBuffer getInstance() {
+        if (instance == null) {
+            instance = new CentripetalBuffer(DEFAULT_CAPACITY);
+        }
+
+        return instance;
+    }
+
     private final int theCapacity;
     private final Queue<Pose> theContainer1;
     private final Queue<Pose> theContainer2;
@@ -36,13 +49,24 @@ public class CentripetalBuffer {
         }
     }
 
-    public Pose getAveragePose(Queue<Pose> aContainer) {
-        return new Pose();
+    private Pose getAveragePose(Queue<Pose> aContainer) {
+        Pose averagePose = new Pose();
+
+        for (Pose pose : aContainer) {
+            averagePose.add(pose);
+        }
+
+        averagePose.times(1.0 / aContainer.size());
+
+        return averagePose;
     }
 
-    public Pose[] getPoses() {
-        return new Pose[] {
 
+    public Pose[] getAveragePoses() {
+        return new Pose[] {
+                getAveragePose(theContainer1),
+                getAveragePose(theContainer2),
+                getAveragePose(theContainer3)
         };
     }
 }
