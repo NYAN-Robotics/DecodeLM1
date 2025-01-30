@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
+import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 
 public abstract class Localizer implements Subsystem {
+
+    public CentripetalBuffer centripetalPoseBuffer = new CentripetalBuffer(3);
 
     Pose currentPose = new Pose();
     Pose lastPose = new Pose();

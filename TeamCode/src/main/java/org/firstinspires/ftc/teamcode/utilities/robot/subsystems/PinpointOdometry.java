@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.drivers.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 
@@ -18,6 +19,7 @@ public class PinpointOdometry extends Localizer {
     Telemetry telemetry;
 
     ElapsedTime poseTimer;
+
 
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -86,6 +88,7 @@ public class PinpointOdometry extends Localizer {
 
         poseTimer.reset();
 
+        centripetalPoseBuffer.addPose(currentPose);
     }
 
     public void setPose(Pose newPose) {

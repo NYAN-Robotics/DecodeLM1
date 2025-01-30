@@ -8,16 +8,6 @@ import java.util.Queue;
 public class CentripetalBuffer {
 
     public static final int DEFAULT_CAPACITY = 3;
-    // implement singleton
-    private static CentripetalBuffer instance;
-
-    public static CentripetalBuffer getInstance() {
-        if (instance == null) {
-            instance = new CentripetalBuffer(DEFAULT_CAPACITY);
-        }
-
-        return instance;
-    }
 
     private final int theCapacity;
     private final Queue<Pose> theContainer1;
@@ -26,6 +16,7 @@ public class CentripetalBuffer {
 
     public CentripetalBuffer(int aCapacity) {
         this.theCapacity = aCapacity;
+
         this.theContainer1 = new LinkedList<>();
         this.theContainer2 = new LinkedList<>();
         this.theContainer3 = new LinkedList<>();

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
 import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
+import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.physics.states.MecanumWheelState;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.extensions.MotorGroup;
@@ -250,6 +251,15 @@ public class Drivetrain implements Subsystem {
                 leftBackMotor.getVelocity(),
                 rightBackMotor.getVelocity()
         );
+    }
+
+    public double getCentripetalCorrection() {
+
+        Pose[] recentPoseAverage = robotInstance.theLocalizer.centripetalPoseBuffer.getAveragePoses();
+
+        double radius = MathHelper.findRadiusFromPoints(recentPoseAverage);
+
+        return radius;
     }
 
     public void setWeightedDrivePower(double weight) {
