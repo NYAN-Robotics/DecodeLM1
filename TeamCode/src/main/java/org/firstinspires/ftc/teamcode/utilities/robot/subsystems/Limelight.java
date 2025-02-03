@@ -16,7 +16,7 @@ public class Limelight implements Subsystem {
 
     Limelight3A limelight;
 
-    OpticalOdometry odometry;
+    Localizer odometry;
 
     Pose currentPose = new Pose(0, 0, 0);
 

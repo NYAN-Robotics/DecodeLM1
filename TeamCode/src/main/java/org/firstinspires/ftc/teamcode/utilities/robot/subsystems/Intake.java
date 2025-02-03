@@ -407,8 +407,8 @@ public class Intake implements Subsystem {
         telemetry.addData("Intake State: ", currentLinkageState);
         telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
         telemetry.addData("Intake Motor State: ", currentIntakeMotorState);
-        // telemetry.addData("Intake Currnet: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
-        telemetry.addData("Linkage Position: ", currentLinkageState.position);
+        // telemetry.addData("Intake Current: ", activeMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        // telemetry.addData("Linkage Position: ", currentLinkageState.position);
         telemetry.addData("Drop Down State: ", currentIntakeState);
         telemetry.addData("Cowcatcher State: ", currentCowcatcherState);
         // telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());

@@ -62,7 +62,6 @@ public class RobotEx {
     public Intake theIntake = new Intake();
     public Limelight theLimelight = new Limelight();
 
-
     public VoltageSensor theVoltageSensor;
 
     private final ElapsedTime theFrameTimer = new ElapsedTime();
@@ -106,25 +105,25 @@ public class RobotEx {
 
 
 
-    public void init(LinearOpMode opMode, Telemetry telemetry) {
-        this.theOpMode = opMode;
-        this.theHardwareMap = opMode.hardwareMap;
-        this.theTelemetry = telemetry;
+    public void init(LinearOpMode aOpMode, Telemetry aTelemetry) {
+        theOpMode = aOpMode;
+        theHardwareMap = aOpMode.hardwareMap;
+        theTelemetry = aTelemetry;
 
-        this.theVoltageSensor = theHardwareMap.voltageSensor.iterator().next();
-        this.voltageCompensator = this.theVoltageSensor.getVoltage();
+        theVoltageSensor = theHardwareMap.voltageSensor.iterator().next();
+        voltageCompensator = theVoltageSensor.getVoltage();
 
-        for (Subsystem subsystem : this.theSubsystems) {
-            subsystem.onInit(theHardwareMap, telemetry);
+        for (Subsystem subsystem : theSubsystems) {
+            subsystem.onInit(theHardwareMap, aTelemetry);
         }
 
         theCommandScheduler.clearCommands();
 
-        telemetry.update();
+        aTelemetry.update();
     }
 
     public void init(LinearOpMode opMode) {
-        this.init(opMode, opMode.telemetry);
+        init(opMode, opMode.telemetry);
     }
 
     public void postStart() {
@@ -148,7 +147,7 @@ public class RobotEx {
         }
 
 
-        for (Subsystem subsystem : this.theSubsystems) {
+        for (Subsystem subsystem : theSubsystems) {
             subsystem.onOpmodeStarted();
         }
 
@@ -181,13 +180,10 @@ public class RobotEx {
             hub.clearBulkCache();
         }
 
-        theTelemetry.addData("End Cache Clear time: ", theFrameTimer.milliseconds() - startTime);
-
         theCommandScheduler.update();
 
         for (Subsystem subsystem : theSubsystems) {
             subsystem.onCyclePassed();
-            theTelemetry.addData("Subsystem Update: ", theFrameTimer.milliseconds() - startTime);
         }
 
         theTelemetry.addLine("Refresh Rate: " + frames + " hz");
