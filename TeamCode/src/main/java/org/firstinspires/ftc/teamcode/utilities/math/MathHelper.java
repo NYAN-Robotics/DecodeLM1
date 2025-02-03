@@ -122,5 +122,9 @@ public class MathHelper {
         return Math.sqrt(sqr_of_r);
     }
 
+    // create a function that converts a veloicty in terms of in/sec to m/sec
+    public static double inchesPerSecondToMetersPerSecond(double inchesPerSecond) {
+        return inchesPerSecond * 0.0254;
+    }
 
 }

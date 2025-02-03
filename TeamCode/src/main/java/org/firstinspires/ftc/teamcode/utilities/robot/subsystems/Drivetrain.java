@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
-import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.physics.states.MecanumWheelState;
@@ -30,6 +29,7 @@ public class Drivetrain implements Subsystem {
     }
 
     private RobotEx robotInstance;
+    private Localizer theLocalizer;
 
     MotorGroup<DcMotorEx> drivetrainMotorGroup;
     private DcMotorEx[] drivetrainMotors;
@@ -84,10 +84,14 @@ public class Drivetrain implements Subsystem {
 
     public static double LATERAL_MULTIPLIER = 1.33;
 
+    public static double CENTRIPETAL_CONVERSION = 0.1;
+
+    public static double MASS = 26;
+
     @Override
     public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
 
-        this.robotInstance = RobotEx.getInstance();
+        robotInstance = RobotEx.getInstance();
 
         rightFrontMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "rightFrontMotor"), 1e-5);
         leftFrontMotor = new CachingDcMotorEX((DcMotorEx) newHardwareMap.get(DcMotor.class, "leftFrontMotor"), 1e-5);
@@ -97,10 +101,10 @@ public class Drivetrain implements Subsystem {
         // todo: figure out the directions
 
         drivetrainMotors = new DcMotorEx[] {
-                this.rightFrontMotor,
-                this.leftFrontMotor,
-                this.leftBackMotor,
-                this.rightBackMotor
+                rightFrontMotor,
+                leftFrontMotor,
+                leftBackMotor,
+                rightBackMotor
         };
 
 
@@ -114,10 +118,10 @@ public class Drivetrain implements Subsystem {
 
 
         drivetrainMotorGroup = new MotorGroup<>(
-                this.rightFrontMotor,
-                this.leftFrontMotor,
-                this.leftBackMotor,
-                this.rightBackMotor
+                rightFrontMotor,
+                leftFrontMotor,
+                leftBackMotor,
+                rightBackMotor
         );
 
         rightBackPower = 0;
@@ -125,47 +129,49 @@ public class Drivetrain implements Subsystem {
         leftFrontPower = 0;
         rightFrontPower = 0;
 
+
         telemetry = newTelemetry;
     }
 
     public void enableAntiTip() {
-        this.enableAntiTip = true;
+        enableAntiTip = true;
     }
 
     public void disableAntiTip() {
-        this.enableAntiTip = false;
+        enableAntiTip = false;
     }
 
     public void enableHeadingRetention() {
-        this.enableHeadingRetention = true;
+        enableHeadingRetention = true;
     }
 
     public void disableHeadingRetention() {
-        this.enableHeadingRetention = false;
+        enableHeadingRetention = false;
     }
 
     @Override
     public void onOpmodeStarted() {
-        this.robotInstance = RobotEx.getInstance();
+        robotInstance = RobotEx.getInstance();
+        theLocalizer = robotInstance.theLocalizer;
     }
 
     @Override
     public void onCyclePassed() {
 
-        this.headingPID.updateCoefficients(Drivetrain.kP, Drivetrain.kI, Drivetrain.kD, 0);
+        headingPID.updateCoefficients(Drivetrain.kP, Drivetrain.kI, Drivetrain.kD, 0);
 
-        this.rightBackMotor.setPower(rightBackPower);
-        this.rightFrontMotor.setPower(rightFrontPower);
-        this.leftBackMotor.setPower(leftBackPower);
-        this.leftFrontMotor.setPower(leftFrontPower);
+        rightBackMotor.setPower(rightBackPower);
+        rightFrontMotor.setPower(rightFrontPower);
+        leftBackMotor.setPower(leftBackPower);
+        leftFrontMotor.setPower(leftFrontPower);
 
-        this.lastRightBackPower = this.rightBackPower;
-        this.lastLeftBackPower= this.leftBackPower;
-        this.lastLeftFrontPower = this.leftFrontPower;
-        this.lastRightFrontPower = this.rightFrontPower;
+        lastRightBackPower = rightBackPower;
+        lastLeftBackPower= leftBackPower;
+        lastLeftFrontPower = leftFrontPower;
+        lastRightFrontPower = rightFrontPower;
 
-        this.rightBackPower = 0;
-        this.leftBackPower = 0;
+        rightBackPower = 0;
+        leftBackPower = 0;
         leftFrontPower = 0;
         rightFrontPower = 0;
     }
@@ -254,12 +260,15 @@ public class Drivetrain implements Subsystem {
     }
 
     public double getCentripetalCorrection() {
-
-        Pose[] recentPoseAverage = robotInstance.theLocalizer.centripetalPoseBuffer.getAveragePoses();
+        Pose[] recentPoseAverage = theLocalizer.centripetalPoseBuffer.getAveragePoses();
 
         double radius = MathHelper.findRadiusFromPoints(recentPoseAverage);
 
-        return radius;
+        double velocityMagnitude = theLocalizer.getVelocity().magnitude();
+        double velocity_mpers = MathHelper.inchesPerSecondToMetersPerSecond(velocityMagnitude);
+
+        double centripetalForce = MASS * velocity_mpers * velocity_mpers / radius;
+        return centripetalForce * CENTRIPETAL_CONVERSION;
     }
 
     public void setWeightedDrivePower(double weight) {

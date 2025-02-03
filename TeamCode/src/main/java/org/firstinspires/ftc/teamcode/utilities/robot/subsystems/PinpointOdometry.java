@@ -34,7 +34,6 @@ public class PinpointOdometry extends Localizer {
         this.telemetry = telemetry;
 
         poseTimer = new ElapsedTime();
-
     }
 
     @Override

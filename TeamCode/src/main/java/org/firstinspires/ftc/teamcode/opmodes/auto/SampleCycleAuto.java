@@ -106,15 +106,6 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new YieldCommand(robot.theOuttake::atTargetPosition),
                                 new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
-                                /*
-                                new YieldCommand(150),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
-
-                                 */
                         )
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
@@ -153,13 +144,6 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new YieldCommand(robot.theOuttake::atTargetPosition),
                                 new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
-                                /*
-                                new YieldCommand(100),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))*/
                         )
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
@@ -203,15 +187,6 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new YieldCommand(robot.theOuttake::atTargetPosition),
                                 new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
-                                /*
-                                new YieldCommand(100),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
-                                new YieldCommand(250),
-                                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
-
-                                 */
                         )
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),

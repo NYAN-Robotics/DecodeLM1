@@ -22,6 +22,10 @@ public class CentripetalBuffer {
         this.theContainer3 = new LinkedList<>();
     }
 
+    public CentripetalBuffer() {
+        this(DEFAULT_CAPACITY);
+    }
+
     public void addPose(Pose pose) {
         if (theContainer1.size() < theCapacity) {
             theContainer1.add(pose);
