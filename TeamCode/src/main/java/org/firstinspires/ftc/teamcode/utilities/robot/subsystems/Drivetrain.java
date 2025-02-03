@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
+import org.firstinspires.ftc.teamcode.utilities.datastructures.Circle;
 import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.physics.states.MecanumWheelState;
@@ -259,16 +260,27 @@ public class Drivetrain implements Subsystem {
         );
     }
 
-    public double getCentripetalCorrection() {
+    public Pose getCentripetalCorrection() {
         Pose[] recentPoseAverage = theLocalizer.centripetalPoseBuffer.getAveragePoses();
 
-        double radius = MathHelper.findRadiusFromPoints(recentPoseAverage);
+        Circle circle = MathHelper.findCircleFromPoints(recentPoseAverage);
+
+        double radius = circle.theRadius;
 
         double velocityMagnitude = theLocalizer.getVelocity().magnitude();
         double velocity_mpers = MathHelper.inchesPerSecondToMetersPerSecond(velocityMagnitude);
 
         double centripetalForce = MASS * velocity_mpers * velocity_mpers / radius;
-        return centripetalForce * CENTRIPETAL_CONVERSION;
+
+        Pose currentPose = theLocalizer.getPose();
+        double angleToCenter = Math.atan2(circle.theY - currentPose.getY(), circle.theX - currentPose.getX());
+        double correctionAngle = angleToCenter - currentPose.getHeading();
+
+        correctionAngle = Math.atan2(Math.sin(correctionAngle), Math.cos(correctionAngle));
+
+        double force = centripetalForce * CENTRIPETAL_CONVERSION;
+
+        return new Pose(force * Math.cos(correctionAngle), force * Math.sin(correctionAngle), 0);
     }
 
     public void setWeightedDrivePower(double weight) {

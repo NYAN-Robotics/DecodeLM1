@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utilities.math;
 
+import org.firstinspires.ftc.teamcode.utilities.datastructures.Circle;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 
 public class MathHelper {
@@ -55,10 +56,12 @@ public class MathHelper {
         return turnError;
     }
 
-    public static double findRadiusFromPoints(Pose[] poses) {
-        return findRadiusFromPoints(poses[0], poses[1], poses[2]);
+    public static Circle findCircleFromPoints(Pose[] poses) {
+        return findCircleFromPoints(poses[0], poses[1], poses[2]);
     }
-    public static double findRadiusFromPoints(Pose pose1, Pose pose2, Pose pose3) {
+
+
+    public static Circle findCircleFromPoints(Pose pose1, Pose pose2, Pose pose3) {
 
         double x1 = pose1.getX();
         double y1 = pose1.getY();
@@ -119,7 +122,7 @@ public class MathHelper {
 
         // r is the radius
 
-        return Math.sqrt(sqr_of_r);
+        return new Circle(h, k, Math.sqrt(sqr_of_r));
     }
 
     // create a function that converts a veloicty in terms of in/sec to m/sec

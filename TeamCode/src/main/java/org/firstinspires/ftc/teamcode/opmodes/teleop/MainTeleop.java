@@ -32,7 +32,7 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.setMsTransmissionInterval(10);
+        telemetry.setMsTransmissionInterval(500);
 
         // Initialize the robot
         robot.init(this, telemetry);
@@ -78,20 +78,10 @@ public class MainTeleop extends LinearOpMode {
 
         robot.update();
 
-        ElapsedTime e = new ElapsedTime();
-
-        // robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
-
-
-        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
-
-        PIDDrive drive = new PIDDrive(robot, this, telemetry);
-
         double frameTime = 0;
 
         while (!robot.stopRequested) {
 
-            e.reset();
             // Retain information about the previous frame's gamepad
             previousFrameGamepad1.copy(currentFrameGamepad1);
             previousFrameGamepad2.copy(currentFrameGamepad2);
@@ -143,8 +133,8 @@ public class MainTeleop extends LinearOpMode {
             } else if (currentFrameGamepad1.triangle && !previousFrameGamepad2.triangle) {
                 robot.theIntake.setDisableOuttake(false);
             }
-
              */
+
 
             if (currentFrameGamepad1.circle && !previousFrameGamepad1.circle) {
                 robot.theIntake.reverseIntake();
