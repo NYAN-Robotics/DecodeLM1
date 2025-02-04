@@ -185,6 +185,7 @@ public class Outtake implements Subsystem {
 
     DcMotorEx leftLiftMotor;
     DcMotorEx rightLiftMotor;
+    DcMotorEx centerLiftMotor;
 
     DcMotorEx slidesEncoderMotor;
 
@@ -243,6 +244,7 @@ public class Outtake implements Subsystem {
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
         leftLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "leftLiftMotor"), 1e-5);
         rightLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "rightLiftMotor"), 1e-5);
+        centerLiftMotor = new CachingDcMotorEX(hardwareMap.get(DcMotorEx.class, "centerLiftMotor"), 1e-5);
 
         slidesEncoderMotor = hardwareMap.get(DcMotorEx.class, "rightBackMotor");
 
@@ -264,12 +266,15 @@ public class Outtake implements Subsystem {
 
         leftLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        centerLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        centerLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        centerLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         clawServo.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
@@ -319,6 +324,8 @@ public class Outtake implements Subsystem {
                 leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                centerLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                centerLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             }
         }
@@ -372,6 +379,7 @@ public class Outtake implements Subsystem {
 
         leftLiftMotor.setPower(liftPower);
         rightLiftMotor.setPower(liftPower);
+        centerLiftMotor.setPower(liftPower);
 
         leftOuttakeServo.setPosition(currentOuttakeServoState.position);
         rightOuttakeServo.setPosition(currentOuttakeServoState.position);
