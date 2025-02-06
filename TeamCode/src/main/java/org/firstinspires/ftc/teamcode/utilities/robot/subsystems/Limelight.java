@@ -25,6 +25,7 @@ public class Limelight implements Subsystem {
     @Override
     public void onInit(HardwareMap newHardwareMap, Telemetry newTelemetry) {
 
+        /*
         limelight = newHardwareMap.get(Limelight3A.class, "limelight");
 
         limelight.setPollRateHz(250);
@@ -34,13 +35,15 @@ public class Limelight implements Subsystem {
 
         telemetry = newTelemetry;
 
+         */
+
         // Set Up limelight
 
     }
 
     @Override
     public void onOpmodeStarted() {
-        // if (limelight == null) return;
+        if (limelight == null) return;
         limelight.start();
         odometry = RobotEx.getInstance().theLocalizer;
         // More setup

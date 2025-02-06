@@ -29,7 +29,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(2000),
+        SAMPLES(1650),
         HANG(2150),
         HANG_FINAL(1600),
         SPECIMENS(1150),
@@ -53,12 +53,12 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.51),
+        DEFAULT(0.54), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.16),
         HANG_FINAL(DEFAULT.position + 0.26),
-        EXTENDED(DEFAULT.position + 0.44),
+        EXTENDED(DEFAULT.position + 0.44), // TWEAK
         EXTENDED_INITIAL(DEFAULT.position + 0.3),
         SPECIMEN_INITIAL(DEFAULT.position + 0.13),
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
@@ -144,13 +144,13 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.44),
+        DEFAULT(0.44), // FIGURE OUT
         TRANSFER_POSITION(DEFAULT.position - .2),
         SPECIMEN_INITIAL(DEFAULT.position),
         SPECIMEN_DROP(DEFAULT.position - 0.1),
-        SAMPLE_DROP(DEFAULT.position + 0.04),
+        SAMPLE_DROP(DEFAULT.position + 0.04), // FIGURE OUT
         SPECIMEN_PICKUP(DEFAULT.position - 0.46),
-        DOWN(DEFAULT.position - 0.25);
+        DOWN(DEFAULT.position - 0.25); // FIGURE OUT
 
         public double position;
 
@@ -270,7 +270,7 @@ public class Outtake implements Subsystem {
 
         leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        centerLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        centerLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -441,7 +441,7 @@ public class Outtake implements Subsystem {
     }
 
     public double getCurrentSensorPosition() {
-        return slidesEncoderMotor.getCurrentPosition();
+        return -slidesEncoderMotor.getCurrentPosition();
     }
 
     public void setCurrentOuttakeState(OuttakeServoState newState) {

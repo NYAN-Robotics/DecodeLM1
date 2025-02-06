@@ -29,9 +29,9 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.37),
+        DEFAULT(0.38),
         AUTO_EXTENSION(0.45),
-        EXTENDED(0.61);
+        EXTENDED(0.575);
 
         public double position;
 
@@ -48,7 +48,7 @@ public class Intake implements Subsystem {
     public enum IntakeState {
         DEFAULT(0.6),
         EJECT(0.6),
-        EXTENDED(0.74);
+        EXTENDED(0.72);
 
         public double position;
 
@@ -63,8 +63,8 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.55),
-        DEFAULT(0.88);
+        EXTENDED(0.12),
+        DEFAULT(0.4);
 
         public double position;
 
@@ -536,7 +536,7 @@ public class Intake implements Subsystem {
     }
 
     public boolean linkageAtHomeAnalog() {
-        return linkageAnalog.getVoltage() < 1.33 && currentLinkageState == LinkageStates.DEFAULT;
+        return linkageAnalog.getVoltage() < 1.345 && currentLinkageState == LinkageStates.DEFAULT;
     }
 
     public void setLinkageHolderState(LinkageHolderState newState) {
