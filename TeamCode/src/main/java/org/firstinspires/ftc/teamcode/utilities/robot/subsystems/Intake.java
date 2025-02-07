@@ -46,8 +46,8 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        DEFAULT(0.6),
-        EJECT(0.6),
+        DEFAULT(0.57),
+        EJECT(0.57),
         EXTENDED(0.72);
 
         public double position;
@@ -63,8 +63,8 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.12),
-        DEFAULT(0.4);
+        EXTENDED(0.10),
+        DEFAULT(0.42);
 
         public double position;
 
@@ -296,6 +296,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
         // telemetry.addData("Sample Holder State: ", currentSampleHolderState);
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
+        telemetry.addData("Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("At home: ", linkageAtHomeAnalog());
@@ -304,12 +305,15 @@ public class Intake implements Subsystem {
 
         // telemetry.addData("Servo latch position:", holderServo.getPosition());
         // telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+
         /*
         telemetry.addData("Red: ", intakeColorSensor.red());
         telemetry.addData("Green: ", intakeColorSensor.green());
         telemetry.addData("Blue: ", intakeColorSensor.blue());
 
+
          */
+
 
 
 
@@ -357,7 +361,6 @@ public class Intake implements Subsystem {
                     wrongColor = true;
                 } else if (Globals.ALLIANCE == Alliance.BLUE && sampleContained == SampleContained.RED) {
                     wrongColor = true;
-
                 }
 
                 if (!wrongColor || disableOuttake) {
@@ -497,14 +500,22 @@ public class Intake implements Subsystem {
     }
 
     public void updatePossessedColor() {
+        /*
         int green = intakeColorSensor.green();
         int red = intakeColorSensor.red();
         int blue = intakeColorSensor.blue();
 
+
+         */
+        /*
         if ((green + red + blue) < 900) {
             sampleContained = SampleContained.NONE;
             return;
         }
+
+         */
+
+        /*
 
         if (red > green && red > blue) {
             sampleContained = SampleContained.RED;
@@ -513,6 +524,22 @@ public class Intake implements Subsystem {
         } else {
             sampleContained = SampleContained.YELLOW;
         }
+
+         */
+        /*
+
+        if (green > 17000) {
+            sampleContained = SampleContained.YELLOW;
+        } else if (red > 7500) {
+            sampleContained = SampleContained.RED;
+        } else if (blue > 14000) {
+            sampleContained = SampleContained.BLUE;
+        } else {
+            sampleContained = SampleContained.NONE;
+        }
+         */
+
+        sampleContained = SampleContained.YELLOW;
         /*
         if (green > red && green > blue) {
             sampleContained = SampleContained.YELLOW;
@@ -536,7 +563,7 @@ public class Intake implements Subsystem {
     }
 
     public boolean linkageAtHomeAnalog() {
-        return linkageAnalog.getVoltage() < 1.345 && currentLinkageState == LinkageStates.DEFAULT;
+        return linkageAnalog.getVoltage() < 1.305 && currentLinkageState == LinkageStates.DEFAULT;
     }
 
     public void setLinkageHolderState(LinkageHolderState newState) {
@@ -567,7 +594,7 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
-                        new YieldCommand(150),
+                        new YieldCommand(250),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),

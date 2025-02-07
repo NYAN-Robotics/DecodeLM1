@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
@@ -32,7 +34,7 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.setMsTransmissionInterval(500);
+        telemetry.setMsTransmissionInterval(10);
 
         // Initialize the robot
         robot.init(this, telemetry);
@@ -77,6 +79,7 @@ public class MainTeleop extends LinearOpMode {
         // robot.drivetrain.enableAntiTip();
 
         robot.update();
+
 
         double frameTime = 0;
 
@@ -228,6 +231,20 @@ public class MainTeleop extends LinearOpMode {
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
                 robot.theIntake.triggerCowcatcher();
             }
+
+
+            /*
+            if (currentFrameGamepad1.x && !previousFrameGamepad1.x) {
+                robot.theCommandScheduler.scheduleCommand(
+                        new MovementCommand(
+                                robot.theLocalizer.getPose(),
+                                new Pose(0, 0, 0),
+                                new MovementConstants()
+                        )
+                );
+            }
+
+             */
 
 
 

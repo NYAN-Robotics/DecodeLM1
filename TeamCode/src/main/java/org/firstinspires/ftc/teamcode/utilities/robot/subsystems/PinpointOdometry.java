@@ -26,7 +26,7 @@ public class PinpointOdometry extends Localizer {
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
-        pinpoint.setOffsets(130, 34);
+        pinpoint.setOffsets(-127, 41.075);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.resetPosAndIMU();

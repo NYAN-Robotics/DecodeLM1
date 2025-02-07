@@ -29,9 +29,9 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1650),
-        HANG(2150),
-        HANG_FINAL(1600),
+        SAMPLES(1600),
+        HANG(1710),
+        HANG_FINAL(700),
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
@@ -53,7 +53,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.54), // DEFAULT
+        DEFAULT(0.39), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.16),
@@ -261,7 +261,7 @@ public class Outtake implements Subsystem {
         magneticLimitSwitch = hardwareMap.get(DigitalChannel.class, "slidesMagnetic");
         outtakeAnalog = hardwareMap.get(AnalogInput.class, "outtakeAnalog");
 
-        leftOuttakeServo.setDirection(Servo.Direction.FORWARD); // dir
+        leftOuttakeServo.setDirection(Servo.Direction.REVERSE); // dir
         rightOuttakeServo.setDirection(Servo.Direction.REVERSE); // Dir
 
         leftLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -350,7 +350,7 @@ public class Outtake implements Subsystem {
             outtakeReset = true;
         }
 
-        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
 
