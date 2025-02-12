@@ -93,7 +93,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         defaultMovementConstants
                 ),
                 new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
-                new YieldCommand(250),
+                // new YieldCommand(250),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new ParallelCommandGroup(
                         new MovementCommand(
@@ -131,7 +131,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         )
                 ),
                 new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
-                new YieldCommand(500),
+                // new YieldCommand(500),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new ParallelCommandGroup(
                         new MovementCommand(
@@ -174,7 +174,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         defaultMovementConstants
                 ),
                 new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
-                new YieldCommand(500),
+                // new YieldCommand(500),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new ParallelCommandGroup(
                         new MovementCommand(
@@ -224,8 +224,8 @@ public class SampleCycleAuto extends LinearOpMode {
                         defaultMovementConstants
 
                 ),
-                new YieldCommand(2000, robot.theIntake::containsSampleColorSensor),
-                new YieldCommand(250)
+                new YieldCommand(2000, robot.theIntake::containsSampleColorSensor)
+                // new YieldCommand(250)
                 // new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 // new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
 

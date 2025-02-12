@@ -55,7 +55,7 @@ public class Pose {
 
     public void subtract(Pose other) {
         theX -= other.getX();
-        theY -= other.getX();
+        theY -= other.getY();
         theHeading -= other.getHeading();
     }
 

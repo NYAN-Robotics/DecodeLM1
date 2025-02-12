@@ -61,8 +61,8 @@ public class PinpointOdometry extends Localizer {
 
         currentPose = new Pose(
                 pos.getX(DistanceUnit.INCH),
-                -pos.getY(DistanceUnit.INCH),
-                pos.getHeading(AngleUnit.RADIANS) + Math.PI / 4
+                pos.getY(DistanceUnit.INCH),
+                pos.getHeading(AngleUnit.RADIANS)
         );
 
 
@@ -98,7 +98,7 @@ public class PinpointOdometry extends Localizer {
                         newPose.getX(),
                         newPose.getY(),
                         AngleUnit.RADIANS,
-                        newPose.getHeading() - Math.PI / 2
+                        newPose.getHeading()
                 )
         );
     }

@@ -233,18 +233,18 @@ public class MainTeleop extends LinearOpMode {
             }
 
 
-            /*
+
             if (currentFrameGamepad1.x && !previousFrameGamepad1.x) {
                 robot.theCommandScheduler.scheduleCommand(
                         new MovementCommand(
                                 robot.theLocalizer.getPose(),
-                                new Pose(0, 0, 0),
+                                new Pose(0, 0, robot.theLocalizer.getPose().theHeading),
                                 new MovementConstants()
                         )
                 );
             }
 
-             */
+
 
 
 

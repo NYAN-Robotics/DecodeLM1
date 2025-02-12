@@ -76,10 +76,10 @@ public class MovementCommand extends InstantCommand {
             );
         }
 
-        double feedbackX = 0;// theRobot.theDrivetrain.xController.getOutputFromError(error.getX());
-        double feedbackY = 0;//theRobot.theDrivetrain.yController.getOutputFromError(error.getY());
+        double feedbackX = theRobot.theDrivetrain.xController.getOutputFromError(error.getX());
+        double feedbackY = theRobot.theDrivetrain.yController.getOutputFromError(error.getY());
 
-        System.out.println("Feedforward x: " + targetState.getFeedforwardX() + "Feedforward y: " + targetState.getFeedforwardY());
+        System.out.println("Feedforward x: " + targetState.getFeedforwardX() + " Feedforward y: " + targetState.getFeedforwardY());
         theRobot.theDrivetrain.fieldCentricDriveFromGamepad(
                 targetState.getFeedforwardX() + feedbackY,
                 targetState.getFeedforwardY() + feedbackX,

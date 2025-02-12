@@ -13,10 +13,6 @@ public class OpticalOdometry extends Localizer {
 
     SparkFunOTOS otos;
 
-    Pose currentPose = new Pose();
-    Pose lastPose = new Pose();
-
-    Pose currentVelocity = new Pose();
 
     Telemetry telemetry;
 
@@ -24,7 +20,7 @@ public class OpticalOdometry extends Localizer {
 
     @Override
     public void onInit(HardwareMap hardwareMap, Telemetry telemetry) {
-        otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+        otos = hardwareMap.get(SparkFunOTOS.class, "otos_sensor");
 
         otos.setLinearUnit(DistanceUnit.INCH);
         otos.setAngularUnit(AngleUnit.DEGREES);
@@ -39,7 +35,8 @@ public class OpticalOdometry extends Localizer {
 
          */
 
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-1.42, 0, 180);
+        // SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-1.42, 0, 180);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-1.42, 0, 270);
         otos.setOffset(offset);
         otos.setLinearScalar(1);
         otos.setAngularScalar(0.992); // -23.503
