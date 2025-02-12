@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.drivers.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
+import org.opencv.core.Mat;
 
 public class PinpointOdometry extends Localizer {
 
@@ -60,8 +61,8 @@ public class PinpointOdometry extends Localizer {
 
         currentPose = new Pose(
                 pos.getX(DistanceUnit.INCH),
-                pos.getY(DistanceUnit.INCH),
-                pos.getHeading(AngleUnit.RADIANS)
+                -pos.getY(DistanceUnit.INCH),
+                pos.getHeading(AngleUnit.RADIANS) + Math.PI / 4
         );
 
 
@@ -97,7 +98,7 @@ public class PinpointOdometry extends Localizer {
                         newPose.getX(),
                         newPose.getY(),
                         AngleUnit.RADIANS,
-                        newPose.getHeading()
+                        newPose.getHeading() - Math.PI / 2
                 )
         );
     }
