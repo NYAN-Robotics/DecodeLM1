@@ -160,7 +160,9 @@ public class MainTeleop extends LinearOpMode {
                             new SequentialCommandGroup(
                                     new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.HANG_FINAL)),
                                     new YieldCommand(1000),
-                                    new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.HANG_FINAL))
+                                    new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.HANG_FINAL)),
+                                    new YieldCommand(250),
+                                    new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT))
                             )
                     );
                 }
