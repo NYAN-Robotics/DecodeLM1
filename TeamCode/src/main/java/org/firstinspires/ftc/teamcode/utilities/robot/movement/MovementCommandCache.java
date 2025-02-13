@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class MovementCommandCache {
 
-    private final double CACHE_INCREMENT = 1/200.0;
+    private final double CACHE_INCREMENT = 1/2000.0;
     private ArrayList<MovementStateCommand> theStateCache;
 
     MovementConstants theMovementConstants;
@@ -49,10 +49,6 @@ public class MovementCommandCache {
         theDirection = Math.atan2(theDeltaPose.getY(), theDeltaPose.getX());
         theSine = Math.sin(theDirection);
         theCosine = Math.cos(theDirection);
-        System.out.println("The Direction: " + theDirection);
-        System.out.println("Initial Pose - X: " + aInitialPose.getX() + ", Y: " + aInitialPose.getY() + ", Heading: " + aInitialPose.getHeading());
-        System.out.println("Final Pose - X: " + aFinalPose.getX() + ", Y: " + aFinalPose.getY() + ", Heading: " + aFinalPose.getHeading());
-        System.out.println("Delta Pose - X: " + theDeltaPose.getX() + ", Y: " + theDeltaPose.getY() + ", Heading: " + theDeltaPose.getHeading());
 
         theMotionProfile = new MotionProfile(0, theDisplacement, aConstants.velocityMax, aConstants.accelerationMax);
         theDuration = theMotionProfile.getDuration();

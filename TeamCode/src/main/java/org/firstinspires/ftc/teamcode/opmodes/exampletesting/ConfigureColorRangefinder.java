@@ -4,14 +4,16 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 
 @TeleOp
 public class ConfigureColorRangefinder extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        RevColorSensorV3 sensor = hardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
         ColorRangefinder crf =
-                new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "Color"));
+                new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "intakeColorSensor"));
 
         /*
         Using this example configuration, you can detect all three sample colors based on which pin is reading true:
@@ -30,6 +32,17 @@ public class ConfigureColorRangefinder extends LinearOpMode {
 
         waitForStart();
 
+        crf.setLedBrightness(100);
+
+        telemetry.setMsTransmissionInterval(50);
+        while (!isStopRequested()) {
+            NormalizedRGBA colors = sensor.getNormalizedColors();
+
+            telemetry.addData("Red: ", colors.red);
+            telemetry.addData("Blue: ", colors.blue);
+            telemetry.addData("Green: ", colors.green);
+            telemetry.update();
+        }
         stop();
     }
 }

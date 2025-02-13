@@ -29,7 +29,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1600),
+        SAMPLES(1630),
         HANG(1710),
         HANG_FINAL(700),
         SPECIMENS(1150),
@@ -53,7 +53,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.42), // DEFAULT
+        DEFAULT(0.44), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.16),
@@ -261,8 +261,8 @@ public class Outtake implements Subsystem {
         magneticLimitSwitch = hardwareMap.get(DigitalChannel.class, "slidesMagnetic");
         outtakeAnalog = hardwareMap.get(AnalogInput.class, "outtakeAnalog");
 
-        leftOuttakeServo.setDirection(Servo.Direction.REVERSE); // dir
-        rightOuttakeServo.setDirection(Servo.Direction.REVERSE); // Dir
+        leftOuttakeServo.setDirection(Servo.Direction.FORWARD); // dir
+        rightOuttakeServo.setDirection(Servo.Direction.REVERSE); // dir
 
         leftLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -354,7 +354,7 @@ public class Outtake implements Subsystem {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
 
-            if (!Globals.inTeleop) {
+            if (true){//!Globals.inTeleop) {
                 sampleServoRotatedRequested = true;
 
                 robot.theCommandScheduler.scheduleCommand(
@@ -414,7 +414,7 @@ public class Outtake implements Subsystem {
             return;
         }
 
-        if (newState == OuttakeSlidesStates.SAMPLES && robot.theIntake.requestedReturn && robot.theIntake.sampleContained != Intake.SampleContained.NONE) {
+        if (newState == OuttakeSlidesStates.SAMPLES && robot.theIntake.requestedReturn) {
             robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
                             new YieldCommand(() -> !robot.theIntake.isReturnRequested()),

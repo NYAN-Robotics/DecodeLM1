@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -156,6 +157,8 @@ public class Intake implements Subsystem {
     Servo linkageLockServo;
 
     DigitalChannel intakeBreakbeam;
+    DigitalChannel intakeColorSensorDigital0;
+    DigitalChannel intakeColorSensorDigital1;
 
     AnalogInput linkageAnalog;
 
@@ -220,6 +223,9 @@ public class Intake implements Subsystem {
         cowcatcherServo = new CachingServo(newHardwareMap.get(Servo.class, "cowcatcher"), 1e-5);
 
         intakeColorSensor = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
+
+        intakeColorSensorDigital0 = newHardwareMap.get(DigitalChannel.class, "digital0");
+        intakeColorSensorDigital1 = newHardwareMap.get(DigitalChannel.class, "digital1");
 
         linkageAnalog = newHardwareMap.get(AnalogInput.class, "linkageAnalog");
         intakeBreakbeam = newHardwareMap.get(DigitalChannel.class, "intakeBreakbeam");
@@ -296,7 +302,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Manual: ", getCurrentPosition() != LinkageStates.DEFAULT.position);
         // telemetry.addData("Sample Holder State: ", currentSampleHolderState);
         // telemetry.addData("Linkage Holder State: ", currentLinkageHolderState);
-        telemetry.addData("Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("At home: ", linkageAtHomeAnalog());
@@ -352,7 +358,8 @@ public class Intake implements Subsystem {
 
             updatePossessedColor();
 
-            if (containedTimer.seconds() > 0.75 || sampleContained != SampleContained.NONE) {
+            if (! (containedTimer.seconds() > 0.05)) {
+            } else if (containedTimer.seconds() > 0.5 || sampleContained != SampleContained.NONE) {
                 scheduledAutomation = false;
 
                 boolean wrongColor = false;
@@ -364,8 +371,8 @@ public class Intake implements Subsystem {
                 }
 
                 if (!wrongColor || disableOuttake) {
-                    robot.theOpMode.gamepad1.rumble(250);
-                    robot.theOpMode.gamepad2.rumble(250);
+                    robot.theOpMode.gamepad1.rumble(500);
+                    robot.theOpMode.gamepad2.rumble(500);
                     returnSlides();
                 } else {
                     RobotEx.getInstance().theCommandScheduler.scheduleCommand(
@@ -416,6 +423,9 @@ public class Intake implements Subsystem {
         telemetry.addData("Cowcatcher State: ", currentCowcatcherState);
         // telemetry.addData("Cowcatcher position: ", cowcatcherServo.getPosition());
         telemetry.addData("Holder State: ", currentSampleHolderState);
+        // telemetry.addData("Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Color Sensor digital 0: ", intakeColorSensorDigital0.getState());
+        // telemetry.addData("Color sensor digital 1: ", intakeColorSensorDigital1.getState());
         // telemetry.addData("Servo position: ", holderServo.getPosition());
 
         reverse = false;
@@ -500,13 +510,55 @@ public class Intake implements Subsystem {
     }
 
     public void updatePossessedColor() {
-        /*
-        int green = intakeColorSensor.green();
-        int red = intakeColorSensor.red();
-        int blue = intakeColorSensor.blue();
+
+        NormalizedRGBA colors = intakeColorSensor.getNormalizedColors();
+
+        double green = colors.green;
+        double red = colors.red;
+        double blue = colors.blue;
 
 
-         */
+        // no sample:
+        // red: 0.0313
+        // blue: 0.0972
+        // green: 0.0894
+
+        // yellow sample:
+        // red: 0.1512
+        // blue: 0.1225
+        // green: 0.2209
+
+        // blue sample:
+        // red: 0.0428
+        // blue: 0.1661
+        // green: 0.1143
+
+        // red sample:
+        // red: 0.1056
+        // blue: 0.1102
+        // green: 0.1186
+
+        double buffer = 0.02;
+
+        // Check for yellow sample
+        if (Math.abs(red - 0.1512) <= buffer && Math.abs(blue - 0.1225) <= buffer && Math.abs(green - 0.2209) <= buffer) {
+            sampleContained = SampleContained.YELLOW;
+        }
+        // Check for blue sample
+        else if (Math.abs(red - 0.0428) <= buffer && Math.abs(blue - 0.1661) <= buffer && Math.abs(green - 0.1143) <= buffer) {
+            sampleContained = SampleContained.BLUE;
+        }
+        // Check for red sample
+        else if (Math.abs(red - 0.1056) <= buffer && Math.abs(blue - 0.1102) <= buffer && Math.abs(green - 0.1186) <= buffer) {
+            sampleContained = SampleContained.RED;
+        }
+        // No sample
+        else {
+            sampleContained = SampleContained.NONE;
+        }
+
+
+
         /*
         if ((green + red + blue) < 900) {
             sampleContained = SampleContained.NONE;
@@ -539,7 +591,6 @@ public class Intake implements Subsystem {
         }
          */
 
-        sampleContained = SampleContained.YELLOW;
         /*
         if (green > red && green > blue) {
             sampleContained = SampleContained.YELLOW;
@@ -589,12 +640,12 @@ public class Intake implements Subsystem {
                             }
                         }),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(250), // Wait for holder servo to fully actuate
-                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
+                        new YieldCommand(150), // Wait for holder servo to fully actuate
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
-                        new YieldCommand(250),
+                        new YieldCommand(150),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
