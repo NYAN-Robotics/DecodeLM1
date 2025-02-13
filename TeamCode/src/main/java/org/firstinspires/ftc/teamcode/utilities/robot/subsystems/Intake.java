@@ -49,6 +49,7 @@ public class Intake implements Subsystem {
     public enum IntakeState {
         DEFAULT(0.57),
         EJECT(0.57),
+        AUTO_DEFAULT(0.45),
         EXTENDED(0.72);
 
         public double position;
@@ -65,7 +66,7 @@ public class Intake implements Subsystem {
 
     public enum SampleHolderState {
         EXTENDED(0.06),
-        DEFAULT(0.42);
+        DEFAULT(0.36);
 
         public double position;
 
@@ -147,8 +148,8 @@ public class Intake implements Subsystem {
     public Servo leftServo;
     public Servo rightServo;
 
-    Servo leftDropdownServo;
-    Servo rightDropdownServo;
+    public Servo leftDropdownServo;
+    public Servo rightDropdownServo;
 
     Servo cowcatcherServo;
 
