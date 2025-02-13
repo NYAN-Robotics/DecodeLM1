@@ -538,7 +538,7 @@ public class Intake implements Subsystem {
         // blue: 0.1102
         // green: 0.1186
 
-        double buffer = 0.02;
+        double buffer = 0.04;
 
         // Check for yellow sample
         if (Math.abs(red - 0.1512) <= buffer && Math.abs(blue - 0.1225) <= buffer && Math.abs(green - 0.2209) <= buffer) {

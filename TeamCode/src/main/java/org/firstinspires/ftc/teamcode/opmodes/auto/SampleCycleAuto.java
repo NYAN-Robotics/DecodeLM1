@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.DeadlineCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
@@ -46,9 +47,10 @@ public class SampleCycleAuto extends LinearOpMode {
     public static Pose partnerSamplePickupFinal = new Pose(-17.163, -57.8, 0);
     public static Pose cycleInitial = new Pose(-40, -9, 0);
     public static Pose cycleSubmersible = new Pose(-23, -9, 0);
+    public static Pose cycleSubmersible2 = new Pose(-23, -5, 0);
+    public static Pose getCycleSubmersible3 = new Pose(-23, -1, 0);
     public static Pose cycleDrop = new Pose(-55, -56.5, Math.PI / 4);
     public static Pose cycleStrafe = new Pose(-23, -12, 0);
-    public static Pose cycleFinal = new Pose(-45, -45, Math.PI / 4);
     public static Pose parkInitial = new Pose(-40, -9, Math.PI);
     public static Pose parkFinal = new Pose(-17, -9, Math.PI);
 
@@ -239,7 +241,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         new MovementCommand(
                                 sample3Drop,
                                 cycleInitial,
-                                new MovementConstants(60, 60, -0.4, DriveConstants.K_V, DriveConstants.K_A)
+                                new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
                         ),
                         new SequentialCommandGroup(
                                 new YieldCommand(100),
@@ -253,7 +255,6 @@ public class SampleCycleAuto extends LinearOpMode {
                         new MovementConstants(-0.25)
                 ),
                 new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
-                new OneTimeCommand(() -> robot.theIntake.setDisableOuttake(false)),
                 new YieldCommand(750),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
@@ -263,10 +264,9 @@ public class SampleCycleAuto extends LinearOpMode {
                         cycleSubmersible,
                         cycleStrafe,
                         defaultMovementConstants
-
                 ),
                 new YieldCommand(2000, robot.theIntake::containsSampleColorSensor),
-                new YieldCommand(400)
+                new YieldCommand(100)
                 // new YieldCommand(250)
                 // new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 // new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
@@ -302,7 +302,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleSubmersible,
                         cycleInitial,
-                        new MovementConstants(60, 60, -0.2, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(80, 80, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
                 new MovementCommand(
@@ -311,19 +311,19 @@ public class SampleCycleAuto extends LinearOpMode {
                         new MovementConstants(0)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new YieldCommand(200),
                 new ParallelCommandGroup(
                     new MovementCommand(
                             cycleDrop,
                             cycleInitial,
-                            new MovementConstants(60, 60, -0.3, DriveConstants.K_V, DriveConstants.K_A)
+                            new MovementConstants(80, 80, -0.3, DriveConstants.K_V, DriveConstants.K_A)
                     ),
                     new SequentialCommandGroup(
                             new YieldCommand(500),
                             new OneTimeCommand(() -> robot.theOuttake.reset())
                     )
                 ),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new MovementCommand(
                         cycleInitial,
                         cycleSubmersible,
@@ -342,22 +342,18 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleSubmersible,
                         parkInitial,
-                        new MovementConstants(50, 30, 0.1, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(50, 50, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new MovementCommand(
                         parkInitial,
                         parkFinal,
-                        new MovementConstants(40, 15, 0, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(50, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
                 ),
-
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new YieldCommand(250),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
         );
-
         robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-
         robot.theIntake.leftServo.setPosition(Intake.LinkageStates.DEFAULT.position);
         robot.theIntake.rightServo.setPosition(Intake.LinkageStates.DEFAULT.position);
 
