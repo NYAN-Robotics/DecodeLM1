@@ -30,8 +30,9 @@ public class Outtake implements Subsystem {
     public enum OuttakeSlidesStates {
         DEFAULT(0),
         SAMPLES(1630),
-        HANG(1710),
-        HANG_FINAL(700),
+        SAMPLES_LOW(650),
+        HANG(1730),
+        HANG_FINAL(800),
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
@@ -228,6 +229,7 @@ public class Outtake implements Subsystem {
     );
 
     double liftPower = 0;
+    double positionDrift = 0;
     boolean currentSwitchState = false;
     boolean pushingDown = false;
     boolean outtakeReset = false;
@@ -276,6 +278,9 @@ public class Outtake implements Subsystem {
         rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         centerLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        slidesEncoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidesEncoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         clawServo.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
     }
@@ -315,18 +320,13 @@ public class Outtake implements Subsystem {
         if (atTargetPosition() && this.currentSlideState == OuttakeSlidesStates.DEFAULT) {
             liftPower /= 2;
 
-            if (currentSwitchState && liftPower == 0 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.25) {
+            if (currentSwitchState && liftPower <= 0.005 && profile.timer.seconds() - profile.feedforwardProfile.getDuration() < 0.5) {
                 liftPower = -0.2;
                 pushingDown = true;
             } else if (pushingDown) {
                 pushingDown = false;
-                leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                centerLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                centerLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+                positionDrift += getCurrentSensorPosition();
+                System.out.println("Drift: " + positionDrift);
             }
         }
 
@@ -341,7 +341,7 @@ public class Outtake implements Subsystem {
                 setCurrentOuttakeState(OuttakeServoState.HANG_INITIAL);
             }
 
-            if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+            if (currentSlideState == OuttakeSlidesStates.SAMPLES || currentSlideState == OuttakeSlidesStates.SAMPLES_LOW) {
                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
                 setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
@@ -349,12 +349,15 @@ public class Outtake implements Subsystem {
 
             outtakeReset = true;
         }
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES_LOW &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
+            setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
+        }
 
         if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
 
-            if (true){//!Globals.inTeleop) {
+            if (!Globals.inTeleop) {
                 sampleServoRotatedRequested = true;
 
                 robot.theCommandScheduler.scheduleCommand(
@@ -414,7 +417,7 @@ public class Outtake implements Subsystem {
             return;
         }
 
-        if (newState == OuttakeSlidesStates.SAMPLES && robot.theIntake.requestedReturn) {
+        if ((newState == OuttakeSlidesStates.SAMPLES || newState == OuttakeSlidesStates.SAMPLES_LOW) && robot.theIntake.requestedReturn) {
             robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
                             new YieldCommand(() -> !robot.theIntake.isReturnRequested()),
@@ -441,7 +444,7 @@ public class Outtake implements Subsystem {
     }
 
     public double getCurrentSensorPosition() {
-        return -slidesEncoderMotor.getCurrentPosition();
+        return -slidesEncoderMotor.getCurrentPosition() - positionDrift;
     }
 
     public void setCurrentOuttakeState(OuttakeServoState newState) {

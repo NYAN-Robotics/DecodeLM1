@@ -49,7 +49,7 @@ public class Intake implements Subsystem {
     public enum IntakeState {
         DEFAULT(0.57),
         EJECT(0.57),
-        AUTO_DEFAULT(0.45),
+        AUTO_DEFAULT(0.4),
         EXTENDED(0.72);
 
         public double position;
@@ -632,6 +632,7 @@ public class Intake implements Subsystem {
         }
 
         requestedReturn = true;
+        manual = false;
 
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
@@ -682,7 +683,7 @@ public class Intake implements Subsystem {
         robot.theCommandScheduler.scheduleCommand(
                 new SequentialCommandGroup(
                         new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
-                        new YieldCommand(300),
+                        new YieldCommand(250),
                         new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
         );
     }

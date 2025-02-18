@@ -100,9 +100,17 @@ public class MainTeleop extends LinearOpMode {
             );
 
             if (currentFrameGamepad2.right_trigger > 0) {
-                robot.theOuttake.setLiftPower(currentFrameGamepad2.right_trigger / 3 + Outtake.kF);
+                robot.theOuttake.setLiftPower(currentFrameGamepad2.right_trigger / 1.5 + Outtake.kF);
             } else if (currentFrameGamepad2.left_trigger > 0) {
                 robot.theOuttake.setLiftPower(-currentFrameGamepad2.left_trigger);
+            }
+
+            if (currentFrameGamepad2.right_stick_button) {
+                robot.theOuttake.setLiftPower(-0.15);
+            }
+
+            if (currentFrameGamepad2.left_stick_button) {
+                robot.theOuttake.setLiftPower(-0.15);
             }
 
             if (currentFrameGamepad1.right_trigger > 0.05) {
@@ -147,8 +155,8 @@ public class MainTeleop extends LinearOpMode {
                 robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES);
             }
 
-            if (currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left) {
-                robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS);
+            if ((currentFrameGamepad2.dpad_left && !previousFrameGamepad2.dpad_left)) {
+                robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES_LOW);
             }
 
             if ((currentFrameGamepad2.dpad_right && !previousFrameGamepad2.dpad_right) || (oneDriver && (currentFrameGamepad1.dpad_right && !previousFrameGamepad1.dpad_right))) {
