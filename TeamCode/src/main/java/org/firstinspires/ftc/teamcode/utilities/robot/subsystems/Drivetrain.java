@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -44,6 +43,8 @@ public class Drivetrain implements Subsystem {
 
     private boolean enableAntiTip = false;
     private boolean enableHeadingRetention = false;
+
+    private boolean enableCentripetalCorrection = false;
 
     public GeneralPIDController xController = new GeneralPIDController(0.2, 0, 1, 0);
     public GeneralPIDController yController = new GeneralPIDController(0.2, 0, 1, 0);
@@ -160,6 +161,12 @@ public class Drivetrain implements Subsystem {
     @Override
     public void onCyclePassed() {
 
+        if (enableCentripetalCorrection) {
+            Pose centripetalCorrection = getCentripetalCorrection();
+
+            fieldCentricDriveFromGamepad(centripetalCorrection.theY, centripetalCorrection.theX, 0);
+        }
+
         headingPID.updateCoefficients(Drivetrain.kP, Drivetrain.kI, Drivetrain.kD, 0);
 
         rightBackMotor.setPower(rightBackPower);
@@ -269,7 +276,7 @@ public class Drivetrain implements Subsystem {
         double radius = circle.theRadius;
 
         double velocityMagnitude = theLocalizer.getVelocity().magnitude();
-        double velocity_mpers = MathHelper.inchesPerSecondToMetersPerSecond(velocityMagnitude);
+        double velocity_mpers = MathHelper.imperialToMetricVelocity(velocityMagnitude);
 
         double centripetalForce = MASS * velocity_mpers * velocity_mpers / radius;
 
