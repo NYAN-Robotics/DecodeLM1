@@ -289,7 +289,6 @@ public class SampleCycleAuto extends LinearOpMode {
         );
 
         SequentialCommandGroup cycleCommand = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
                 new MovementCommand(
@@ -348,7 +347,6 @@ public class SampleCycleAuto extends LinearOpMode {
         );
 
         SequentialCommandGroup cycleCommand2 = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
                 new MovementCommand(
