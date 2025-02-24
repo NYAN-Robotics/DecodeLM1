@@ -180,6 +180,7 @@ public class Intake implements Subsystem {
     private double targetPosition = startLinkagePosition;
 
     boolean manual = false;
+    boolean previousManual = false;
     boolean reverse = false;
 
     boolean disableOuttake = false;
@@ -341,7 +342,7 @@ public class Intake implements Subsystem {
 
          */
 
-        if (manual) {
+        if (manual && !previousManual) {
             setIntakeMotorState(IntakeMotorStates.INTAKING);
             setIntakeState(IntakeState.EXTENDED);
         }
@@ -349,7 +350,6 @@ public class Intake implements Subsystem {
         if (currentBreakbeamState && !lastBreakbeamState && currentIntakeState != IntakeState.DEFAULT && linkageTimer.seconds() > 0.25) {
             containedTimer.reset();
             scheduledAutomation = true;
-
         }
 
         if (scheduledAutomation) {
@@ -359,7 +359,7 @@ public class Intake implements Subsystem {
 
             updatePossessedColor();
 
-            if (! (containedTimer.seconds() > 0.05)) {
+            if (!(containedTimer.seconds() > 0.05)) {
             } else if (containedTimer.seconds() > 0.5 || sampleContained != SampleContained.NONE) {
                 scheduledAutomation = false;
 
@@ -387,13 +387,6 @@ public class Intake implements Subsystem {
                 }
             }
         }
-
-
-        /*
-        if (!currentBreakbeamState) {
-            setTargetHolderState(SampleHolderState.DEFAULT);
-        }
-         */
 
         if (linkageAtHome() && !manual) {
             setLinkageHolderState(LinkageHolderState.CLOSED);
@@ -430,6 +423,7 @@ public class Intake implements Subsystem {
         // telemetry.addData("Servo position: ", holderServo.getPosition());
 
         reverse = false;
+        previousManual = manual;
     }
 
     public void setTargetPosition(double newPosition) {
@@ -642,8 +636,14 @@ public class Intake implements Subsystem {
                             }
                         }),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
+                        new YieldCommand(50),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
-                        new YieldCommand(150), // Wait for holder servo to fully actuate
+                        new YieldCommand(100), // Wait for holder servo to fully actuate
+                        new OneTimeCommand(() -> {
+                            if (robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.DEFAULT && robot.theOuttake.atTargetPosition()) {
+                                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
+                            }
+                        }),
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
@@ -651,8 +651,9 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(200), // Wait for claw to close
+                        new YieldCommand(150), // Wait for claw to close
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
+                        new YieldCommand(50),
                         new OneTimeCommand(() -> requestedReturn = false)
                 )
         );
