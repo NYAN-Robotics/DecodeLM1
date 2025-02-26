@@ -47,17 +47,26 @@ public class PinpointOdometry extends Localizer {
 
         pinpoint.update();
 
-        lastPose = currentPose;
-        lastVelocity = currentVelocity;
-
         Pose2D pos = pinpoint.getPosition();
-
         Pose2D vel = pinpoint.getVelocity();
 
         if (pos == null || vel == null) {
             System.out.println("NULL POSE!!!: ");
             return;
         }
+
+        if (Double.isNaN(pos.getX(DistanceUnit.INCH)) || Double.isNaN(pos.getY(DistanceUnit.INCH)) || Double.isNaN(pos.getHeading(AngleUnit.RADIANS))) {
+            System.out.println("NULL POSITION!!!: ");
+            return;
+        }
+
+        if (Double.isNaN(vel.getX(DistanceUnit.INCH)) || Double.isNaN(vel.getY(DistanceUnit.INCH)) || Double.isNaN(vel.getHeading(AngleUnit.RADIANS))) {
+            System.out.println("NULL VELOCITY!!!: ");
+            return;
+        }
+
+        lastPose = currentPose;
+        lastVelocity = currentVelocity;
 
         currentPose = new Pose(
                 pos.getX(DistanceUnit.INCH),

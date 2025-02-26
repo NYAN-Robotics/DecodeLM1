@@ -30,9 +30,9 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.38),
+        DEFAULT(0.375),
         AUTO_EXTENSION(0.45),
-        EXTENDED(0.575);
+        EXTENDED(0.555);
 
         public double position;
 
@@ -96,7 +96,7 @@ public class Intake implements Subsystem {
 
     public enum IntakeMotorStates {
         INTAKING(1),
-        HOLD(0.2),
+        HOLD(0.4),
         STATIONARY(0),
         SLOW_REVERSE(-0.65),
         REVERSE(-0.8);
@@ -627,11 +627,12 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.HOLD)),
                         new YieldCommand(150),
-                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                         new YieldCommand(150), // Wait for claw to close
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                         new YieldCommand(50),
                         new OneTimeCommand(() -> requestedReturn = false)

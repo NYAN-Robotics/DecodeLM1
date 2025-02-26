@@ -36,8 +36,8 @@ public class Outtake implements Subsystem {
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
-        SPECIMEN_INITIAL_PICKUP(610),
-        SPECIMEN_PICKUP(580),
+        SPECIMEN_INITIAL_PICKUP(620),
+        SPECIMEN_PICKUP(500),
         HOVER(350);
 
         public double position;
@@ -65,8 +65,8 @@ public class Outtake implements Subsystem {
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.17),
-        SPECIMEN_PICKUP_2(DEFAULT.position - 0.25);
+        SPECIMEN_PICKUP(DEFAULT.position - 0.125),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.23);
 
         public double position;
 
@@ -129,7 +129,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeClawStates {
         DEFAULT(0.48),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.05),
+        SPECIMEN_PICKUP(DEFAULT.position),
         CLOSED(DEFAULT.position - 0.1);
 
         public double position;
@@ -145,7 +145,7 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.44), // FIGURE OUT
+        DEFAULT(0.75), // FIGURE OUT
         TRANSFER_POSITION(DEFAULT.position - .2),
         SPECIMEN_INITIAL(DEFAULT.position),
         SPECIMEN_DROP(DEFAULT.position - 0.1),
