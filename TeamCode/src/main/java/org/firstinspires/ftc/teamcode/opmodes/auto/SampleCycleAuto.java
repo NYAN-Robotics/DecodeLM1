@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandt
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.InitialCycleCommand1;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.RetryCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
@@ -244,6 +245,16 @@ public class SampleCycleAuto extends LinearOpMode {
 
         SequentialCommandGroup initialCycleCommand = new InitialCycleCommand1(robot, 0);
 
+        SequentialCommandGroup retryPickupCommand = new SequentialCommandGroup(
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
+                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
+                new YieldCommand(200),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
+                new YieldCommand(800),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION))
+                );
+
         SequentialCommandGroup cycleCommand = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
@@ -380,12 +391,16 @@ public class SampleCycleAuto extends LinearOpMode {
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
         );
 
+        SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
+
         robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
         robot.theIntake.leftServo.setPosition(Intake.LinkageStates.DEFAULT.position - 0.03);
         robot.theIntake.rightServo.setPosition(Intake.LinkageStates.DEFAULT.position - 0.03);
 
         Gamepad gamepad1Copy = new Gamepad();
         Gamepad gamepad2Copy = new Gamepad();
+
+        double offset = 0;
 
         while (opModeInInit()) {
             if (gamepad1.cross) {
@@ -399,13 +414,19 @@ public class SampleCycleAuto extends LinearOpMode {
 
             if (gamepad1.dpad_left && !gamepad1Copy.dpad_left) {
                 System.out.println("Left offset");
-                initialCycleCommand = new InitialCycleCommand1(robot, 10);
+                offset = 10;
+                initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                retryCommand = new RetryCommand(robot, offset);
             } else if (gamepad1.dpad_down && !gamepad1Copy.dpad_down) {
                 System.out.println("Middle offset");
-                initialCycleCommand = new InitialCycleCommand1(robot, 5);
+                offset = 5;
+                initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                retryCommand = new RetryCommand(robot, offset);
             } else if (gamepad1.dpad_right && !gamepad1Copy.dpad_right) {
                 System.out.println("Right offset");
-                initialCycleCommand = new InitialCycleCommand1(robot, 0);
+                offset = 0;
+                initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                retryCommand = new RetryCommand(robot, offset);
             }
 
             if (gamepad1.triangle) {
@@ -426,6 +447,7 @@ public class SampleCycleAuto extends LinearOpMode {
             telemetry.addLine("Press square (gamepad1) to set alliance to BLUE");
             telemetry.addLine("Press cross (gamepad2) to disable submersible cycle");
             telemetry.addLine("Press square (gamepad2) to enable submersible cycle");
+            telemetry.addData("Offset: ", offset);
             telemetry.addData("current and previous: ", gamepad1.dpad_left + " " + gamepad1Copy.dpad_left);
 
 
@@ -469,6 +491,7 @@ public class SampleCycleAuto extends LinearOpMode {
         robot.update();
 
         robot.theCommandScheduler.scheduleCommand(preloadedSamples);
+        boolean retriedPickup = false;
 
         while (!isStopRequested()) {
 
@@ -489,27 +512,48 @@ public class SampleCycleAuto extends LinearOpMode {
 
 
             if (!doneWithInitial) {
-                if (preloadedSamples.isFinished() && initialCycleCommand.isFinished()) {
-                    doneWithInitial = true;
+                if (preloadedSamples.isFinished() && initialCycleCommand.isFinished() && !retriedPickup || retriedPickup && retryCommand.isFinished()) {
 
                     robot.theIntake.updatePossessedColor();
 
                     System.out.println(robot.theIntake.sampleContained);
 
+                    boolean wrongColor = false;
+
                     if (robot.theIntake.sampleContained == Intake.SampleContained.BLUE && Globals.ALLIANCE == Alliance.RED) {
-                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        // robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        wrongColor = true;
                     } else if (robot.theIntake.sampleContained == Intake.SampleContained.RED && Globals.ALLIANCE == Alliance.BLUE) {
-                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        // robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        wrongColor = true;
                     } else if (robot.theIntake.sampleContained == Intake.SampleContained.NONE && !robot.theIntake.containsSampleColorSensor()) {
-                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        // robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        wrongColor = true;
                     } else {
+                        System.out.println("Cycling");
                         robot.theCommandScheduler.scheduleCommand(
                                 new SequentialCommandGroup(
                                         cycleCommand,
                                         initialCycleCommand2
                                 )
                         );
+                        doneWithInitial = true;
                     }
+
+                    if (wrongColor) {
+                        if (retriedPickup) {
+                            System.out.println("Parking");
+                            robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                            doneWithInitial = true;
+                        } else {
+                            System.out.println("Retrying pickup");
+                            initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                            robot.theCommandScheduler.scheduleCommand(new SequentialCommandGroup(retryPickupCommand, retryCommand));
+                            retriedPickup = true;
+                            robot.pause(0.5);
+                        }
+                    }
+
                 }
             }
 
@@ -538,6 +582,9 @@ public class SampleCycleAuto extends LinearOpMode {
             }
 
             telemetry.addData("Sample contained: ", robot.theIntake.sampleContained);
+            telemetry.addData("Retry: ", retriedPickup);
+            telemetry.addData("Done with preloads: ", doneWithPreloads);
+            telemetry.addData("Done with initial: ", doneWithInitial);
             robot.update();
         }
 
