@@ -54,13 +54,13 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.44), // DEFAULT
+        DEFAULT(0.46), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.19),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
-        HANG_INITIAL(DEFAULT.position + 0.16),
-        HANG_FINAL(DEFAULT.position + 0.26),
-        EXTENDED(DEFAULT.position + 0.44), // TWEAK
-        EXTENDED_INITIAL(DEFAULT.position + 0.3),
+        HANG_INITIAL(DEFAULT.position + 0.14),
+        HANG_FINAL(DEFAULT.position + 0.24),
+        EXTENDED(DEFAULT.position + 0.42), // TWEAK
+        EXTENDED_INITIAL(DEFAULT.position + 0.28),
         SPECIMEN_INITIAL(DEFAULT.position + 0.13),
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),

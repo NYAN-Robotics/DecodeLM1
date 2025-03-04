@@ -30,7 +30,7 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.395),
+        DEFAULT(0.38),
         AUTO_EXTENSION(0.48),
         EXTENDED(0.61);
 
@@ -359,9 +359,7 @@ public class Intake implements Subsystem {
                     RobotEx.getInstance().theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
                                     new OneTimeCommand(this::reverseIntake),
-                                    new YieldCommand(1500),
-                                    new OneTimeCommand(() -> setIntakeState(IntakeState.EXTENDED)),
-                                    new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.INTAKING))
+                                    new YieldCommand(1500)
                             )
                     );
                 }
