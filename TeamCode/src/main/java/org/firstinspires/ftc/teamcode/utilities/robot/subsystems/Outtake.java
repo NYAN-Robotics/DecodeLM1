@@ -403,6 +403,7 @@ public class Outtake implements Subsystem {
         telemetry.addData("Magnetic Switch: ", currentSwitchState);
         telemetry.addData("Analog Position Outtake: ", outtakeAnalog.getVoltage());
         telemetry.addData("At position: ", atTargetPosition());
+        telemetry.addData("Velocity: ", slidesEncoderMotor.getVelocity());
 
         liftPower = 0;
     }

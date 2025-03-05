@@ -34,7 +34,7 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.setMsTransmissionInterval(250);
+        telemetry.setMsTransmissionInterval(500);
 
         // Initialize the robot
         robot.init(this, telemetry);

@@ -20,6 +20,5 @@ dependencies {
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
     implementation 'com.github.Froze-N-Milk:mercurialftc:v0.0.5'
-
 }
 
