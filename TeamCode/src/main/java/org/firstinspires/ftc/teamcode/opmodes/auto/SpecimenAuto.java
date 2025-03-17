@@ -77,21 +77,21 @@ public class SpecimenAuto extends LinearOpMode {
 
         SequentialCommandGroup commands = new SequentialCommandGroup(
                 new MovementCommand(new Pose(9.3, -62.2, Math.PI / 2), new Pose(1.77, -32.1, Math.PI / 2), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(1.77, -32.1, Math.PI / 2), new Pose(31.5, -40.29, 0.6478), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(31.5, -40.29, 0.6478), new Pose(33.58, -48.74, -0.6355), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(33.58, -48.74, -0.6355), new Pose(33.26, -45.7764, 0.6466), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(33.26, -45.7764, 0.6466), new Pose(37.24, -49.1045, -0.87), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(37.24, -49.1045, -0.87), new Pose(45.4, -42.9, 0.6302), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(45.4, -42.9, 0.6302), new Pose(45.1, -49.8, -0.8727), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(45.1, -49.8, -0.8727), new Pose(34.8309, -62.36, 1.6119), new MovementConstants()),
-                new YieldCommand(2000),
+                new YieldCommand(500),
                 new MovementCommand(new Pose(34.8309, -62.36, 1.6119), new Pose(2.6, -33.82, 1.5975), new MovementConstants())
         );
 
@@ -109,10 +109,6 @@ public class SpecimenAuto extends LinearOpMode {
         while (!isStopRequested()) {
             robot.update();
         }
-
-
-
-
 
     }
 }

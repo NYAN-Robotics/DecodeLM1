@@ -47,7 +47,7 @@ public class SampleCycleAuto extends LinearOpMode {
     public static Pose sample3Drop = new Pose(-58.1774, -52.9033, 1.1448);
     public static Pose partnerSamplePickupInitial = new Pose(-26.163, -57.8, 0);
     public static Pose partnerSamplePickupFinal = new Pose(-17.163, -57.8, 0);
-    public static Pose cycleInitial = new Pose(-44, -9, 0);
+    public static Pose cycleInitial = new Pose(-44, -9, Math.PI / 4);
     public static Pose cycleSubmersible = new Pose(-23, -9, 0);
     public static Pose cycleSubmersible2 = new Pose(-23, -3, 0);
     public static Pose cycleSubmersible3 = new Pose(-27, 3, 0.5);

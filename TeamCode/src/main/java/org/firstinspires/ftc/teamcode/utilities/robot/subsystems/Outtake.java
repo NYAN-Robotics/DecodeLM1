@@ -37,7 +37,7 @@ public class Outtake implements Subsystem {
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
         SPECIMEN_INITIAL_PICKUP(620),
-        SPECIMEN_PICKUP(500),
+        SPECIMEN_PICKUP(50),
         HOVER(350);
 
         public double position;
@@ -65,8 +65,8 @@ public class Outtake implements Subsystem {
         SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
         UP(DEFAULT.position + 0.26),
         AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.125),
-        SPECIMEN_PICKUP_2(DEFAULT.position - 0.23);
+        SPECIMEN_PICKUP(DEFAULT.position - 0.19),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.19);
 
         public double position;
 
@@ -110,9 +110,9 @@ public class Outtake implements Subsystem {
      */
 
     public enum OuttakeRotationStates {
-        DEFAULT(0.65),
-        SPECIMEN_ROTATED(0.96),
-        ROTATED(0.3);
+        DEFAULT(0.5),
+        SPECIMEN_ROTATED(0.23),
+        ROTATED(0.77);
 
         public double position;
 
@@ -129,7 +129,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeClawStates {
         DEFAULT(0.48),
-        SPECIMEN_PICKUP(DEFAULT.position),
+        SPECIMEN_PICKUP(DEFAULT.position + 0.1),
         CLOSED(DEFAULT.position - 0.1);
 
         public double position;
@@ -149,9 +149,9 @@ public class Outtake implements Subsystem {
         TRANSFER_POSITION(DEFAULT.position - .2),
         SPECIMEN_INITIAL(DEFAULT.position),
         SPECIMEN_DROP(DEFAULT.position - 0.1),
-        SAMPLE_DROP(DEFAULT.position + 0.04), // FIGURE OUT
-        SPECIMEN_PICKUP(DEFAULT.position - 0.46),
-        DOWN(DEFAULT.position - 0.25); // FIGURE OUT
+        SAMPLE_DROP(DEFAULT.position + 0.1), // FIGURE OUT
+        SPECIMEN_PICKUP(DEFAULT.position - 0.65),
+        DOWN(DEFAULT.position - 0.15); // FIGURE OUT
 
         public double position;
 
@@ -466,9 +466,9 @@ public class Outtake implements Subsystem {
 
             robot.theCommandScheduler.scheduleCommand(
                     new SequentialCommandGroup(
-                            new YieldCommand(500),
+                            new YieldCommand(50),
                             new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_PICKUP_2)),
-                            new YieldCommand(250),
+                            new YieldCommand(50),
                             new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMEN_TRANSFER)),
                             new YieldCommand(2000, this::atTargetPosition),
                             new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_INITIAL)),
