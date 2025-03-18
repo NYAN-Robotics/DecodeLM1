@@ -29,14 +29,14 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1630),
+        SAMPLES(1680),
         SAMPLES_LOW(650),
         HANG(1730),
         HANG_FINAL(800),
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
         SPECIMENS_DROP(0),
-        SPECIMEN_INITIAL_PICKUP(620),
+        SPECIMEN_INITIAL_PICKUP(400),
         SPECIMEN_PICKUP(50),
         HOVER(350);
 
@@ -54,19 +54,17 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.46), // DEFAULT
-        BACK_PICKUP(DEFAULT.position - 0.19),
-        AUTO_DEFAULT(DEFAULT.position - 0.07),
-        HANG_INITIAL(DEFAULT.position + 0.14),
-        HANG_FINAL(DEFAULT.position + 0.24),
-        EXTENDED(DEFAULT.position + 0.42), // TWEAK
-        EXTENDED_INITIAL(DEFAULT.position + 0.28),
-        SPECIMEN_INITIAL(DEFAULT.position + 0.13),
-        SPECIMEN_DROP_FINAL(DEFAULT.position + 0.45),
-        UP(DEFAULT.position + 0.26),
-        AUTO_PARK(DEFAULT.position + 0.46),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.19),
-        SPECIMEN_PICKUP_2(DEFAULT.position - 0.19);
+        DEFAULT(0.48), // DEFAULT
+        BACK_PICKUP(DEFAULT.position - 0.22),
+        AUTO_DEFAULT(DEFAULT.position - 0.10),
+        HANG_INITIAL(DEFAULT.position + 0.11),
+        HANG_FINAL(DEFAULT.position + 0.21),
+        EXTENDED(DEFAULT.position + 0.39), // TWEAK
+        EXTENDED_INITIAL(DEFAULT.position + 0.25),
+        SPECIMEN_INITIAL(DEFAULT.position + 0.10),
+        AUTO_PARK(DEFAULT.position + 0.43),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.22),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.22);
 
         public double position;
 
@@ -128,9 +126,9 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeClawStates {
-        DEFAULT(0.48),
-        SPECIMEN_PICKUP(DEFAULT.position + 0.1),
-        CLOSED(DEFAULT.position - 0.1);
+        DEFAULT(0.48 + 0.03),
+        SPECIMEN_PICKUP(DEFAULT.position + 0.1 - 0.03),
+        CLOSED(DEFAULT.position - 0.06 - 0.03);
 
         public double position;
 
@@ -145,13 +143,13 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakePivotStates {
-        DEFAULT(0.75), // FIGURE OUT
-        TRANSFER_POSITION(DEFAULT.position - .2),
-        SPECIMEN_INITIAL(DEFAULT.position),
-        SPECIMEN_DROP(DEFAULT.position - 0.1),
-        SAMPLE_DROP(DEFAULT.position + 0.1), // FIGURE OUT
-        SPECIMEN_PICKUP(DEFAULT.position - 0.65),
-        DOWN(DEFAULT.position - 0.15); // FIGURE OUT
+        DEFAULT(0.67), // FIGURE OUT
+        TRANSFER_POSITION(DEFAULT.position - .1),
+        SPECIMEN_INITIAL(DEFAULT.position+0.1),
+        SPECIMEN_DROP(DEFAULT.position + 0),
+        SAMPLE_DROP(DEFAULT.position + 0.2), // FIGURE OUT
+        SPECIMEN_PICKUP(DEFAULT.position - 0.55),
+        DOWN(DEFAULT.position - 0.05); // FIGURE OUT
 
         public double position;
 
@@ -351,28 +349,45 @@ public class Outtake implements Subsystem {
         }
         if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES_LOW &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
+            robot.theIntake.setIntakeState(Intake.IntakeState.TRANSFER);
+
+
         }
 
         if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
+            robot.theIntake.setIntakeState(Intake.IntakeState.TRANSFER);
 
-            if (!Globals.inTeleop) {
+            /*
+            robot.theCommandScheduler.scheduleCommand(
+                    new SequentialCommandGroup(
+                            new YieldCommand(500),
+                            new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.DEFAULT))
+                    )
+            );
+
+
+             */
+
+            if (true || !Globals.inTeleop) {
                 sampleServoRotatedRequested = true;
 
                 robot.theCommandScheduler.scheduleCommand(
                         new SequentialCommandGroup(
-                                new YieldCommand(300),
+                                new YieldCommand(200),
                                 new OneTimeCommand(() ->
                                 {
                                     if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
 
-                                        setCurrentOuttakeState(OuttakeServoState.EXTENDED_INITIAL);
+                                        setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                                         setCurrentRotationState(OuttakeRotationStates.ROTATED);
-                                        setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
                                     }
                                     sampleServoRotatedRequested = false;
-                                })
+                                }),
+                                new YieldCommand(2000, this::atTargetPosition),
+                                new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP))
+
                         )
                 );
             }
@@ -474,7 +489,7 @@ public class Outtake implements Subsystem {
                             new OneTimeCommand(() -> setCurrentOuttakeState(OuttakeServoState.SPECIMEN_INITIAL)),
                             new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SPECIMEN_DROP)),
                             new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.ROTATED)),
-                            new YieldCommand(500),
+                            new YieldCommand(200),
                             new OneTimeCommand(() -> setSlidesState(OuttakeSlidesStates.SPECIMENS)),
                             new OneTimeCommand(() -> setCurrentRotationState(OuttakeRotationStates.SPECIMEN_ROTATED))
 

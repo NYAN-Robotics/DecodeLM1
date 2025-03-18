@@ -180,13 +180,13 @@ public class MainTeleop extends LinearOpMode {
                 robot.theCommandScheduler.scheduleCommand(
                         new SequentialCommandGroup(
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
-                                new YieldCommand(500),
-                                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                                new YieldCommand(3000, robot.theOuttake::atTargetPosition),
+                                new YieldCommand(200),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                                new YieldCommand(500),
+                                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
+                                new YieldCommand(1000, robot.theOuttake::atTargetPosition),
+                                new YieldCommand(100),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
 
                         )

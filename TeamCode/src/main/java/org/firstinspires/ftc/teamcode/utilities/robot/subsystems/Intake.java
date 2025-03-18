@@ -47,8 +47,9 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        DEFAULT(0.57),
-        EJECT(0.57),
+        DEFAULT(0.61),
+        EJECT(0.61),
+        TRANSFER(0.57),
         AUTO_DEFAULT(0.4),
         EXTENDED(0.72);
 
