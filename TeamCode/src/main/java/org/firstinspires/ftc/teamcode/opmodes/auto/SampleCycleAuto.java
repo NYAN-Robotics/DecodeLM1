@@ -79,7 +79,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         startPose,
                         initialDrop,
-                        new MovementConstants(0)
+                        new MovementConstants(-0.2)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new ParallelCommandGroup(
@@ -118,7 +118,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(400),
+                new YieldCommand(200),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new YieldCommand(50),
@@ -157,10 +157,10 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(400),
+                new YieldCommand(200),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new YieldCommand(50),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION_FURTHER)),
                 new ParallelCommandGroup(
                         new MovementCommand(
                                 sample2Drop,
@@ -200,7 +200,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(400),
+                new YieldCommand(200),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new YieldCommand(50)
         );
@@ -210,7 +210,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         new MovementCommand(
                                 new Pose(sample3Drop.theX, sample3Drop.theY, partnerSamplePickupInitial.theHeading),
                                 partnerSamplePickupInitial,
-                                new MovementConstants(-0.3)
+                                new MovementConstants(-0.5)
                         ),
                         new SequentialCommandGroup(
                                 new YieldCommand(250),
@@ -238,7 +238,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         )
                 ),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(400),
+                new YieldCommand(200),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new YieldCommand(50)
         );
@@ -261,7 +261,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleSubmersible,
                         cycleInitial,
-                        new MovementConstants(80, 80, 0, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
                 new MovementCommand(
@@ -319,13 +319,13 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleSubmersible,
                         cycleInitial,
-                        new MovementConstants(80, 80, 0, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
                 new MovementCommand(
                         cycleInitial,
                         cycleDrop,
-                        new MovementConstants(40, 40, 0.25, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(40, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),

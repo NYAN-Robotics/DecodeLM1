@@ -31,7 +31,8 @@ public class Intake implements Subsystem {
 
     public enum LinkageStates {
         DEFAULT(0.38),
-        AUTO_EXTENSION(0.48),
+        AUTO_EXTENSION(0.49),
+        AUTO_EXTENSION_FURTHER(0.54),
         EXTENDED(0.61);
 
         public double position;
@@ -66,7 +67,7 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.06),
+        EXTENDED(0.03),
         DEFAULT(0.36);
 
         public double position;
@@ -626,11 +627,11 @@ public class Intake implements Subsystem {
                         new OneTimeCommand(() -> setTargetLinkageState(LinkageStates.DEFAULT)),
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.REVERSE)),
                         new YieldCommand(1500, this::linkageAtHomeAnalog), // Wait for slides to return
-                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.HOLD)),
-                        new YieldCommand(150),
+                        new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
+                        new YieldCommand(75),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(150), // Wait for claw to close
+                        new YieldCommand(75), // Wait for claw to close
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                         new YieldCommand(50),

@@ -25,7 +25,7 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                         new MovementCommand(
                                 sample3Drop,
                                 cycleInitial,
-                                new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
+                                new MovementConstants(80, 80, -0.5, DriveConstants.K_V, DriveConstants.K_A)
                         ),
                         new SequentialCommandGroup(
                                 new YieldCommand(100),
@@ -36,10 +36,10 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                 new MovementCommand(
                         cycleInitial,
                         new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
-                        new MovementConstants(40, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(40, 40, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
-                new YieldCommand(550),
+                new YieldCommand(0),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
                 new YieldCommand(50),

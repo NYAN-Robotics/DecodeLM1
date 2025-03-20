@@ -29,7 +29,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1680),
+        SAMPLES(1720),
         SAMPLES_LOW(650),
         HANG(1730),
         HANG_FINAL(800),
@@ -54,12 +54,12 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.48), // DEFAULT
+        DEFAULT(0.46), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.22),
         AUTO_DEFAULT(DEFAULT.position - 0.10),
         HANG_INITIAL(DEFAULT.position + 0.11),
         HANG_FINAL(DEFAULT.position + 0.21),
-        EXTENDED(DEFAULT.position + 0.39), // TWEAK
+        EXTENDED(DEFAULT.position + 0.45), // TWEAK
         EXTENDED_INITIAL(DEFAULT.position + 0.25),
         SPECIMEN_INITIAL(DEFAULT.position + 0.10),
         AUTO_PARK(DEFAULT.position + 0.43),
@@ -209,7 +209,7 @@ public class Outtake implements Subsystem {
     OuttakeSlidesStates previousSlideState = OuttakeSlidesStates.DEFAULT;
     OuttakePivotStates currentPivotState = OuttakePivotStates.DEFAULT;
 
-    public static double kP = 0.0025;
+    public static double kP = 0.0045;
     public static double kI = 0;
     public static double kD = 0.0001;
     public static double kF = 0.1;
