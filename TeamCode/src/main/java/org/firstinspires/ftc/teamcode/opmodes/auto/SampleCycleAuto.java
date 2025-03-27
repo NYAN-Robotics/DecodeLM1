@@ -79,7 +79,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         startPose,
                         initialDrop,
-                        new MovementConstants(-0.2)
+                        new MovementConstants(0)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new ParallelCommandGroup(
