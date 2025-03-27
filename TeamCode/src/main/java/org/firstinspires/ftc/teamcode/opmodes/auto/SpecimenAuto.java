@@ -9,8 +9,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.DeadlineCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
@@ -76,7 +79,7 @@ public class SpecimenAuto extends LinearOpMode {
         // (2.6, -33.82, 1.5975)
 
 
-      /*  SequentialCommandGroup commands = new SequentialCommandGroup(
+        SequentialCommandGroup commands = new SequentialCommandGroup(
         public static Pose startPose = new MovementCommand(new Pose(9.3, -62.2, Math.PI / 2), new Pose(1.77, -32.1, Math.PI / 2), new MovementConstants());
                 new YieldCommand(500),
                 new MovementCommand(new Pose(1.77, -32.1, Math.PI / 2), new Pose(31.5, -40.29, 0.6478), new MovementConstants()),
@@ -113,7 +116,7 @@ public class SpecimenAuto extends LinearOpMode {
     }
 }
 
-*/
+
 /**
  * Example teleop code for a basic mecanum drive
  */
@@ -124,23 +127,24 @@ public class SpecimenAuto extends LinearOpMode {
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
 
-    public static Pose startPose = new Pose(-37.1, -61.0, Math.toRadians(90));
-    public static Pose Spec1 = new Pose(-59.8, -52.2, 1.1784);
-    public static Pose sample1 = new Pose(-58.2995, -51.5757, 1.1784);
-    public static Pose spec2Pickup = new Pose(-57, -47.3757, 1.1784);
-    public static Pose spec2Spit = new Pose(-58.1997, -51.2757, 1.1784);
-    public static Pose spec3Pickup = new Pose(-58.2771, -52.8033, 1.1448);
-    public static Pose spec3Spit = new Pose(-52.7078, -45.9624, 2.1477);
-    public static Pose spec4Pickup = new Pose(-52.7078, -45.9624, 2.1477);
-    public static Pose spec4Spit = new Pose(-52.7078, -45.9624, 2.1477);
-    public static Pose spec5Pickup = new Pose(-52.6078, -45.8624, 2.2477);
-    public static Pose spec5Spit = new Pose(-23, -9, 0);
+    public static Pose startPose = new Pose(10.57, -60.48, 1.583);
+    public static Pose Spec1 = new Pose(4.11, -30.52, 1.594);
+    public static Pose Spec2Pickup = new Pose(28.455, -40.30, 0.684);
+    public static Pose Spec2Spit = new Pose(38.1997, -51.2757, -0.6512);
+    public static Pose Spec3Pickup = new Pose(41.002, -38.878, 0.708);
+    public static Pose Spec3Spit = new Pose(52.7078, -45.9624, -0.7);
+    public static Pose Spec4Pickup = new Pose(45.8, -34.96, 2.1477);
+    public static Pose Spec4Spit = new Pose(45.1, -34.36, -0.844);
     public static Pose SpecLoadInitial = new Pose(-23, -3, 0);
     public static Pose SpecLoadFinal = new Pose(-23, -3, 0);
-    public static Pose Spec2Place = new Pose(-27, 3, 0.5);
-    public static Pose Spec3Place = new Pose(-27, 3, 0.5);
-    public static Pose Spec4Place = new Pose(-27, 3, 0.5);
-    public static Pose Spec5Place = new Pose(-27, 3, 0.5);
+    public static Pose Spec2PlaceInitial = new Pose(-27, 3, 0.5);
+    public static Pose Spec2PlaceFinal = new Pose(-27, 3, 0.5);
+    public static Pose Spec3PlaceInitial = new Pose(-27, 3, 0.5);
+    public static Pose Spec3PlaceFinal = new Pose(-27, 3, 0.5);
+    public static Pose Spec4PlaceInitial = new Pose(-27, 3, 0.5);
+    public static Pose Spec4PlaceFinal = new Pose(-27, 3, 0.5);
+    public static Pose Spec5PlaceInitial = new Pose(-27, 3, 0.5);
+    public static Pose Spec5PlaceFinal = new Pose(-27, 3, 0.5);
     public static Pose parkFinal = new Pose(-17, -9, Math.PI);
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
@@ -152,16 +156,105 @@ public class SpecimenAuto extends LinearOpMode {
 
         // Initialize the robot
         robot.init(this, telemetry);
+
+
+
+
+
         SequentialCommandGroup preloadedSpecimen = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
+
+
+
+                //new SequentialCommandGroup(
+                        //new ParallelCommandGroup(
+               // new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
+               // new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
+               // new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_INITIAL)),
+                //new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
+                               // ),
                 new MovementCommand(
                         startPose,
                         Spec1,
                         new MovementConstants(0)
+                )
+                /*new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
+                new YieldCommand(100)//wait for slides to move down
                 ),
 
-        );
+                new ParallelCommandGroup(
+                        new MovementCommand(
+                                Spec1,
+                                Spec2Pickup,
+                                new MovementConstants(0)
+                        ),
+                        new SequentialCommandGroup(
+                            new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
+                            new YieldCommand(200),
+                            new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
+                            new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
+                            new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
+                            new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
+                            new YieldCommand(1000, robot.theOuttake::atTargetPosition),
+                            new YieldCommand(100),
+                            new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
+                        )//spec pickup ready
+                ),
+                new SequentialCommandGroup(
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+                        new YieldCommand(500),//pickup
+                new MovementCommand(
+                        Spec2Pickup,
+                        Spec2Spit,
+                        new MovementConstants(0)
+                ),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+                    new YieldCommand(500),//spit out
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+                new MovementCommand(
+                        Spec2Spit,
+                        Spec3Pickup,
+                        new MovementConstants(0)
+                ),
+                new YieldCommand(500),//suk
+                new MovementCommand(
+                        Spec3Pickup,
+                        Spec3Spit,
+                        new MovementConstants(0)
+                ),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+                new YieldCommand(500),//spit out
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+                new MovementCommand(
+                        Spec3Spit,
+                        Spec4Pickup,
+                        new MovementConstants(0)
+                ),
+                 new YieldCommand(500),//slurp
+                 new MovementCommand(
+                         Spec4Pickup,
+                         Spec4Spit,
+                         new MovementConstants(0)
+                 ),
+                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+                 new YieldCommand(500)//spit out
+*/
+                //)
+                );
 
+
+
+
+
+
+
+
+
+        // Notify subsystems before loop
+        waitForStart();
+        robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+        robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
 
         // Notify subsystems before loop
         robot.postStart();
@@ -192,7 +285,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         robot.update();
 
-        robot.theCommandScheduler.scheduleCommand(preloadedSamples);
+        robot.theCommandScheduler.scheduleCommand(preloadedSpecimen);
         boolean retriedPickup = false;
 
         while (!isStopRequested()) {
@@ -201,8 +294,8 @@ public class SpecimenAuto extends LinearOpMode {
 
             telemetry.addData("Sample contained: ", robot.theIntake.sampleContained);
             telemetry.addData("Retry: ", retriedPickup);
-            telemetry.addData("Done with preloads: ", doneWithPreloads);
-            telemetry.addData("Done with initial: ", doneWithInitial);
+            //telemetry.addData("Done with preloads: ", doneWithPreloads);
+            //telemetry.addData("Done with initial: ", doneWithInitial);
             robot.update();
         }
 

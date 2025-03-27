@@ -30,10 +30,10 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.38),
+        DEFAULT(0.36),
         AUTO_EXTENSION(0.49),
         AUTO_EXTENSION_FURTHER(0.54),
-        EXTENDED(0.61);
+        EXTENDED(0.59);
 
         public double position;
 
