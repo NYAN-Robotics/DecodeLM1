@@ -72,7 +72,7 @@ public class SampleCycleAuto extends LinearOpMode {
         boolean doneWithPreloads = false;
         boolean submersibleCycle = true;
         boolean submersibleCycleDone = false;
-
+/*
         SequentialCommandGroup preloadedSamples = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
@@ -390,7 +390,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
         );
-
+/*
         SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
 
         robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
