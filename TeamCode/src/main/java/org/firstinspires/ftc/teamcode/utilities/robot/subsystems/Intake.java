@@ -102,6 +102,7 @@ public class Intake implements Subsystem {
         HOLD(0.4),
         STATIONARY(0),
         SLOW_REVERSE(-0.65),
+        HARD_REVERSE(-1),
         REVERSE(-0.8);
 
         public double position;
