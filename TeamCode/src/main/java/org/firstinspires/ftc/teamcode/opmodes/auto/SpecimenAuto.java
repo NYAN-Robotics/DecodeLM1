@@ -127,7 +127,7 @@ public class SpecimenAuto extends LinearOpMode {
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
 
-    public static Pose startPose = new Pose(10.57, -60.48, 1.583);
+    public static Pose startPose = new Pose(10.57, -60.48,  Math.PI / 2);
     public static Pose Spec1 = new Pose(4.11, -30.52, 1.594);
     public static Pose Spec2Pickup = new Pose(28.455, -40.30, 0.684);
     public static Pose Spec2Spit = new Pose(38.1997, -51.2757, -0.6512);
@@ -165,20 +165,20 @@ public class SpecimenAuto extends LinearOpMode {
 
 
 
-                //new SequentialCommandGroup(
-                        //new ParallelCommandGroup(
-               // new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-               // new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
-               // new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_INITIAL)),
-                //new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
-                               // ),
+                new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_INITIAL)),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
+                                ),
                 new MovementCommand(
                         startPose,
                         Spec1,
                         new MovementConstants(0)
                 )
                 /*new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new YieldCommand(100)//wait for slides to move down
+                new YieldCommand(300)//wait for slides to move down
                 ),
 
                 new ParallelCommandGroup(
@@ -239,8 +239,8 @@ public class SpecimenAuto extends LinearOpMode {
                  ),
                  new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
                  new YieldCommand(500)//spit out
-*/
-                //)
+
+                )
                 );
 
 
@@ -281,7 +281,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(10.57, -60.48,  Math.PI / 2));
 
         robot.update();
 
