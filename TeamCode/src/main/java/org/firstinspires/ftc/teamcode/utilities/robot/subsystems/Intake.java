@@ -31,7 +31,7 @@ public class Intake implements Subsystem {
 
     public enum LinkageStates {
         DEFAULT(0.36),
-        AUTO_ROTATE(0.36),
+        AUTO_ROTATE(0.45),
         AUTO_EXTENSION(0.49),
         AUTO_EXTENSION_FURTHER(0.54),
         EXTENDED(0.59);

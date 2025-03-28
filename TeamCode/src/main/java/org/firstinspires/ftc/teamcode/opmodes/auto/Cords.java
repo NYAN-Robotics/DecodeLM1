@@ -29,8 +29,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
  * Example teleop code for a basic mecanum drive
  */
 
-@Autonomous(name = "Sample Cycle Auto")
-public class SampleCycleAuto extends LinearOpMode {
+@Autonomous(name = "Cords")
+public class Cords extends LinearOpMode {
 
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
@@ -390,7 +390,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
         );
-/*
+*/
         SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
 
         robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
@@ -412,7 +412,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position);
             }
 
-            if (gamepad1.dpad_left && !gamepad1Copy.dpad_left) {
+         /*   if (gamepad1.dpad_left && !gamepad1Copy.dpad_left) {
                 System.out.println("Left offset");
                 offset = 10;
                 initialCycleCommand = new InitialCycleCommand1(robot, offset);
@@ -428,7 +428,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 initialCycleCommand = new InitialCycleCommand1(robot, offset);
                 retryCommand = new RetryCommand(robot, offset);
             }
-
+*/
             if (gamepad1.triangle) {
                 Globals.ALLIANCE = Alliance.RED;
             } else if (gamepad1.square) {
@@ -486,16 +486,16 @@ public class SampleCycleAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(10.57, -60.48,  Math.PI / 2));
 
         robot.update();
 
-        robot.theCommandScheduler.scheduleCommand(preloadedSamples);
+       // robot.theCommandScheduler.scheduleCommand(preloadedSamples);
         boolean retriedPickup = false;
 
         while (!isStopRequested()) {
 
-
+/*
             if (!doneWithPreloads) {
                 if (preloadedSamples.isFinished()) {
                     doneWithPreloads = true;
@@ -580,7 +580,7 @@ public class SampleCycleAuto extends LinearOpMode {
                     }
                 }
             }
-
+*/
             telemetry.addData("Sample contained: ", robot.theIntake.sampleContained);
             telemetry.addData("Retry: ", retriedPickup);
             telemetry.addData("Done with preloads: ", doneWithPreloads);
