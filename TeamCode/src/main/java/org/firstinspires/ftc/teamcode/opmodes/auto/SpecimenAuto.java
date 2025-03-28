@@ -201,13 +201,14 @@ public class SpecimenAuto extends LinearOpMode {
                             new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
                         )//spec pickup ready
                 ),
-               // new SequentialCommandGroup(
+                new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                        new YieldCommand(400),//pickup
-                new ParallelCommandGroup( 
-
+                        new YieldCommand(400)//pickup
+                ),
+                new ParallelCommandGroup(
+                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
                     new MovementCommand(
                         Spec2Pickup,
                         Spec2Spit,
@@ -222,7 +223,7 @@ public class SpecimenAuto extends LinearOpMode {
                         Spec3Pickup,
                         new MovementConstants(0)
                 ),
-
+                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),      new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
                 new YieldCommand(500),//suk
                 new ParallelCommandGroup( 
 
