@@ -128,24 +128,24 @@ public class SpecimenAuto extends LinearOpMode {
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
 
-    public static Pose startPose = new Pose(10, -60,  Math.PI / 2);
-    public static Pose Spec1 = new Pose(4.11, -30.52, 1.594);
-    public static Pose Spec2Pickup = new Pose(28.455, -40.30, 0.684);
-    public static Pose Spec2Spit = new Pose(38.1997, -51.2757, -0.6512);
-    public static Pose Spec3Pickup = new Pose(41.002, -38.878, 0.708);
-    public static Pose Spec3Spit = new Pose(52.7078, -45.9624, -0.7);
-    public static Pose Spec4Pickup = new Pose(45.8, -34.96, 2.1477);
-    public static Pose Spec4Spit = new Pose(45.1, -34.36, -0.844);
+    public static Pose startPose = new Pose(1.5, -0.5,  0);
+    public static Pose Spec1 = new Pose(30.4, 4.74, -0.02);
+    public static Pose Spec2Pickup = new Pose(20.5, -18.6, -0.90);
+    public static Pose Spec2Spit = new Pose(19.18, -24.55, -2.3);
+    public static Pose Spec3Pickup = new Pose(22.39, -26.93, -1);
+    public static Pose Spec3Spit = new Pose(19.21, -28.13, -2.29);
+    public static Pose Spec4Pickup = new Pose(24.57, -35.71, -1);
+    public static Pose Spec4Spit = new Pose(8.58, -1.95, -1.95);
     public static Pose SpecLoadInitial = new Pose(-23, -3, 0);
     public static Pose SpecLoadFinal = new Pose(-23, -3, 0);
     public static Pose Spec2PlaceInitial = new Pose(-27, 3, 0.5);
-    public static Pose Spec2PlaceFinal = new Pose(-27.3, 3.5, 0.6);
-   // public static Pose Spec3PlaceInitial = new Pose(-27, 3, 0.5);
-   // public static Pose Spec3PlaceFinal = new Pose(-27, 3, 0.5);
-  //  public static Pose Spec4PlaceInitial = new Pose(-27, 3, 0.5);
- //   public static Pose Spec4PlaceFinal = new Pose(-27, 3, 0.5);
-   // public static Pose Spec5PlaceInitial = new Pose(-27, 3, 0.5);
-   // public static Pose Spec5PlaceFinal = new Pose(-27, 3, 0.5);
+    public static Pose Spec2PlaceFinal = new Pose(-27.5, 3.5, 0.6);
+   // public static Pose Spec3PlaceInitial = new Pose(-28, 3, 0.5);
+   // public static Pose Spec3PlaceFinal = new Pose(-29, 3, 0.5);
+  //  public static Pose Spec4PlaceInitial = new Pose(-23, 3, 0.5);
+ //   public static Pose Spec4PlaceFinal = new Pose(-24, 3, 0.5);
+   // public static Pose Spec5PlaceInitial = new Pose(-25, 3, 0.5);
+   // public static Pose Spec5PlaceFinal = new Pose(-26, 3, 0.5);
    // public static Pose parkFinal = new Pose(-17, -9, Math.PI);
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
@@ -180,7 +180,7 @@ public class SpecimenAuto extends LinearOpMode {
                         new MovementConstants(0)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),//update value
-                new YieldCommand(300),//wait for slides to move down
+                new YieldCommand(1500),//wait for slides to move down
 
 
                 new ParallelCommandGroup(
@@ -205,9 +205,9 @@ public class SpecimenAuto extends LinearOpMode {
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                        new YieldCommand(500),//pickup
+                        new YieldCommand(400),//pickup
                 new ParallelCommandGroup( 
-                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
+
                     new MovementCommand(
                         Spec2Pickup,
                         Spec2Spit,
@@ -222,10 +222,10 @@ public class SpecimenAuto extends LinearOpMode {
                         Spec3Pickup,
                         new MovementConstants(0)
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),    
+
                 new YieldCommand(500),//suk
                 new ParallelCommandGroup( 
-                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
+
                     new MovementCommand(
                         Spec3Pickup,
                         Spec3Spit,
@@ -240,10 +240,10 @@ public class SpecimenAuto extends LinearOpMode {
                         Spec4Pickup,
                         new MovementConstants(0)
                 ),
-                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),   
+
                  new YieldCommand(500),//slurp
                   new ParallelCommandGroup( 
-                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
+                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.DEFAULT)),
                     new MovementCommand(
                         Spec4Pickup,
                         Spec4Spit,
@@ -335,7 +335,7 @@ public class SpecimenAuto extends LinearOpMode {
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theLocalizer.setPose(new Pose(10.57, -60.48,  Math.PI / 2));
+        robot.theLocalizer.setPose(new Pose(0, 0,  0));
 
         robot.update();
 

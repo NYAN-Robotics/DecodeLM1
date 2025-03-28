@@ -101,6 +101,9 @@ public class MovementCommandCache {
     }
 
     public int getKeyFromTime(double time) {
+        if (theDuration==0){
+            return 0;
+        }
         return (int) MathHelper.clamp(time / CACHE_INCREMENT, 0, theDuration/CACHE_INCREMENT - 1);
     }
 
