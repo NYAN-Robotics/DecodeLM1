@@ -31,6 +31,7 @@ public class Intake implements Subsystem {
 
     public enum LinkageStates {
         DEFAULT(0.36),
+        AUTO_ROTATE(0.45),
         AUTO_EXTENSION(0.49),
         AUTO_EXTENSION_FURTHER(0.54),
         EXTENDED(0.59);
@@ -67,7 +68,7 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0.03),
+        EXTENDED(0),
         DEFAULT(0.36);
 
         public double position;
@@ -101,6 +102,7 @@ public class Intake implements Subsystem {
         HOLD(0.4),
         STATIONARY(0),
         SLOW_REVERSE(-0.65),
+        HARD_REVERSE(-1),
         REVERSE(-0.8);
 
         public double position;

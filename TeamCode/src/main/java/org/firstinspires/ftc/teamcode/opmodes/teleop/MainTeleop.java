@@ -219,7 +219,8 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad2.triangle && !previousFrameGamepad2.triangle) {
-                robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.DOWN);
+                robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
+                robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
             }
 
             /*
