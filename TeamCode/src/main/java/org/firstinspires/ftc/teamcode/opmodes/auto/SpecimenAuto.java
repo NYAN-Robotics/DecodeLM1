@@ -133,9 +133,9 @@ public class SpecimenAuto extends LinearOpMode {
 
     public static Pose startPose = new Pose(1.5, 0.5,  0);
     public static Pose Spec1 = new Pose(32.4, 4.74, -0.02);
-    public static Pose Spec2Pickup = new Pose(20.5, -18.6, -0.90);
+    public static Pose Spec2Pickup = new Pose(22.5, -20.6, -0.90);
     public static Pose Spec2Spit = new Pose(19.18, -24.55, -2.3);
-    public static Pose Spec3Pickup = new Pose(22.39, -26.93, -1);
+    public static Pose Spec3Pickup = new Pose(24, -28, -1);
     public static Pose Spec3Spit = new Pose(19.21, -28.13, -2.29);
     public static Pose Spec4Pickup = new Pose(24.57, -35.71, -1);
     public static Pose Spec4Spit = new Pose(8.58, -1.95, -1.95);
