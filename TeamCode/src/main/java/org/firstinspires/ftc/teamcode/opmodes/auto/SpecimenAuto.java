@@ -141,14 +141,14 @@ public class SpecimenAuto extends LinearOpMode {
     public static Pose Spec4Spit = new Pose(8.58, -1.95, -1.95);
     public static Pose SpecLoadInitial = new Pose(5, -25.87, 0);
     public static Pose SpecLoadFinal = new Pose(-0.5, -25.87, 0);
-    public static Pose Spec2PlaceInitial = new Pose(28, 6, 0.5);
+    public static Pose Spec2PlaceInitial = new Pose(28, 6, 0);
     public static Pose Spec2PlaceFinal = new Pose(32.4, 6, 0);
-    public static Pose Spec3PlaceInitial = new Pose(28, 8, 0.5);
-    public static Pose Spec3PlaceFinal = new Pose(32.4, 8, 0.5);
-    public static Pose Spec4PlaceInitial = new Pose(28, 10, 0.5);
-    public static Pose Spec4PlaceFinal = new Pose(32.4, 10, 0.5);
-    public static Pose Spec5PlaceInitial = new Pose(28, 12, 0.5);
-    public static Pose Spec5PlaceFinal = new Pose(32.4, 12, 0.5);
+    public static Pose Spec3PlaceInitial = new Pose(28, 8, 0);
+    public static Pose Spec3PlaceFinal = new Pose(32.4, 8, 0);
+    public static Pose Spec4PlaceInitial = new Pose(28, 10, 0);
+    public static Pose Spec4PlaceFinal = new Pose(32.4, 10, 0);
+    public static Pose Spec5PlaceInitial = new Pose(28, 12, 0);
+    public static Pose Spec5PlaceFinal = new Pose(32.4, 12, 0);
     public static Pose parkFinal = new Pose(0, -25.87, 0);
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
