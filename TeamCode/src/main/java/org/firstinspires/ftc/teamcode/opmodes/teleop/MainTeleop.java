@@ -229,7 +229,7 @@ public class MainTeleop extends LinearOpMode {
             }*/
 
             if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
-                robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
+                robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.HORIZONTAL_SAMPLE_DROP);
             }
 
             if ((currentFrameGamepad2.square && !previousFrameGamepad2.square) || (oneDriver && (currentFrameGamepad1.dpad_up && !previousFrameGamepad1.dpad_up))) {

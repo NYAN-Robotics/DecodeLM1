@@ -171,8 +171,7 @@ public class SpecimenAuto extends LinearOpMode {
 
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                 new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                new OneTimeCommand(() -> robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
+                                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.AUTO_DEFAULT)),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
@@ -273,16 +272,17 @@ public class SpecimenAuto extends LinearOpMode {
                     new MovementCommand(
                         Spec4Spit,
                         SpecLoadInitial,
-                        new MovementConstants(0.2)
+                        new MovementConstants(0.5)
                 )
                         ),
                    new SequentialCommandGroup(
+                           new YieldCommand(500),
                        new ParallelCommandGroup(
                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
                        new MovementCommand(
                         SpecLoadInitial,
                         SpecLoadFinal,
-                        new MovementConstants(0)
+                        new MovementConstants(0.5)
                           )
                         ),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
@@ -291,7 +291,7 @@ public class SpecimenAuto extends LinearOpMode {
                                    new MovementCommand(
                                            SpecLoadFinal,
                                            Spec2PlaceInitial,
-                                           new MovementConstants(0.2)
+                                           new MovementConstants(0.5)
                                    ),
                                    new SequentialCommandGroup(
                                    new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),

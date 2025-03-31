@@ -30,11 +30,11 @@ import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.Caching
 public class Intake implements Subsystem {
 
     public enum LinkageStates {
-        DEFAULT(0.36),
+        DEFAULT(0.364),
         AUTO_ROTATE(0.45),
         AUTO_EXTENSION(0.49),
         AUTO_EXTENSION_FURTHER(0.54),
-        EXTENDED(0.59);
+        EXTENDED(0.62);
 
         public double position;
 
@@ -49,11 +49,11 @@ public class Intake implements Subsystem {
     }
 
     public enum IntakeState {
-        DEFAULT(0.61),
-        EJECT(0.61),
-        TRANSFER(0.57),
-        AUTO_DEFAULT(0.4),
-        EXTENDED(0.72);
+        DEFAULT(0.67),
+        EJECT(0.65),
+        TRANSFER(0.64),
+        AUTO_DEFAULT(0.45),
+        EXTENDED(0.80);
 
         public double position;
 
@@ -69,7 +69,7 @@ public class Intake implements Subsystem {
 
     public enum SampleHolderState {
         EXTENDED(0),
-        DEFAULT(0.36);
+        DEFAULT(0.5);
 
         public double position;
 
@@ -282,7 +282,7 @@ public class Intake implements Subsystem {
     public void onCyclePassed() {
 
         lastBreakbeamState = currentBreakbeamState;
-        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 1; // !intakeBreakbeam.getState();
+        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 2; // !intakeBreakbeam.getState();
 
         /*
         Add majority decision breakbeam
@@ -534,6 +534,7 @@ public class Intake implements Subsystem {
             sampleContained = SampleContained.NONE;
         }
 
+        sampleContained = SampleContained.YELLOW;
 
 
         /*

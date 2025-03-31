@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.State;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.MotionProfiledMotion;
 import org.firstinspires.ftc.teamcode.utilities.controltheory.feedback.GeneralPIDController;
@@ -18,7 +17,6 @@ import org.firstinspires.ftc.teamcode.utilities.controltheory.motionprofiler.Mot
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.mercurialftc.mercurialftc.util.hardware.cachinghardwaredevice.CachingDcMotorEX;
@@ -29,7 +27,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1720),
+        SAMPLES(1740),
         SAMPLES_LOW(650),
         HANG(1730),
         HANG_FINAL(800),
@@ -54,12 +52,12 @@ public class Outtake implements Subsystem {
     }
 
     public enum OuttakeServoState {
-        DEFAULT(0.485), // DEFAULT
+        DEFAULT(0.505), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.23),
         AUTO_DEFAULT(DEFAULT.position - 0.10),
         HANG_INITIAL(DEFAULT.position + 0.11),
         HANG_FINAL(DEFAULT.position + 0.21),
-        EXTENDED(DEFAULT.position + 0.43), // TWEAK
+        EXTENDED(DEFAULT.position + 0.41), // TWEAK
         EXTENDED_INITIAL(DEFAULT.position + 0.25),
         SPECIMEN_INITIAL(DEFAULT.position + 0.10),
         AUTO_PARK(DEFAULT.position + 0.43),
@@ -145,10 +143,11 @@ public class Outtake implements Subsystem {
     public enum OuttakePivotStates {
         DEFAULT(0.67), // FIGURE OUT
         TRANSFER_POSITION(DEFAULT.position - .1),
-        SPECIMEN_INITIAL(DEFAULT.position+0.1),
+        SPECIMEN_INITIAL(DEFAULT.position + 0.1),
         SPECIMEN_DROP(DEFAULT.position + 0),
         SAMPLE_DROP(DEFAULT.position + 0.2), // FIGURE OUT
         SPECIMEN_PICKUP(DEFAULT.position - 0.58),
+        HORIZONTAL_SAMPLE_DROP(SAMPLE_DROP.position - 0.1),
         DOWN(DEFAULT.position - 0.05); // FIGURE OUT
 
         public double position;
@@ -386,7 +385,7 @@ public class Outtake implements Subsystem {
                                     sampleServoRotatedRequested = false;
                                 }),
                                 new YieldCommand(2000, this::atTargetPosition),
-                                new OneTimeCommand(() -> setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP))
+                                new OneTimeCommand(() -> { if (currentSlideState == OuttakeSlidesStates.SAMPLES) { setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP); } })
 
                         )
                 );
