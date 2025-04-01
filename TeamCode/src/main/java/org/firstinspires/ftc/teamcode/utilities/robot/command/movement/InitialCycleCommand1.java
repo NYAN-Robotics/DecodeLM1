@@ -29,10 +29,11 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                         ),
                         new SequentialCommandGroup(
                                 new YieldCommand(100),
-                                new OneTimeCommand(() -> robot.theOuttake.reset())
-                        )
+                                new OneTimeCommand(() -> robot.theOuttake.reset()),
+                                new YieldCommand(500),
+                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED))
+                                )
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new MovementCommand(
                         cycleInitial,
                         new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),

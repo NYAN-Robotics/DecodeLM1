@@ -52,7 +52,7 @@ public class Intake implements Subsystem {
         DEFAULT(0.67),
         EJECT(0.65),
         TRANSFER(0.64),
-        AUTO_DEFAULT(0.45),
+        AUTO_DEFAULT(0.54),
         EXTENDED(0.80);
 
         public double position;
@@ -282,7 +282,7 @@ public class Intake implements Subsystem {
     public void onCyclePassed() {
 
         lastBreakbeamState = currentBreakbeamState;
-        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 2; // !intakeBreakbeam.getState();
+        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 1.5; // !intakeBreakbeam.getState();
 
         /*
         Add majority decision breakbeam

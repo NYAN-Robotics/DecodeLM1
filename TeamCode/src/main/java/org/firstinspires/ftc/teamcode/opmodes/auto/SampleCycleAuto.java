@@ -37,7 +37,7 @@ public class SampleCycleAuto extends LinearOpMode {
 
     public static Pose startPose = new Pose(-37.1, -61.0, Math.PI / 2);
     public static Pose initialDrop = new Pose(-59.8, -52.2, 1.1784);
-    public static Pose sample1 = new Pose(-58.2995, -51.5757, 1.1784);
+    public static Pose sample1 = new Pose(-59.2995, -52.0757, 1.1784);
     public static Pose sample1Final = new Pose(-57, -47.3757, 1.1784);
     public static Pose sample1Drop = new Pose(-58.1997, -51.2757, 1.1784);
     public static Pose sample2 = new Pose(-58.5219, -47.5666, 1.5987);
@@ -47,8 +47,8 @@ public class SampleCycleAuto extends LinearOpMode {
     public static Pose sample3Drop = new Pose(-58.1774, -52.9033, 1.1448);
     public static Pose partnerSamplePickupInitial = new Pose(-26.163, -57.8, 0);
     public static Pose partnerSamplePickupFinal = new Pose(-17.163, -57.8, 0);
-    public static Pose cycleInitial = new Pose(-44, -9, Math.PI / 4);
-    public static Pose cycleSubmersible = new Pose(-23, -9, 0);
+    public static Pose cycleInitial = new Pose(-35.4, -17.6, Math.PI / 4);
+    public static Pose cycleSubmersible = new Pose(-30.4, -14, 0.558);
     public static Pose cycleSubmersible2 = new Pose(-23, -3, 0);
     public static Pose cycleSubmersible3 = new Pose(-27, 3, 0.5);
     public static Pose cycleDrop = new Pose(-55, -56.5, Math.PI / 4);
@@ -72,6 +72,7 @@ public class SampleCycleAuto extends LinearOpMode {
         boolean doneWithPreloads = false;
         boolean submersibleCycle = true;
         boolean submersibleCycleDone = false;
+        boolean submersibleCycleDone2 = false;
 
         SequentialCommandGroup preloadedSamples = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
@@ -79,7 +80,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         startPose,
                         initialDrop,
-                        new MovementConstants(0)
+                        new MovementConstants(-0.1)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new ParallelCommandGroup(
@@ -267,7 +268,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleInitial,
                         cycleDrop,
-                        new MovementConstants(0.1)
+                        new MovementConstants(0.15)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
@@ -276,25 +277,43 @@ public class SampleCycleAuto extends LinearOpMode {
                     new MovementCommand(
                             cycleDrop,
                             cycleInitial,
-                            new MovementConstants(80, 80, -0.25, DriveConstants.K_V, DriveConstants.K_A)
+                            new MovementConstants(80, 80, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                     ),
                     new SequentialCommandGroup(
                             new YieldCommand(500),
-                            new OneTimeCommand(() -> robot.theOuttake.reset())
+                            new OneTimeCommand(() -> robot.theOuttake.reset()),
+                            new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED))
                     )
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new MovementCommand(
                         cycleInitial,
                         cycleSubmersible,
-                        new MovementConstants(20, 40, -0.25, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
         );
 
         SequentialCommandGroup initialCycleCommand2 = new SequentialCommandGroup(
+                new DeadlineCommand(
+                        new YieldCommand(robot.theIntake::containsSampleColorSensor),
+                        new SequentialCommandGroup(
+                                new MovementCommand(
+                                        cycleStrafe,
+                                        cycleSubmersible2,
+                                        new MovementConstants(-0.25)
+                                ),
+                                new MovementCommand(
+                                        cycleSubmersible2,
+                                        cycleSubmersible3,
+                                        new MovementConstants(0.5)
+                                )
+                        )
+                ),
+                new YieldCommand(100)
+        );
+
+        SequentialCommandGroup initialCycleCommand3 = new SequentialCommandGroup(
                 new DeadlineCommand(
                         new YieldCommand(robot.theIntake::containsSampleColorSensor),
                         new SequentialCommandGroup(
@@ -325,7 +344,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 new MovementCommand(
                         cycleInitial,
                         cycleDrop,
-                        new MovementConstants(40, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
+                        new MovementConstants(0.2)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
@@ -341,17 +360,53 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new OneTimeCommand(() -> robot.theOuttake.reset())
                         )
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new MovementCommand(
                         cycleInitial,
                         cycleSubmersible,
-                        defaultMovementConstants
+                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
                 ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
         );
 
+        SequentialCommandGroup cycleCommand3 = new SequentialCommandGroup(
+                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
+                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
+                new MovementCommand(
+                        cycleSubmersible,
+                        cycleInitial,
+                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
+                ),
+                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
+                new MovementCommand(
+                        cycleInitial,
+                        cycleDrop,
+                        new MovementConstants(0.2)
+                ),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
+                new YieldCommand(100),
+                new ParallelCommandGroup(
+                        new MovementCommand(
+                                cycleDrop,
+                                cycleInitial,
+                                new MovementConstants(80, 80, -0.3, DriveConstants.K_V, DriveConstants.K_A)
+                        ),
+                        new SequentialCommandGroup(
+                                new YieldCommand(500),
+                                new OneTimeCommand(() -> robot.theOuttake.reset())
+                        )
+                ),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
+                new MovementCommand(
+                        cycleInitial,
+                        cycleSubmersible,
+                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
+                ),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
+        );
 
         SequentialCommandGroup wrongColorCommand = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
@@ -373,6 +428,25 @@ public class SampleCycleAuto extends LinearOpMode {
         );
 
         SequentialCommandGroup wrongColorCommand2 = new SequentialCommandGroup(
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
+                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
+                new YieldCommand(250),
+                new MovementCommand(
+                        cycleSubmersible,
+                        parkInitial,
+                        new MovementConstants(50, 50, -0.2, DriveConstants.K_V, DriveConstants.K_A)
+                ),
+                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
+                new MovementCommand(
+                        parkInitial,
+                        parkFinal,
+                        new MovementConstants(50, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
+                ),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
+                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
+        );
+
+        SequentialCommandGroup wrongColorCommand3 = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
                 new YieldCommand(250),
@@ -557,7 +631,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 }
             }
 
-            if (!submersibleCycleDone && submersibleCycle) {
+            if (!submersibleCycleDone) {
                 if (initialCycleCommand.isFinished() && cycleCommand.isFinished() && initialCycleCommand2.isFinished()) {
                     submersibleCycleDone = true;
                     robot.theIntake.updatePossessedColor();
@@ -574,10 +648,36 @@ public class SampleCycleAuto extends LinearOpMode {
                         System.out.println("Scheduling cycle command 2");
                         robot.theCommandScheduler.scheduleCommand(
                                 new SequentialCommandGroup(
-                                        cycleCommand2
+                                        cycleCommand2,
+                                        initialCycleCommand3
                                 )
                         );
                     }
+                }
+            }
+
+            if (!submersibleCycleDone2) {
+                if (initialCycleCommand2.isFinished() && cycleCommand2.isFinished() && initialCycleCommand3.isFinished()) {
+                    submersibleCycleDone2 = true;
+                    robot.theIntake.updatePossessedColor();
+
+                    System.out.println(robot.theIntake.sampleContained);
+
+                    if (robot.theIntake.sampleContained == Intake.SampleContained.BLUE && Globals.ALLIANCE == Alliance.RED) {
+                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand3);
+                    } else if (robot.theIntake.sampleContained == Intake.SampleContained.RED && Globals.ALLIANCE == Alliance.BLUE) {
+                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand3);
+                    } else if (robot.theIntake.sampleContained == Intake.SampleContained.NONE && !robot.theIntake.containsSampleColorSensor()) {
+                        robot.theCommandScheduler.scheduleCommand(wrongColorCommand3);
+                    } else {
+                        System.out.println("Scheduling cycle command 2");
+                        robot.theCommandScheduler.scheduleCommand(
+                                new SequentialCommandGroup(
+                                        cycleCommand3
+                                )
+                        );
+                    }
+
                 }
             }
 
