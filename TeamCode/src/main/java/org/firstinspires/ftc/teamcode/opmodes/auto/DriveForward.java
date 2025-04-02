@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -20,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 /**
  * Example teleop code for a basic mecanum drive
  */
-
+@Disabled
 @Autonomous(name = "Drive Forward")
 public class DriveForward extends LinearOpMode {
 

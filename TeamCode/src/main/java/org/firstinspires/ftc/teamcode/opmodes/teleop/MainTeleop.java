@@ -80,6 +80,9 @@ public class MainTeleop extends LinearOpMode {
 
         robot.update();
 
+        robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
+
+        robot.theIntake.setAutomation(true);
 
         double frameTime = 0;
 

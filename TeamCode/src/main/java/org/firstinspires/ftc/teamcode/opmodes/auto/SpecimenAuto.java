@@ -131,16 +131,23 @@ public class SpecimenAuto extends LinearOpMode {
     // Create new Instance of the robot
     RobotEx robot = RobotEx.getInstance();
 
-    public static Pose startPose = new Pose(1.5, 0.5,  0);
-    public static Pose Spec1 = new Pose(32.4, 4.74, -0.02);
-    public static Pose Spec2Pickup = new Pose(22.5, -20.6, -0.90);
-    public static Pose Spec2Spit = new Pose(19.18, -24.55, -2.3);
-    public static Pose Spec3Pickup = new Pose(24, -28, -1);
-    public static Pose Spec3Spit = new Pose(19.21, -28.13, -2.29);
-    public static Pose Spec4Pickup = new Pose(24.57, -35.71, -1);
-    public static Pose Spec4Spit = new Pose(8.58, -1.95, -1.95);
-    public static Pose SpecLoadInitial = new Pose(5, -25.87, 0);
-    public static Pose SpecLoadFinal = new Pose(-0.5, -25.87, 0);
+    public static Pose startPose = new Pose(9.88, -61.1, Math.PI / 2);
+    public static Pose Spec1 = new Pose(4.33, -28.6, Math.PI / 2);
+    public static Pose Spec1Drop = new Pose(4.33, -38.6, Math.PI / 2);
+    public static Pose Spec2Pickup = new Pose(21.7-2, -41.5-2, 0.5677);
+    public static Pose Spec2PickupFinal = new Pose(21.7 + 4*Math.cos(0.5677), -41.5 + 4*Math.sin(0.5677), 0.5677);
+    public static Pose Spec2Spit = new Pose(24.99, -43.72, -0.6267);
+    public static Pose Spec3Pickup = new Pose(33.2-2, -41.3-2, 0.5844);
+    public static Pose Spec3PickupFinal = new Pose(33.2 + 4 * Math.cos(0.5844), -41.3 + 4 * Math.sin(0.5844), 0.5844);
+
+    public static Pose Spec3Spit = new Pose(37.47, -42.1, -0.809);
+    public static Pose Spec4Pickup = new Pose(41.22-2, -40.1-2, 0.5275);
+    public static Pose Spec4PickupFinal = new Pose(41.22 + 4 * Math.cos(0.5275), -40.1 + 4 * Math.sin(0.5275), 0.5275);
+
+    public static Pose Spec4Spit = new Pose(39.57, -40.5, -0.8783);
+    public static Pose SpecLoadInitial = new Pose(34.79, -50.93, Math.PI / 2);
+    public static Pose SpecLoadInitial2 = new Pose(34.79, -60.93, Math.PI / 2);
+    public static Pose SpecLoadFinal = new Pose(1.9025, -31.84, Math.PI / 2);
     public static Pose Spec2PlaceInitial = new Pose(28, 6, 0);
     public static Pose Spec2PlaceFinal = new Pose(32.4, 6, 0);
     public static Pose Spec3PlaceInitial = new Pose(28, 8, 0);
@@ -162,310 +169,149 @@ public class SpecimenAuto extends LinearOpMode {
         robot.init(this, telemetry);
 
 
-
-
-
         SequentialCommandGroup preloadedSpecimen = new SequentialCommandGroup(
-
 
 
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
                                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.AUTO_DEFAULT)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
-                                ),
-                new MovementCommand(
-                        startPose,
-                        Spec1,
-                        new MovementConstants(0.2)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
-                new YieldCommand(200),//wait for slides to move down
-
-
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                Spec1,
-                                Spec2Pickup,
-                                new MovementConstants(0.2)
-                        ),
-                        new SequentialCommandGroup(
-                            new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
-                            new YieldCommand(200),
-                            new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
-                            new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
-                            new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                            new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                            new YieldCommand(1000, robot.theOuttake::atTargetPosition),
-                            new YieldCommand(400),
-                            new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
-                        )//spec pickup ready
-                ),
-                new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                        new YieldCommand(600)//pickup
-                ),
-                new ParallelCommandGroup(
-                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EJECT)),
-                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
-                    new MovementCommand(
-                        Spec2Pickup,
-                        Spec2Spit,
-                        new MovementConstants(0)
-                    )
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.HARD_REVERSE)),
-                    new YieldCommand(300),//spit out
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                new MovementCommand(
-                        Spec2Spit,
-                        Spec3Pickup,
-                        new MovementConstants(0.2)
-                ),
-                new SequentialCommandGroup(
-                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                    new YieldCommand(600)//suk
-                ),
-                new ParallelCommandGroup(
-                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EJECT)),
-                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
-                    new MovementCommand(
-                        Spec3Pickup,
-                        Spec3Spit,
-                        new MovementConstants(0)
-                    )
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.HARD_REVERSE)),
-                new YieldCommand(300),//spit out
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                new MovementCommand(
-                        Spec3Spit,
-                        Spec4Pickup,
-                        new MovementConstants(0.4)
-                ),
-                        new SequentialCommandGroup(
-                                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                                new YieldCommand(600)//suk
-                        ),
-                        new ParallelCommandGroup(
-                                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EJECT)),
-                    new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_ROTATE)),
-                    new MovementCommand(
-                        Spec4Pickup,
-                        Spec4Spit,
-                        new MovementConstants(0)
-                    )
-                ),
-                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.HARD_REVERSE)),
-                 new YieldCommand(300),//spit out
-                new ParallelCommandGroup( 
-                    new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                    new MovementCommand(
-                        Spec4Spit,
-                        SpecLoadInitial,
-                        new MovementConstants(0.5)
-                )
-                        ),
-                   new SequentialCommandGroup(
-                           new YieldCommand(500),
-                       new ParallelCommandGroup(
-                       new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                       new MovementCommand(
-                        SpecLoadInitial,
-                        SpecLoadFinal,
-                        new MovementConstants(0.5)
-                          )
-                        ),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(200),
-                           new ParallelCommandGroup(
-                                   new MovementCommand(
-                                           SpecLoadFinal,
-                                           Spec2PlaceInitial,
-                                           new MovementConstants(0.5)
-                                   ),
-                                   new SequentialCommandGroup(
-                                   new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                                   new OneTimeCommand(() -> robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                                   new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                                   new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-                                   new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
-                                   new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_DROP)),
-                                   new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
-                                   )
-                           ),
-                       new MovementCommand(
-                        Spec2PlaceInitial,
-                        Spec2PlaceFinal,
-                        new MovementConstants(0)
-                       ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
-                new YieldCommand(300),//wait for slides to move down
-        new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                new YieldCommand(400),      //wait to move back slighltly
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
-                new YieldCommand(200),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                new YieldCommand(1000, robot.theOuttake::atTargetPosition),
-                new YieldCommand(400),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
-                ),
-                new MovementCommand(
-                        Spec2PlaceFinal,
-                        SpecLoadInitial,
-                        new MovementConstants(0.2)
-                ),
-            new MovementCommand(
-                SpecLoadInitial,
-                SpecLoadFinal,
-                new MovementConstants(0)
-        )
-        ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                new YieldCommand(200),
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                SpecLoadFinal,
-                                Spec3PlaceInitial,
-                                new MovementConstants(0.2)
-                        ),
-                        new SequentialCommandGroup(
-                        new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                        new OneTimeCommand(() -> robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_DROP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
-                        )
-                ),
-                new MovementCommand(
-                        Spec3PlaceInitial,
-                        Spec3PlaceFinal,
-                        new MovementConstants(0)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
-                new YieldCommand(300),//wait for slides to move down
-        new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                        new YieldCommand(400),      //wait to move back slighltly
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
-                        new YieldCommand(200),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                        new YieldCommand(1000, robot.theOuttake::atTargetPosition),
-                        new YieldCommand(400),
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
-                ),
-                new MovementCommand(
-                        Spec3PlaceFinal,
-                        SpecLoadInitial,
-                        new MovementConstants(0.2)
-                ),
-                new MovementCommand(
-                        SpecLoadInitial,
-                        SpecLoadFinal,
-                        new MovementConstants(0)
-                )
-        ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                new YieldCommand(200),
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                SpecLoadFinal,
-                                Spec4PlaceInitial,
-                                new MovementConstants(0.2)
-                        ),
-                        new SequentialCommandGroup(
-                        new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                        new OneTimeCommand(() -> robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_DROP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
-                        )
-                ),
-                new MovementCommand(
-                        Spec4PlaceInitial,
-                        Spec4PlaceFinal,
-                        new MovementConstants(0)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
-                new YieldCommand(300),//wait for slides to move down
-        new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                        new YieldCommand(400),      //wait to move back slighltly
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
-                        new YieldCommand(200),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.SPECIMEN_PICKUP)),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.ROTATED)),
-                        new YieldCommand(1000, robot.theOuttake::atTargetPosition),
-                        new YieldCommand(400),
-                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_PICKUP))
-                ),
-                new MovementCommand(
-                        Spec4PlaceFinal,
-                        SpecLoadInitial,
-                        new MovementConstants(0.2)
-                ),
-                new MovementCommand(
-                        SpecLoadInitial,
-                        SpecLoadFinal,
-                        new MovementConstants(0)
-                )
-        ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                new YieldCommand(200),
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                SpecLoadFinal,
-                                Spec5PlaceInitial,
-                                new MovementConstants(0.2)
-                        ),
-                        new SequentialCommandGroup(
-                                new OneTimeCommand(() -> robot.theIntake.leftDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
-                                new OneTimeCommand(() -> robot.theIntake.rightDropdownServo.setPosition(Intake.IntakeState.AUTO_DEFAULT.position)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.SPECIMEN_INITIAL)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SPECIMEN_DROP)),
                                 new OneTimeCommand(() -> robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.SPECIMEN_ROTATED))
+                        ),
+                        new MovementCommand(
+                                startPose,
+                                Spec1,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
+                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
+                        new YieldCommand(200),
+                        new MovementCommand(
+                                Spec1,
+                                Spec1Drop,
+                                new MovementConstants(0.2)
+                        ),
+                        new ParallelCommandGroup(
+                                new MovementCommand(
+                                        Spec1Drop,
+                                        Spec2Pickup,
+                                        new MovementConstants(0.2)
+                                ),
+                                new SequentialCommandGroup(
+                                        new YieldCommand(500),
+                                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED))
+                                )
+                        ),
+                        // start cycle
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+                        new DeadlineCommand(
+                                new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
+                                new SequentialCommandGroup(
+                                        new MovementCommand(
+                                                Spec2Pickup,
+                                                Spec2PickupFinal,
+                                                new MovementConstants(2)
+                                        )
+                                )
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.DEFAULT)),
+                        new MovementCommand(
+                                Spec2Pickup,
+                                Spec2Spit,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+
+                        new YieldCommand(500),
+                        // end spit
+
+                        new MovementCommand(
+                                Spec2Spit,
+                                Spec3Pickup,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+
+                        new DeadlineCommand(
+                                new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
+                                new SequentialCommandGroup(
+                                        new MovementCommand(
+                                                Spec3Pickup,
+                                                Spec3PickupFinal,
+                                                new MovementConstants(2)
+                                        )
+                                )
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.DEFAULT)),
+                        new MovementCommand(
+                                Spec3Pickup,
+                                Spec3Spit,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+
+                        new YieldCommand(500),
+                        // end spit
+                        new MovementCommand(
+                                Spec3Spit,
+                                Spec4Pickup,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
+
+                        new DeadlineCommand(
+                                new YieldCommand(3000, robot.theIntake::containsSampleColorSensor),
+                                new SequentialCommandGroup(
+                                        new MovementCommand(
+                                                Spec4Pickup,
+                                                Spec4PickupFinal,
+                                                new MovementConstants(2)
+                                        )
+                                )
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.EXTENDED)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.DEFAULT)),
+                        new MovementCommand(
+                                Spec4Pickup,
+                                Spec4Spit,
+                                new MovementConstants(0.2)
+                        ),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetHolderState(Intake.SampleHolderState.DEFAULT)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.REVERSE)),
+
+                        new YieldCommand(1000),
+                        new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.DEFAULT)),
+                        new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.STATIONARY)),
+                        // end spit
+                        new MovementCommand(
+                                Spec4Spit,
+                                SpecLoadInitial,
+                                new MovementConstants(0.2)
+                        ),
+                        new MovementCommand(
+                                SpecLoadInitial,
+                                SpecLoadInitial2,
+                                new MovementConstants(0.2)
+                        ),
+                        new MovementCommand(
+                                SpecLoadInitial2,
+                                SpecLoadFinal,
+                                new MovementConstants(0.2)
                         )
-                ),
-                new MovementCommand(
-                        Spec5PlaceInitial,
-                        Spec5PlaceFinal,
-                        new MovementConstants(0)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
-                new YieldCommand(300)//wait for slides to move down
+
+
                 )
-
-             )
         );
-
 
 
         SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
@@ -491,27 +337,16 @@ public class SpecimenAuto extends LinearOpMode {
             }
 
 
-
-
-
-
             // Notify subsystems before loop
-        waitForStart();
-        robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
-        robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
+            waitForStart();
+            // robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+            // robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
 
 
-
-
-
-
-
-
-
-
-                }
+        }
         // Notify subsystems before loop
         robot.postStart();
+        robot.theIntake.setAutomation(false);
 
         if (isStopRequested()) return;
 
@@ -528,14 +363,14 @@ public class SpecimenAuto extends LinearOpMode {
 
         ElapsedTime e = new ElapsedTime();
 
-       //  robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
+        //  robot.localizer.setPose(new Pose(-59, 15, Math.PI/2), true);
 
 
         ElapsedTime timer = new ElapsedTime();
 
         PIDDrive drive = new PIDDrive(robot, this, telemetry);
 
-        robot.theLocalizer.setPose(new Pose(0, 0,  0));
+        robot.theLocalizer.setPose(startPose);
 
         robot.update();
 
@@ -545,16 +380,12 @@ public class SpecimenAuto extends LinearOpMode {
         while (!isStopRequested()) {
 
 
-
             telemetry.addData("Sample contained: ", robot.theIntake.sampleContained);
 
             //telemetry.addData("Done with preloads: ", doneWithPreloads);
             //telemetry.addData("Done with initial: ", doneWithInitial);
             robot.update();
         }
-
-
-
 
 
     }

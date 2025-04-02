@@ -187,6 +187,8 @@ public class Intake implements Subsystem {
     boolean previousManual = false;
     boolean reverse = false;
 
+    boolean disableAutomation = false;
+
     boolean disableOuttake = false;
 
     boolean lastBreakbeamState = false;
@@ -336,7 +338,7 @@ public class Intake implements Subsystem {
             scheduledAutomation = true;
         }
 
-        if (scheduledAutomation) {
+        if (scheduledAutomation && !disableAutomation) {
             if (!currentBreakbeamState) {
                 scheduledAutomation = false;
             }
@@ -671,6 +673,10 @@ public class Intake implements Subsystem {
                         new YieldCommand(250),
                         new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)))
         );
+    }
+
+    public void setAutomation(boolean bool) {
+        disableAutomation = !bool;
     }
 
 }
