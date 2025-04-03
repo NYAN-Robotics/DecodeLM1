@@ -39,4 +39,8 @@ public class MovementConstants {
     public MovementConstants() {
         this(V_MAX, A_MAX, MAX_CORRECTION_TIME, K_V, K_A);
     }
-}
+
+    public MovementConstants(double velocityMax, double accelerationMax, double maxCorrectionTime) {
+        this(velocityMax, accelerationMax, maxCorrectionTime, K_V, K_A);
+    }
+ }
