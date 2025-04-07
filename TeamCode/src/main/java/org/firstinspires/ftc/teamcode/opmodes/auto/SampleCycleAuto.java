@@ -633,7 +633,7 @@ public class SampleCycleAuto extends LinearOpMode {
 
             if (!submersibleCycleDone) {
                 if (initialCycleCommand.isFinished() && cycleCommand.isFinished() && initialCycleCommand2.isFinished()) {
-                    submersibleCycleDone = true;
+                    ;
                     robot.theIntake.updatePossessedColor();
 
                     System.out.println(robot.theIntake.sampleContained);
@@ -645,6 +645,7 @@ public class SampleCycleAuto extends LinearOpMode {
                     } else if (robot.theIntake.sampleContained == Intake.SampleContained.NONE && !robot.theIntake.containsSampleColorSensor()) {
                         robot.theCommandScheduler.scheduleCommand(wrongColorCommand2);
                     } else {
+                        submersibleCycleDone = true;
                         System.out.println("Scheduling cycle command 2");
                         robot.theCommandScheduler.scheduleCommand(
                                 new SequentialCommandGroup(

@@ -167,7 +167,8 @@ public class Intake implements Subsystem {
 
     AnalogInput linkageAnalog;
 
-    RevColorSensorV3 intakeColorSensor;
+    RevColorSensorV3 intakeColorSensor1;
+    RevColorSensorV3 intakeColorSensor2;
 
     public static double startLinkagePosition = LinkageStates.DEFAULT.position;
     public static double extendedLinkagePosition = LinkageStates.EXTENDED.position;
@@ -230,7 +231,8 @@ public class Intake implements Subsystem {
 
         cowcatcherServo = new CachingServo(newHardwareMap.get(Servo.class, "cowcatcher"), 1e-5);
 
-        intakeColorSensor = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
+        intakeColorSensor1 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor1");
+        intakeColorSensor2 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor2");
 
         intakeColorSensorDigital0 = newHardwareMap.get(DigitalChannel.class, "digital0");
         intakeColorSensorDigital1 = newHardwareMap.get(DigitalChannel.class, "digital1");
@@ -284,7 +286,7 @@ public class Intake implements Subsystem {
     public void onCyclePassed() {
 
         lastBreakbeamState = currentBreakbeamState;
-        currentBreakbeamState = intakeColorSensor.getDistance(DistanceUnit.INCH) < 1.5; // !intakeBreakbeam.getState();
+        currentBreakbeamState = intakeColorSensor2.getDistance(DistanceUnit.INCH) < 1.5; // !intakeBreakbeam.getState();
 
         /*
         Add majority decision breakbeam
@@ -320,13 +322,14 @@ public class Intake implements Subsystem {
         // telemetry.addData("Servo latch position:", holderServo.getPosition());
         // telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
 
-        /*
-        telemetry.addData("Red: ", intakeColorSensor.red());
-        telemetry.addData("Green: ", intakeColorSensor.green());
-        telemetry.addData("Blue: ", intakeColorSensor.blue());
+        NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
+
+        telemetry.addData("Red: ", colors.red);
+        telemetry.addData("Green: ", colors.green);
+        telemetry.addData("Blue: ", colors.blue);
 
 
-         */
+
 
         if (manual && !previousManual) {
             setIntakeMotorState(IntakeMotorStates.INTAKING);
@@ -490,7 +493,7 @@ public class Intake implements Subsystem {
 
     public void updatePossessedColor() {
 
-        NormalizedRGBA colors = intakeColorSensor.getNormalizedColors();
+        NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
 
         double green = colors.green;
         double red = colors.red;
@@ -517,6 +520,26 @@ public class Intake implements Subsystem {
         // blue: 0.1102
         // green: 0.1186
 
+        System.out.println("Green: " + green);
+        System.out.println("Red: " + red);
+        System.out.println("Blue: " + blue);
+
+        if (green > 0.002 && red > 0.002) {
+            sampleContained = SampleContained.YELLOW;
+        } else if (red > 0.001 && green < 0.001 && blue < 0.0015){
+            sampleContained = SampleContained.RED;
+        } else if (blue > 0.001 && red < 0.001 && green < 0.001) {
+            sampleContained = SampleContained.BLUE;
+        } else {
+            sampleContained = SampleContained.NONE;
+        }
+
+        if (!containsSampleColorSensor()) {
+            sampleContained = SampleContained.NONE;
+        }
+
+        System.out.println(sampleContained);
+        /*
         double buffer = 0.04;
 
         // Check for yellow sample
@@ -536,7 +559,7 @@ public class Intake implements Subsystem {
             sampleContained = SampleContained.NONE;
         }
 
-        sampleContained = SampleContained.YELLOW;
+         */
 
 
         /*
