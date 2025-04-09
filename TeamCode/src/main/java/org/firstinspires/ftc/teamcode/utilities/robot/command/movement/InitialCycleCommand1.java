@@ -21,26 +21,6 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 public class InitialCycleCommand1 extends SequentialCommandGroup {
     public InitialCycleCommand1(RobotEx robot, double offset) {
         super(
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                sample3Drop,
-                                cycleInitial,
-                                new MovementConstants(80, 80, -0.5, DriveConstants.K_V, DriveConstants.K_A)
-                        ),
-                        new SequentialCommandGroup(
-                                new YieldCommand(100),
-                                new OneTimeCommand(() -> robot.theOuttake.reset()),
-                                new YieldCommand(500),
-                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED))
-                                )
-                ),
-                new MovementCommand(
-                        cycleInitial,
-                        new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
-                        new MovementConstants(40, 40, -0.2, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
-                new YieldCommand(0),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
                 new YieldCommand(50),

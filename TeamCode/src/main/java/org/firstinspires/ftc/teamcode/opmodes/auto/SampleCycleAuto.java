@@ -17,6 +17,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandt
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.ApproachCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.CycleCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.InitialCycleCommand1;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.RetryCommand;
@@ -244,55 +246,10 @@ public class SampleCycleAuto extends LinearOpMode {
                 new YieldCommand(50)
         );
 
+        SequentialCommandGroup approachCommand = new ApproachCommand(robot, 0);
         SequentialCommandGroup initialCycleCommand = new InitialCycleCommand1(robot, 0);
 
-        SequentialCommandGroup retryPickupCommand = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
-                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
-                new YieldCommand(200),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
-                new YieldCommand(800),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION))
-                );
-
-        SequentialCommandGroup cycleCommand = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
-                new MovementCommand(
-                        cycleSubmersible,
-                        cycleInitial,
-                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleDrop,
-                        new MovementConstants(0.15)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
-                new YieldCommand(100),
-                new ParallelCommandGroup(
-                    new MovementCommand(
-                            cycleDrop,
-                            cycleInitial,
-                            new MovementConstants(80, 80, -0.2, DriveConstants.K_V, DriveConstants.K_A)
-                    ),
-                    new SequentialCommandGroup(
-                            new YieldCommand(500),
-                            new OneTimeCommand(() -> robot.theOuttake.reset()),
-                            new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED))
-                    )
-                ),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleSubmersible,
-                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
-        );
+        SequentialCommandGroup cycleCommand = new CycleCommand(robot);
 
         SequentialCommandGroup initialCycleCommand2 = new SequentialCommandGroup(
                 new DeadlineCommand(
@@ -490,16 +447,19 @@ public class SampleCycleAuto extends LinearOpMode {
                 System.out.println("Left offset");
                 offset = 10;
                 initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                approachCommand = new ApproachCommand(robot, offset);
                 retryCommand = new RetryCommand(robot, offset);
             } else if (gamepad1.dpad_down && !gamepad1Copy.dpad_down) {
                 System.out.println("Middle offset");
                 offset = 5;
                 initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                approachCommand = new ApproachCommand(robot, offset);
                 retryCommand = new RetryCommand(robot, offset);
             } else if (gamepad1.dpad_right && !gamepad1Copy.dpad_right) {
                 System.out.println("Right offset");
                 offset = 0;
                 initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                approachCommand = new ApproachCommand(robot, offset);
                 retryCommand = new RetryCommand(robot, offset);
             }
 
@@ -563,9 +523,11 @@ public class SampleCycleAuto extends LinearOpMode {
         robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
         robot.update();
+        robot.theIntake.setAutomation(false);
 
         robot.theCommandScheduler.scheduleCommand(preloadedSamples);
-        boolean retriedPickup = false;
+        boolean retryingPickup = false;
+        boolean currentlyCycling = false;
 
         while (!isStopRequested()) {
 
@@ -576,21 +538,26 @@ public class SampleCycleAuto extends LinearOpMode {
 
                     if (!submersibleCycle) {
                         robot.theCommandScheduler.scheduleCommand(
-                                new SequentialCommandGroup(partnerSamplePickup, initialCycleCommand)
+                                new SequentialCommandGroup(partnerSamplePickup, approachCommand, initialCycleCommand)
                         );
                     } else {
-                        robot.theCommandScheduler.scheduleCommand(initialCycleCommand);
+                        robot.theCommandScheduler.scheduleCommand(
+                                new SequentialCommandGroup(approachCommand, initialCycleCommand));
                     }
+
+                    currentlyCycling = true;
                 }
             }
 
 
             if (!doneWithInitial) {
-                if (preloadedSamples.isFinished() && initialCycleCommand.isFinished() && !retriedPickup || retriedPickup && retryCommand.isFinished()) {
+                if (currentlyCycling && initialCycleCommand.isFinished() || retryingPickup && retryCommand.isFinished()) {
+                    retryingPickup = false;
+                    currentlyCycling = false;
 
                     robot.theIntake.updatePossessedColor();
 
-                    System.out.println(robot.theIntake.sampleContained);
+                    System.out.println("Sample Contained: " + robot.theIntake.sampleContained);
 
                     boolean wrongColor = false;
 
@@ -600,36 +567,35 @@ public class SampleCycleAuto extends LinearOpMode {
                     } else if (robot.theIntake.sampleContained == Intake.SampleContained.RED && Globals.ALLIANCE == Alliance.BLUE) {
                         // robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
                         wrongColor = true;
-                    } else if (robot.theIntake.sampleContained == Intake.SampleContained.NONE && !robot.theIntake.containsSampleColorSensor()) {
+                    } else if (robot.theIntake.sampleContained == Intake.SampleContained.NONE) {
                         // robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
+                        wrongColor = true;
+                    } else if (!robot.theIntake.containsSampleColorSensor()) {
                         wrongColor = true;
                     } else {
                         System.out.println("Cycling");
+                        currentlyCycling = true;
+                        initialCycleCommand = new InitialCycleCommand1(robot, offset);
+                        cycleCommand = new CycleCommand(robot);
+
                         robot.theCommandScheduler.scheduleCommand(
                                 new SequentialCommandGroup(
                                         cycleCommand,
-                                        initialCycleCommand2
+                                        initialCycleCommand
                                 )
                         );
-                        doneWithInitial = true;
                     }
 
                     if (wrongColor) {
-                        if (retriedPickup) {
-                            System.out.println("Parking");
-                            robot.theCommandScheduler.scheduleCommand(wrongColorCommand);
-                            doneWithInitial = true;
-                        } else {
-                            System.out.println("Retrying pickup");
-                            initialCycleCommand = new InitialCycleCommand1(robot, offset);
-                            robot.theCommandScheduler.scheduleCommand(new SequentialCommandGroup(retryPickupCommand, retryCommand));
-                            retriedPickup = true;
-                            robot.pause(0.5);
-                        }
+                        retryCommand = new RetryCommand(robot, offset);
+                        robot.theCommandScheduler.scheduleCommand(retryCommand);
+                        retryingPickup = true;
                     }
 
                 }
             }
+
+            /*
 
             if (!submersibleCycleDone) {
                 if (initialCycleCommand.isFinished() && cycleCommand.isFinished() && initialCycleCommand2.isFinished()) {
@@ -682,8 +648,9 @@ public class SampleCycleAuto extends LinearOpMode {
                 }
             }
 
+             */
+
             telemetry.addData("Sample contained: ", robot.theIntake.sampleContained);
-            telemetry.addData("Retry: ", retriedPickup);
             telemetry.addData("Done with preloads: ", doneWithPreloads);
             telemetry.addData("Done with initial: ", doneWithInitial);
             robot.update();

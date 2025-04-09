@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.robot.subsystems;
 
+import android.graphics.Color;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -493,7 +495,10 @@ public class Intake implements Subsystem {
 
     public void updatePossessedColor() {
 
+        float[] hsvValues = new float[3];
+
         NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
+        Color.colorToHSV(colors.toColor(), hsvValues);
 
         double green = colors.green;
         double red = colors.red;
@@ -524,6 +529,7 @@ public class Intake implements Subsystem {
         System.out.println("Red: " + red);
         System.out.println("Blue: " + blue);
 
+        /*
         if (green > 0.002 && red > 0.002) {
             sampleContained = SampleContained.YELLOW;
         } else if (red > 0.001 && green < 0.001 && blue < 0.0015){
@@ -534,7 +540,12 @@ public class Intake implements Subsystem {
             sampleContained = SampleContained.NONE;
         }
 
+         */
+
+        sampleContained = SampleContained.YELLOW;
+
         if (!containsSampleColorSensor()) {
+            System.out.println("No Sample Detected by Distance");
             sampleContained = SampleContained.NONE;
         }
 

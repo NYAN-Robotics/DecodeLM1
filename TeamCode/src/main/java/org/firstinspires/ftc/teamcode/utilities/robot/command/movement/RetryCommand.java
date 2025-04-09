@@ -16,33 +16,12 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 
 public class RetryCommand extends SequentialCommandGroup {
     public RetryCommand(RobotEx robot, double offset) {
-        super( new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+        super(
+                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
+                new YieldCommand(1000),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                new YieldCommand(50),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new DeadlineCommand(
-                        new YieldCommand(robot.theIntake::containsSampleColorSensor),
-                        new SequentialCommandGroup(
-                                new MovementCommand(
-                                        new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
-                                        new Pose(cycleStrafe.getX(), cycleStrafe.getY() + offset, cycleStrafe.getHeading()),
-                                        new MovementConstants(0.2)
-                                ),
-                                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
-                                new MovementCommand(
-                                        new Pose(cycleStrafe.getX(), cycleStrafe.getY() + offset, cycleStrafe.getHeading()),
-                                        new Pose(cycleSubmersible2.getX(), cycleSubmersible2.getY() + offset, cycleSubmersible2.getHeading()),
-                                        new MovementConstants(-0.25)
-                                ),
-                                new MovementCommand(
-                                        new Pose(cycleSubmersible2.getX(), cycleSubmersible2.getY() + offset, cycleSubmersible2.getHeading()),
-                                        new Pose(cycleSubmersible3.getX(), cycleSubmersible3.getY() + offset, cycleSubmersible3.getHeading()),
-                                        new MovementConstants(0.5)
-                                )
-                        )
-                ),
-                new YieldCommand(100)
+                new InitialCycleCommand1(robot, offset)
         );
     }
 
