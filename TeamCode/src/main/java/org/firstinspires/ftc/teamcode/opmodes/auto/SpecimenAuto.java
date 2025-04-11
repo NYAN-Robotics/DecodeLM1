@@ -352,7 +352,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 SpecLoadFinal2,
                                 scoreEndMovementConstant
                         ),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                        // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         new ParallelCommandGroup(
                                 new MovementCommand(
                                         SpecLoadFinal2,
@@ -394,7 +394,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 Spec3LoadFinal2,
                                 scoreEndMovementConstant
                         ),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                        // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         new ParallelCommandGroup(
                                 new MovementCommand(
                                         Spec3LoadFinal2,
@@ -435,7 +435,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 Spec4LoadFinal2,
                                 scoreEndMovementConstant
                         ),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                        // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         new ParallelCommandGroup(
                                 new MovementCommand(
                                         Spec4LoadFinal2,
@@ -475,8 +475,8 @@ public class SpecimenAuto extends LinearOpMode {
                                 Spec5LoadFinal,
                                 Spec5LoadFinal2,
                                 scoreEndMovementConstant
-                        ),
-                        new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT))
+                        )
+                        // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT))
                         /*
                         new ParallelCommandGroup(
                                 new MovementCommand(
