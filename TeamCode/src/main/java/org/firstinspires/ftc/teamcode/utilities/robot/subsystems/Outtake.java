@@ -61,8 +61,8 @@ public class Outtake implements Subsystem {
         EXTENDED_INITIAL(DEFAULT.position + 0.25),
         SPECIMEN_INITIAL(DEFAULT.position + 0.10),
         AUTO_PARK(DEFAULT.position + 0.43),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.24),
-        SPECIMEN_PICKUP_2(DEFAULT.position - 0.24);
+        SPECIMEN_PICKUP(DEFAULT.position - 0.23),
+        SPECIMEN_PICKUP_2(DEFAULT.position - 0.23);
 
         public double position;
 
