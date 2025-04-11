@@ -51,6 +51,5 @@ public class CycleCommand extends SequentialCommandGroup {
                 ),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)));
-
     }
 }

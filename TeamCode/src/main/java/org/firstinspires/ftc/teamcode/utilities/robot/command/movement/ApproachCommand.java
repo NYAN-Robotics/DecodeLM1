@@ -40,7 +40,9 @@ public class ApproachCommand extends SequentialCommandGroup {
                         new MovementConstants(40, 40, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                 ),
                 new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
-                new YieldCommand(0)
+                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
+
         );
     }
 }
