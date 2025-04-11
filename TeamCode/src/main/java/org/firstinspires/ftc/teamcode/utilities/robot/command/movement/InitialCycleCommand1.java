@@ -40,7 +40,7 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                                         new MovementConstants(0.5)
                                 )
                         )
-                )
+                ),
                 new YieldCommand(100)
         );
     }
