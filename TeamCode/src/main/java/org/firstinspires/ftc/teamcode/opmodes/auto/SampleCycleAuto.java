@@ -113,9 +113,9 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new MovementConstants(1)
                         ),
                         new SequentialCommandGroup(
-                                new YieldCommand(250),
-                                new YieldCommand(robot.theOuttake::atTargetPosition),
-                                new YieldCommand(robot.theIntake::linkageAtHome),
+                                new YieldCommand(50),
+                                // new YieldCommand(robot.theOuttake::atTargetPosition),
+                                // new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                         )
                 ),
@@ -152,9 +152,9 @@ public class SampleCycleAuto extends LinearOpMode {
                                 defaultMovementConstants
                         ),
                         new SequentialCommandGroup(
-                                new YieldCommand(250),
-                                new YieldCommand(robot.theOuttake::atTargetPosition),
-                                new YieldCommand(robot.theIntake::linkageAtHome),
+                                new YieldCommand(50),
+                                // new YieldCommand(robot.theOuttake::atTargetPosition),
+                                // new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                         )
                 ),
@@ -195,9 +195,9 @@ public class SampleCycleAuto extends LinearOpMode {
                                 defaultMovementConstants
                         ),
                         new SequentialCommandGroup(
-                                new YieldCommand(250),
-                                new YieldCommand(robot.theOuttake::atTargetPosition),
-                                new YieldCommand(robot.theIntake::linkageAtHome),
+                                new YieldCommand(50),
+                                // new YieldCommand(robot.theOuttake::atTargetPosition),
+                                // new YieldCommand(robot.theIntake::linkageAtHome),
                                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES))
                         )
                 ),
@@ -250,177 +250,6 @@ public class SampleCycleAuto extends LinearOpMode {
         SequentialCommandGroup initialCycleCommand = new InitialCycleCommand1(robot, 0);
 
         SequentialCommandGroup cycleCommand = new CycleCommand(robot);
-
-        SequentialCommandGroup initialCycleCommand2 = new SequentialCommandGroup(
-                new DeadlineCommand(
-                        new YieldCommand(robot.theIntake::containsSampleColorSensor),
-                        new SequentialCommandGroup(
-                                new MovementCommand(
-                                        cycleStrafe,
-                                        cycleSubmersible2,
-                                        new MovementConstants(-0.25)
-                                ),
-                                new MovementCommand(
-                                        cycleSubmersible2,
-                                        cycleSubmersible3,
-                                        new MovementConstants(0.5)
-                                )
-                        )
-                ),
-                new YieldCommand(100)
-        );
-
-        SequentialCommandGroup initialCycleCommand3 = new SequentialCommandGroup(
-                new DeadlineCommand(
-                        new YieldCommand(robot.theIntake::containsSampleColorSensor),
-                        new SequentialCommandGroup(
-                                new MovementCommand(
-                                        cycleStrafe,
-                                        cycleSubmersible2,
-                                        new MovementConstants(-0.25)
-                                ),
-                                new MovementCommand(
-                                        cycleSubmersible2,
-                                        cycleSubmersible3,
-                                        new MovementConstants(0.5)
-                                )
-                        )
-                ),
-                new YieldCommand(100)
-        );
-
-        SequentialCommandGroup cycleCommand2 = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
-                new MovementCommand(
-                        cycleSubmersible,
-                        cycleInitial,
-                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleDrop,
-                        new MovementConstants(0.2)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
-                new YieldCommand(100),
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                cycleDrop,
-                                cycleInitial,
-                                new MovementConstants(80, 80, -0.3, DriveConstants.K_V, DriveConstants.K_A)
-                        ),
-                        new SequentialCommandGroup(
-                                new YieldCommand(500),
-                                new OneTimeCommand(() -> robot.theOuttake.reset())
-                        )
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleSubmersible,
-                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
-        );
-
-        SequentialCommandGroup cycleCommand3 = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
-                new MovementCommand(
-                        cycleSubmersible,
-                        cycleInitial,
-                        new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleDrop,
-                        new MovementConstants(0.2)
-                ),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
-                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),
-                new YieldCommand(100),
-                new ParallelCommandGroup(
-                        new MovementCommand(
-                                cycleDrop,
-                                cycleInitial,
-                                new MovementConstants(80, 80, -0.3, DriveConstants.K_V, DriveConstants.K_A)
-                        ),
-                        new SequentialCommandGroup(
-                                new YieldCommand(500),
-                                new OneTimeCommand(() -> robot.theOuttake.reset())
-                        )
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new MovementCommand(
-                        cycleInitial,
-                        cycleSubmersible,
-                        new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
-        );
-
-        SequentialCommandGroup wrongColorCommand = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
-                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
-                new YieldCommand(250),
-                new MovementCommand(
-                        cycleSubmersible,
-                        parkInitial,
-                        new MovementConstants(50, 50, -0.2, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new MovementCommand(
-                        parkInitial,
-                        parkFinal,
-                        new MovementConstants(50, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
-        );
-
-        SequentialCommandGroup wrongColorCommand2 = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
-                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
-                new YieldCommand(250),
-                new MovementCommand(
-                        cycleSubmersible,
-                        parkInitial,
-                        new MovementConstants(50, 50, -0.2, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new MovementCommand(
-                        parkInitial,
-                        parkFinal,
-                        new MovementConstants(50, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
-        );
-
-        SequentialCommandGroup wrongColorCommand3 = new SequentialCommandGroup(
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
-                new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
-                new YieldCommand(250),
-                new MovementCommand(
-                        cycleSubmersible,
-                        parkInitial,
-                        new MovementConstants(50, 50, -0.2, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
-                new MovementCommand(
-                        parkInitial,
-                        parkFinal,
-                        new MovementConstants(50, 40, 0, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
-                new OneTimeCommand(() -> robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_PARK))
-        );
 
         SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
 
