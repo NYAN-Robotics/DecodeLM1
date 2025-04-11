@@ -54,10 +54,10 @@ public class Outtake implements Subsystem {
     public enum OuttakeServoState {
         DEFAULT(0.505), // DEFAULT
         BACK_PICKUP(DEFAULT.position - 0.23),
-        AUTO_DEFAULT(DEFAULT.position - 0.10),
+        AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.11),
         HANG_FINAL(DEFAULT.position + 0.21),
-        EXTENDED(DEFAULT.position + 0.41), // TWEAK
+        EXTENDED(DEFAULT.position + 0.42), // TWEAK
         EXTENDED_INITIAL(DEFAULT.position + 0.25),
         SPECIMEN_INITIAL(DEFAULT.position + 0.10),
         AUTO_PARK(DEFAULT.position + 0.43),
@@ -187,13 +187,13 @@ public class Outtake implements Subsystem {
 
     DcMotorEx slidesEncoderMotor;
 
-    Servo leftOuttakeServo;
-    Servo rightOuttakeServo;
+    public Servo leftOuttakeServo;
+    public Servo rightOuttakeServo;
 
-    Servo rotationOuttakeServo;
+    public Servo rotationOuttakeServo;
     public Servo clawServo;
 
-    Servo clawPivot;
+    public Servo clawPivot;
 
     DcMotorEx intakeMotor;
 

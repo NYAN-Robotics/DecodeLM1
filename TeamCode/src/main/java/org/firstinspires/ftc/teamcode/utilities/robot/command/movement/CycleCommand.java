@@ -27,7 +27,7 @@ public class CycleCommand extends SequentialCommandGroup {
                 new MovementCommand(
                         cycleInitial,
                         cycleDrop,
-                        new MovementConstants(0.15)
+                        new MovementConstants(0.4)
                 ),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.DEFAULT)),

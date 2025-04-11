@@ -425,6 +425,8 @@ public class SampleCycleAuto extends LinearOpMode {
         SequentialCommandGroup retryCommand = new RetryCommand(robot, 0);
 
         robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED);
+        robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.AUTO_DEFAULT);
+        robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.SAMPLE_DROP);
         robot.theIntake.leftServo.setPosition(Intake.LinkageStates.DEFAULT.position - 0.03);
         robot.theIntake.rightServo.setPosition(Intake.LinkageStates.DEFAULT.position - 0.03);
 
@@ -434,8 +436,14 @@ public class SampleCycleAuto extends LinearOpMode {
         double offset = 0;
 
         while (opModeInInit()) {
+
             if (gamepad1.cross) {
                 robot.theOuttake.clawServo.setPosition(Outtake.OuttakeClawStates.CLOSED.position);
+            }
+
+            if (gamepad2.triangle && !gamepad2Copy.triangle) {
+                robot.theOuttake.leftOuttakeServo.setPosition(Outtake.OuttakeServoState.AUTO_DEFAULT.position);
+                robot.theOuttake.rightOuttakeServo.setPosition(Outtake.OuttakeServoState.AUTO_DEFAULT.position);
             }
 
             if (gamepad1.circle) {

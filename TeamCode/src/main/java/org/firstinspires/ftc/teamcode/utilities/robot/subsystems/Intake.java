@@ -54,7 +54,8 @@ public class Intake implements Subsystem {
         DEFAULT(0.67),
         EJECT(0.65),
         TRANSFER(0.64),
-        AUTO_DEFAULT(0.54),
+        AUTO_DEFAULT(0.57),
+
         EXTENDED(0.80);
 
         public double position;
@@ -70,7 +71,7 @@ public class Intake implements Subsystem {
     }
 
     public enum SampleHolderState {
-        EXTENDED(0),
+        EXTENDED(0.05),
         DEFAULT(0.5);
 
         public double position;
@@ -203,6 +204,8 @@ public class Intake implements Subsystem {
 
     boolean requestedReturn = false;
 
+    public double gain = 5.0;
+
     public static double aMax = 10;
     public static double vMax = 10;
 
@@ -235,6 +238,7 @@ public class Intake implements Subsystem {
 
         intakeColorSensor1 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor1");
         intakeColorSensor2 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor2");
+        intakeColorSensor1.setGain((float) gain);
 
         intakeColorSensorDigital0 = newHardwareMap.get(DigitalChannel.class, "digital0");
         intakeColorSensorDigital1 = newHardwareMap.get(DigitalChannel.class, "digital1");
@@ -288,7 +292,7 @@ public class Intake implements Subsystem {
     public void onCyclePassed() {
 
         lastBreakbeamState = currentBreakbeamState;
-        currentBreakbeamState = intakeColorSensor2.getDistance(DistanceUnit.INCH) < 1.5; // !intakeBreakbeam.getState();
+        currentBreakbeamState = intakeColorSensor1.getDistance(DistanceUnit.INCH) < 1; // !intakeBreakbeam.getState();
 
         /*
         Add majority decision breakbeam
@@ -318,7 +322,9 @@ public class Intake implements Subsystem {
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("At home: ", linkageAtHomeAnalog());
-        // telemetry.addData("Color Sensor Distance: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Color Sensor Distance: ", intakeColorSensor1.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Color Sensor Distance: ", intakeColorSensor2.getDistance(DistanceUnit.INCH));
+
         telemetry.addData("Possessed Color: ", sampleContained);
 
         // telemetry.addData("Servo latch position:", holderServo.getPosition());
@@ -495,14 +501,23 @@ public class Intake implements Subsystem {
 
     public void updatePossessedColor() {
 
+
         float[] hsvValues = new float[3];
 
         NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
-        Color.colorToHSV(colors.toColor(), hsvValues);
+        // Color.colorToHSV(colors.toColor(), hsvValues);
 
         double green = colors.green;
         double red = colors.red;
         double blue = colors.blue;
+
+        /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
+         * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
+         * HSV (hue, saturation and value) values. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
+         * for an explanation of HSV color. */
+
+        // Update the hsvValues array by passing it to Color.colorToHSV()
+        Color.colorToHSV(colors.toColor(), hsvValues);
 
 
         // no sample:
@@ -528,7 +543,21 @@ public class Intake implements Subsystem {
         System.out.println("Green: " + green);
         System.out.println("Red: " + red);
         System.out.println("Blue: " + blue);
+        System.out.println("Hue: " + hsvValues[0]);
+        System.out.println("Saturation: " + hsvValues[1]);
+        System.out.println("Value: " + hsvValues[2]);
 
+        double hue = hsvValues[0];
+        double saturation = hsvValues[1];
+        double value = hsvValues[2];
+
+        if (hue > 180 && hue < 300) {
+            sampleContained = SampleContained.BLUE;
+        } else if (hue < 120 && hue > 50) {
+            sampleContained = SampleContained.YELLOW;
+        } else {
+            sampleContained = SampleContained.RED;
+        }
         /*
         if (green > 0.002 && red > 0.002) {
             sampleContained = SampleContained.YELLOW;
@@ -542,10 +571,9 @@ public class Intake implements Subsystem {
 
          */
 
-        sampleContained = SampleContained.YELLOW;
 
         if (!containsSampleColorSensor()) {
-            System.out.println("No Sample Detected by Distance");
+            System.out.println("No Sample Detected by Distance" + intakeColorSensor2.getDistance(DistanceUnit.INCH));
             sampleContained = SampleContained.NONE;
         }
 
@@ -655,7 +683,7 @@ public class Intake implements Subsystem {
                             }
                         }),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.EXTENDED)),
-                        new YieldCommand(50),
+                        new YieldCommand(0),
                         new OneTimeCommand(() -> setIntakeState(IntakeState.DEFAULT)),
                         new YieldCommand(100), // Wait for holder servo to fully actuate
                         new OneTimeCommand(() -> {
@@ -670,7 +698,7 @@ public class Intake implements Subsystem {
                         new YieldCommand(75),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(75), // Wait for claw to close
+                        new YieldCommand(50), // Wait for claw to close
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                         new YieldCommand(50),
