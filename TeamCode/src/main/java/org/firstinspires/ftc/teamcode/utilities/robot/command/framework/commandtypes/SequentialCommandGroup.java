@@ -33,7 +33,7 @@ public class SequentialCommandGroup extends CommandBase {
     @Override
     public void update() {
 
-        /*
+
         while (theCommandIndex < theCommands.length && theCurrentCommand.readyToExecute()) {
             // Update the current command
             theCurrentCommand.update();
@@ -59,7 +59,7 @@ public class SequentialCommandGroup extends CommandBase {
                 return;
             }
         }
-        */
+        /*
 
 
         if (!theCurrentCommand.readyToExecute()) {
@@ -80,6 +80,8 @@ public class SequentialCommandGroup extends CommandBase {
             theCurrentCommand = theCommands[theCommandIndex];
             theCurrentCommand.initialize();
         }
+
+         */
 
 
     }
