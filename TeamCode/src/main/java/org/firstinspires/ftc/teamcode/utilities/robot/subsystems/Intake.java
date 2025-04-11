@@ -322,7 +322,7 @@ public class Intake implements Subsystem {
         telemetry.addData("Breakbeam state: ", !intakeBreakbeam.getState());
         telemetry.addData("Analog: ", linkageAnalog.getVoltage());
         telemetry.addData("At home: ", linkageAtHomeAnalog());
-        telemetry.addData("Color Sensor Distance: ", intakeColorSensor1.getDistance(DistanceUnit.INCH));
+        // telemetry.addData("Color Sensor Distance: ", intakeColorSensor1.getDistance(DistanceUnit.INCH));
         // telemetry.addData("Color Sensor Distance: ", intakeColorSensor2.getDistance(DistanceUnit.INCH));
 
         telemetry.addData("Possessed Color: ", sampleContained);
@@ -330,11 +330,11 @@ public class Intake implements Subsystem {
         // telemetry.addData("Servo latch position:", holderServo.getPosition());
         // telemetry.addData("Distance measured: ", intakeColorSensor.getDistance(DistanceUnit.INCH));
 
-        NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
+        // NormalizedRGBA colors = intakeColorSensor1.getNormalizedColors();
 
-        telemetry.addData("Red: ", colors.red);
-        telemetry.addData("Green: ", colors.green);
-        telemetry.addData("Blue: ", colors.blue);
+        // telemetry.addData("Red: ", colors.red);
+        // telemetry.addData("Green: ", colors.green);
+        // telemetry.addData("Blue: ", colors.blue);
 
 
 
