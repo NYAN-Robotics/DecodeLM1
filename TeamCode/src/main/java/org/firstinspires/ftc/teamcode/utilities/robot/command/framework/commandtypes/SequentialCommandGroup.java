@@ -33,6 +33,33 @@ public class SequentialCommandGroup extends CommandBase {
     @Override
     public void update() {
 
+
+        while (theCommandIndex < theCommands.length && theCurrentCommand.readyToExecute()) {
+            // Update the current command
+            theCurrentCommand.update();
+
+            // If the current command is finished, move to the next one
+            if (theCurrentCommand.isFinished()) {
+                // Clean up the current command
+                theCurrentCommand.onFinish();
+
+                // Move to the next command
+                theCommandIndex++;
+
+                // If we've completed all commands, exit
+                if (theCommandIndex >= theCommands.length) {
+                    return;
+                }
+
+                // Set up the next command
+                theCurrentCommand = theCommands[theCommandIndex];
+                theCurrentCommand.initialize();
+            } else {
+                // Current command is not finished, so stop processing for this update cycle
+                return;
+            }
+        }
+        /*
         if (!theCurrentCommand.readyToExecute()) {
             return;
         }
@@ -51,6 +78,8 @@ public class SequentialCommandGroup extends CommandBase {
             theCurrentCommand = theCommands[theCommandIndex];
             theCurrentCommand.initialize();
         }
+
+         */
     }
 
     @Override
