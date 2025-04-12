@@ -155,7 +155,7 @@ public class SpecimenAuto extends LinearOpMode {
     public static Pose Spec4LoadFinal2 = new Pose(-4.33+6, -35.6, Math.PI / 2);
     public static Pose Spec5LoadFinal = new Pose(-4.33+8, -28.6, Math.PI / 2);
     public static Pose Spec5LoadFinal2 = new Pose(-4.33+8, -35.6, Math.PI / 2);
-    public static Pose Park = new Pose(-4.33+2, -58, Math.PI / 2);
+    public static Pose Park = new Pose(-4.33+8, -58, Math.PI / 2);
     public static Pose Spec2PlaceInitial = new Pose(28, 6, 0);
     public static Pose Spec2PlaceFinal = new Pose(32.4, 6, 0);
     public static Pose Spec3PlaceInitial = new Pose(28, 8, 0);
@@ -168,9 +168,9 @@ public class SpecimenAuto extends LinearOpMode {
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
     public static MovementConstants scoreEndMovementConstant = new MovementConstants(100, 100, -0.5);
-    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 100, -0.4);
-    public static MovementConstants pickupApproachMovementConstant = new MovementConstants(60, 100, -0.1);
-    public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 100, 0);
+    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 60, -0.4);
+    public static MovementConstants pickupApproachMovementConstant = new MovementConstants(100, 100, 0.1);
+    public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 20, 0.3);
 
     public static long placeWait = 150; // in ms
     @Override
@@ -327,6 +327,7 @@ public class SpecimenAuto extends LinearOpMode {
                                                 pickupEndMovementConstant
                                         )
                                 ),
+                                new YieldCommand(250),
                                 new SequentialCommandGroup(
                                         new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMEN_INITIAL_PICKUP)),
                                         new YieldCommand(200),
@@ -382,6 +383,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 SpecLoadInitial2,
                                 pickupEndMovementConstant
                         ),
+
                         // End copy
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
                         new YieldCommand(250),
