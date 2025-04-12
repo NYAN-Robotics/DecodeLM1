@@ -135,26 +135,26 @@ public class SpecimenAuto extends LinearOpMode {
     public static Pose Spec1 = new Pose(-4.33, -28.6, Math.PI / 2);
     public static Pose Spec1Drop = new Pose(-4.33, -38.6, Math.PI / 2);
     public static Pose Spec2Pickup = new Pose(21.7 - 2, -41.5 - 2, 0.5677);
-    public static Pose Spec2PickupFinal = new Pose(21.7 + 4 * Math.cos(0.5677), -41.5 + 4 * Math.sin(0.7677), 0.7677);
+    public static Pose Spec2PickupFinal = new Pose(21.7 + 4 * Math.cos(0.5677), -41.5 + 4 * Math.sin(0.5677), 0.5677);
     public static Pose Spec2Spit = new Pose(24.99, -43.72, -0.6267);
     public static Pose Spec3Pickup = new Pose(33.2 - 2, -41.3 - 2, 0.5844);
-    public static Pose Spec3PickupFinal = new Pose(33.2 + 4 * Math.cos(0.5844), -41.3 + 4 * Math.sin(0.7844), 0.7844);
+    public static Pose Spec3PickupFinal = new Pose(33.2 + 4 * Math.cos(0.5844), -41.3 + 4 * Math.sin(0.5844), 0.5844);
 
     public static Pose Spec3Spit = new Pose(37.47, -42.1, -0.809);
     public static Pose Spec4Pickup = new Pose(41.22 - 2, -40.1 - 2, 0.5275);
-    public static Pose Spec4PickupFinal = new Pose(41.22 + 4 * Math.cos(0.5275), -40.1 + 4 * Math.sin(0.7275), 0.7275);
+    public static Pose Spec4PickupFinal = new Pose(41.22 + 4 * Math.cos(0.5275), -40.1 + 4 * Math.sin(0.5275), 0.5275);
 
     public static Pose Spec4Spit = new Pose(36.57, -38.5, -0.8783);
     public static Pose SpecLoadInitial = new Pose(34.79, -50.93, Math.PI / 2);
     public static Pose SpecLoadInitial2 = new Pose(34.79, -63.93, Math.PI / 2);
     public static Pose SpecLoadFinal = new Pose(-4.33+2, -28.6, Math.PI / 2);
-    public static Pose SpecLoadFinal2 = new Pose(-4.33+2, -34.6, Math.PI / 2);
+    public static Pose SpecLoadFinal2 = new Pose(-4.33+2, -35.6, Math.PI / 2);
     public static Pose Spec3LoadFinal = new Pose(-4.33+4, -28.6, Math.PI / 2);
-    public static Pose Spec3LoadFinal2 = new Pose(-4.33+4, -34.6, Math.PI / 2);
+    public static Pose Spec3LoadFinal2 = new Pose(-4.33+4, -35.6, Math.PI / 2);
     public static Pose Spec4LoadFinal = new Pose(-4.33+6, -28.6, Math.PI / 2);
-    public static Pose Spec4LoadFinal2 = new Pose(-4.33+6, -34.6, Math.PI / 2);
+    public static Pose Spec4LoadFinal2 = new Pose(-4.33+6, -35.6, Math.PI / 2);
     public static Pose Spec5LoadFinal = new Pose(-4.33+8, -28.6, Math.PI / 2);
-    public static Pose Spec5LoadFinal2 = new Pose(-4.33+8, -34.6, Math.PI / 2);
+    public static Pose Spec5LoadFinal2 = new Pose(-4.33+8, -35.6, Math.PI / 2);
     public static Pose Spec2PlaceInitial = new Pose(28, 6, 0);
     public static Pose Spec2PlaceFinal = new Pose(32.4, 6, 0);
     public static Pose Spec3PlaceInitial = new Pose(28, 8, 0);
@@ -166,8 +166,8 @@ public class SpecimenAuto extends LinearOpMode {
     public static Pose parkFinal = new Pose(0, -25.87, 0);
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
-    public static MovementConstants scoreEndMovementConstant = new MovementConstants(80, 80, -0.1);
-    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 40, 0);
+    public static MovementConstants scoreEndMovementConstant = new MovementConstants(100, 100, -0.5);
+    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 50, -0.4);
     public static MovementConstants pickupApproachMovementConstant = new MovementConstants(60, 60, -0.1);
     public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 60, 0);
 
@@ -196,7 +196,7 @@ public class SpecimenAuto extends LinearOpMode {
                         new MovementCommand(
                                 startPose,
                                 Spec1,
-                                new MovementConstants(-0.1)
+                                new MovementConstants(-0.5)
                         ),
                         new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP)),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED)),
@@ -210,7 +210,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 new MovementCommand(
                                         Spec1Drop,
                                         Spec2Pickup,
-                                        new MovementConstants(-0.2)
+                                        new MovementConstants(-0.5)
                                 ),
                                 new SequentialCommandGroup(
                                         new YieldCommand(700),
@@ -355,6 +355,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 SpecLoadFinal2,
                                 scoreEndMovementConstant
                         ),
+                        //new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         new ParallelCommandGroup(
                                 new MovementCommand(
@@ -398,6 +399,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 Spec3LoadFinal2,
                                 scoreEndMovementConstant
                         ),
+                       // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                         new ParallelCommandGroup(
                                 new MovementCommand(
