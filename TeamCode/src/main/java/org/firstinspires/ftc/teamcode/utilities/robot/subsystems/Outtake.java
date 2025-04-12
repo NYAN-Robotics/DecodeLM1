@@ -33,7 +33,7 @@ public class Outtake implements Subsystem {
         HANG_FINAL(800),
         SPECIMENS(1150),
         SPECIMEN_TRANSFER(1300),
-        SPECIMENS_DROP(930),
+        SPECIMENS_DROP(880),
         SPECIMEN_INITIAL_PICKUP(400),
         SPECIMEN_PICKUP(50),
         HOVER(350);
