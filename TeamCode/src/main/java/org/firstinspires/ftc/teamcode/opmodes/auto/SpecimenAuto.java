@@ -170,6 +170,8 @@ public class SpecimenAuto extends LinearOpMode {
     public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 40, 0);
     public static MovementConstants pickupApproachMovementConstant = new MovementConstants(60, 60, -0.1);
     public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 60, 0);
+
+    public static long placeWait = 250; // in ms
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -347,6 +349,7 @@ public class SpecimenAuto extends LinearOpMode {
                             robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
                             robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
                         }),
+                        new YieldCommand(placeWait),
                         new MovementCommand(
                                 SpecLoadFinal,
                                 SpecLoadFinal2,
@@ -389,6 +392,7 @@ public class SpecimenAuto extends LinearOpMode {
                             robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
                             robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
                         }),
+                        new YieldCommand(placeWait),
                         new MovementCommand(
                                 Spec3LoadFinal,
                                 Spec3LoadFinal2,
@@ -430,6 +434,8 @@ public class SpecimenAuto extends LinearOpMode {
                             robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
                             robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
                         }),
+                        new YieldCommand(placeWait),
+
                         new MovementCommand(
                                 Spec4LoadFinal,
                                 Spec4LoadFinal2,
@@ -471,6 +477,8 @@ public class SpecimenAuto extends LinearOpMode {
                             robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SPECIMENS_DROP);
                             robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
                         }),
+                        new YieldCommand(placeWait),
+
                         new MovementCommand(
                                 Spec5LoadFinal,
                                 Spec5LoadFinal2,
