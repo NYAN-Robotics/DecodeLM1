@@ -155,6 +155,7 @@ public class SpecimenAuto extends LinearOpMode {
     public static Pose Spec4LoadFinal2 = new Pose(-4.33+6, -35.6, Math.PI / 2);
     public static Pose Spec5LoadFinal = new Pose(-4.33+8, -28.6, Math.PI / 2);
     public static Pose Spec5LoadFinal2 = new Pose(-4.33+8, -35.6, Math.PI / 2);
+    public static Pose Park = new Pose(-4.33+2, -58, Math.PI / 2);
     public static Pose Spec2PlaceInitial = new Pose(28, 6, 0);
     public static Pose Spec2PlaceFinal = new Pose(32.4, 6, 0);
     public static Pose Spec3PlaceInitial = new Pose(28, 8, 0);
@@ -167,11 +168,11 @@ public class SpecimenAuto extends LinearOpMode {
 
     public static MovementConstants defaultMovementConstants = new MovementConstants();
     public static MovementConstants scoreEndMovementConstant = new MovementConstants(100, 100, -0.5);
-    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 50, -0.4);
-    public static MovementConstants pickupApproachMovementConstant = new MovementConstants(60, 60, -0.1);
-    public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 60, 0);
+    public static MovementConstants scoreApproachMovementConstant = new MovementConstants(50, 100, -0.4);
+    public static MovementConstants pickupApproachMovementConstant = new MovementConstants(60, 100, -0.1);
+    public static MovementConstants pickupEndMovementConstant = new MovementConstants(20, 100, 0);
 
-    public static long placeWait = 250; // in ms
+    public static long placeWait = 150; // in ms
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -221,7 +222,7 @@ public class SpecimenAuto extends LinearOpMode {
                         new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                         new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
                         new DeadlineCommand(
-                                new YieldCommand(1000, robot.theIntake::containsSampleColorSensor),
+                                new YieldCommand(600, robot.theIntake::containsSampleColorSensor),
                                 new SequentialCommandGroup(
                                         new MovementCommand(
                                                 Spec2Pickup,
@@ -255,7 +256,7 @@ public class SpecimenAuto extends LinearOpMode {
                         new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
 
                         new DeadlineCommand(
-                                new YieldCommand(1000, robot.theIntake::containsSampleColorSensor),
+                                new YieldCommand(600, robot.theIntake::containsSampleColorSensor),
                                 new SequentialCommandGroup(
                                         new MovementCommand(
                                                 Spec3Pickup,
@@ -288,7 +289,7 @@ public class SpecimenAuto extends LinearOpMode {
                         new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
 
                         new DeadlineCommand(
-                                new YieldCommand(1000, robot.theIntake::containsSampleColorSensor),
+                                new YieldCommand(600, robot.theIntake::containsSampleColorSensor),
                                 new SequentialCommandGroup(
                                         new MovementCommand(
                                                 Spec4Pickup,
@@ -485,6 +486,11 @@ public class SpecimenAuto extends LinearOpMode {
                                 Spec5LoadFinal,
                                 Spec5LoadFinal2,
                                 scoreEndMovementConstant
+                        ),
+                        new MovementCommand(
+                                Spec5LoadFinal2,
+                                Park,
+                                new MovementConstants(-0.5)
                         )
                         // new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT))
                         /*
