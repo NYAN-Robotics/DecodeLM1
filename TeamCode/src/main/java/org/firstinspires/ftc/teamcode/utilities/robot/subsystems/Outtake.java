@@ -56,7 +56,7 @@ public class Outtake implements Subsystem {
         BACK_PICKUP(DEFAULT.position - 0.23),
         AUTO_DEFAULT(DEFAULT.position - 0.07),
         HANG_INITIAL(DEFAULT.position + 0.11),
-        HANG_FINAL(DEFAULT.position + 0.21),
+        HANG_FINAL(DEFAULT.position + 0.28),
         EXTENDED(DEFAULT.position + 0.42), // TWEAK
         EXTENDED_INITIAL(DEFAULT.position + 0.25),
         SPECIMEN_INITIAL(DEFAULT.position + 0.10),
