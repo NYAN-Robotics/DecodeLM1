@@ -27,7 +27,7 @@ public class Outtake implements Subsystem {
 
     public enum OuttakeSlidesStates {
         DEFAULT(0),
-        SAMPLES(1740),
+        SAMPLES(1710),
         SAMPLES_LOW(650),
         HANG(1730),
         HANG_FINAL(800),
@@ -142,10 +142,11 @@ public class Outtake implements Subsystem {
 
     public enum OuttakePivotStates {
         DEFAULT(0.67), // FIGURE OUT
-        TRANSFER_POSITION(DEFAULT.position - .1),
+        TRANSFER_POSITION(DEFAULT.position - .13),
         SPECIMEN_INITIAL(DEFAULT.position + 0.1),
         SPECIMEN_DROP(DEFAULT.position + 0),
-        SAMPLE_DROP(DEFAULT.position + 0.2), // FIGURE OUT
+        SAMPLE_DROP(DEFAULT.position + 0.16), // FIGURE OUT
+        SAMPLE_DROP_MORE(DEFAULT.position + 0.24),
         SPECIMEN_PICKUP(DEFAULT.position - 0.57),
         HORIZONTAL_SAMPLE_DROP(SAMPLE_DROP.position - 0.1),
         DOWN(DEFAULT.position - 0.05); // FIGURE OUT
@@ -230,6 +231,7 @@ public class Outtake implements Subsystem {
     boolean currentSwitchState = false;
     boolean pushingDown = false;
     boolean outtakeReset = false;
+    boolean moreTilt = false;
 
     boolean sampleServoRotatedRequested = false;
 
@@ -280,6 +282,10 @@ public class Outtake implements Subsystem {
 
         clawServo.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
+
+        positionDrift = 0;
+
+        moreTilt = false;
     }
 
     @Override
@@ -341,19 +347,24 @@ public class Outtake implements Subsystem {
             if (currentSlideState == OuttakeSlidesStates.SAMPLES || currentSlideState == OuttakeSlidesStates.SAMPLES_LOW) {
                 setCurrentOuttakeState(OuttakeServoState.EXTENDED);
                 setCurrentRotationState(OuttakeRotationStates.ROTATED);
-                setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+
+                if (moreTilt) {
+                    setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP_MORE);
+                } else {
+                    setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+                }
             }
 
             outtakeReset = true;
         }
-        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES_LOW &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES_LOW && profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
             robot.theIntake.setIntakeState(Intake.IntakeState.TRANSFER);
 
 
         }
 
-        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES &&  profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
+        if (previousSlideState == OuttakeSlidesStates.DEFAULT && currentSlideState == OuttakeSlidesStates.SAMPLES && profile.timer.seconds() > 0.15 && profile.timer.seconds() < 0.5 && !sampleServoRotatedRequested) {
             setCurrentPivotState(OuttakePivotStates.TRANSFER_POSITION);
 
             robot.theIntake.setIntakeState(Intake.IntakeState.TRANSFER);
@@ -385,7 +396,15 @@ public class Outtake implements Subsystem {
                                     sampleServoRotatedRequested = false;
                                 }),
                                 new YieldCommand(2000, this::atTargetPosition),
-                                new OneTimeCommand(() -> { if (currentSlideState == OuttakeSlidesStates.SAMPLES) { setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP); } })
+                                new OneTimeCommand(() -> {
+                                    if (currentSlideState == OuttakeSlidesStates.SAMPLES) {
+                                        if (!moreTilt) {
+                                            setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP);
+                                        } else {
+                                            setCurrentPivotState(OuttakePivotStates.SAMPLE_DROP_MORE);
+                                        }
+                                    }
+                                })
 
                         )
                 );
@@ -503,6 +522,10 @@ public class Outtake implements Subsystem {
         return profile.atTargetPosition();
     }
 
+    public void setMoreTilt(boolean moreTilt) {
+        this.moreTilt = moreTilt;
+    }
+
     public OuttakeSlidesStates getSlidesState() {
         return currentSlideState;
     }
@@ -521,5 +544,13 @@ public class Outtake implements Subsystem {
 
     public OuttakeServoState getOuttakeServoState() {
         return currentOuttakeServoState;
+    }
+
+    public boolean slidesDownMagneticLimitSwitch() {
+        return currentSwitchState;
+    }
+
+    public void resetSlidesSlip() {
+        positionDrift += getCurrentSensorPosition();
     }
 }

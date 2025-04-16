@@ -24,11 +24,20 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                 new DeadlineCommand(
                         new YieldCommand(robot.theIntake::containsSampleColorSensor),
                         new SequentialCommandGroup(
-                                new MovementCommand(
-                                        new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
-                                        new Pose(cycleStrafe.getX(), cycleStrafe.getY() + offset, cycleStrafe.getHeading()),
-                                        new MovementConstants(0.2)
+                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION_FURTHER)),
+                                new ParallelCommandGroup(
+                                        new MovementCommand(
+                                                new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
+                                                new Pose(cycleStrafe.getX(), cycleStrafe.getY() + offset, cycleStrafe.getHeading()),
+                                                new MovementConstants(100, 100, 0)
+                                        ),
+                                        new SequentialCommandGroup(
+                                                new YieldCommand(150),
+                                                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+                                                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
+                                        )
                                 ),
+                                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                                 new MovementCommand(
                                         new Pose(cycleStrafe.getX(), cycleStrafe.getY() + offset, cycleStrafe.getHeading()),
                                         new Pose(cycleSubmersible2.getX(), cycleSubmersible2.getY() + offset, cycleSubmersible2.getHeading()),
@@ -41,6 +50,7 @@ public class InitialCycleCommand1 extends SequentialCommandGroup {
                                 )
                         )
                 ),
+                new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
                 new YieldCommand(100)
         );
     }

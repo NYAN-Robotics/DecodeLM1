@@ -48,8 +48,8 @@ public class CycleCommand extends SequentialCommandGroup {
                         cycleInitial,
                         cycleSubmersible,
                         new MovementConstants(20, 40, -0.35, DriveConstants.K_V, DriveConstants.K_A)
-                ),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)));
+                ));
+ //               new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
+//                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)));
     }
 }

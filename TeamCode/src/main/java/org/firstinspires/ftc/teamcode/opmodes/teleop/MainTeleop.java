@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.Globals;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.DeadlineCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.LoopCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
@@ -117,9 +119,9 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if (currentFrameGamepad1.right_trigger > 0.05) {
-                robot.theIntake.incrementPositionByVelocity(currentFrameGamepad1.right_trigger, frameTime/1000);
+                robot.theIntake.incrementPositionByVelocity(currentFrameGamepad1.right_trigger, frameTime / 1000);
             } else if (currentFrameGamepad1.left_trigger > 0.05) {
-                robot.theIntake.incrementPositionByVelocity(-currentFrameGamepad1.left_trigger, frameTime/1000);
+                robot.theIntake.incrementPositionByVelocity(-currentFrameGamepad1.left_trigger, frameTime / 1000);
             }
 
             if (currentFrameGamepad1.left_bumper && !previousFrameGamepad1.left_bumper) {
@@ -232,37 +234,28 @@ public class MainTeleop extends LinearOpMode {
             }*/
 
             if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
-                robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.HORIZONTAL_SAMPLE_DROP);
+                robot.theCommandScheduler.scheduleCommand(
+                        new SequentialCommandGroup(
+                                new DeadlineCommand(
+                                        new SequentialCommandGroup(new YieldCommand(2000, robot.theOuttake::slidesDownMagneticLimitSwitch), new YieldCommand(150)),
+                                        new LoopCommand(() -> robot.theOuttake.setLiftPower(-0.6))
+                                ),
+                                new OneTimeCommand(() -> robot.theOuttake.resetSlidesSlip())
+                        )
+                );
             }
 
             if ((currentFrameGamepad2.square && !previousFrameGamepad2.square) || (oneDriver && (currentFrameGamepad1.dpad_up && !previousFrameGamepad1.dpad_up))) {
-                robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);
                 robot.theOuttake.setCurrentOuttakeState(Outtake.OuttakeServoState.DEFAULT);
                 robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
                 robot.theOuttake.setCurrentRotationState(Outtake.OuttakeRotationStates.DEFAULT);
                 robot.theOuttake.setCurrentPivotState(Outtake.OuttakePivotStates.DEFAULT);
+                robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.DEFAULT);
             }
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
                 robot.theIntake.triggerCowcatcher();
             }
-
-
-
-            if (currentFrameGamepad1.x && !previousFrameGamepad1.x) {
-                robot.theCommandScheduler.scheduleCommand(
-                        new MovementCommand(
-                                robot.theLocalizer.getPose(),
-                                new Pose(0, 0, 0),
-                                new MovementConstants()
-                        )
-                );
-            }
-
-
-
-
-
 
             frameTime = robot.update();
 

@@ -698,7 +698,7 @@ public class Intake implements Subsystem {
                         new YieldCommand(75),
                         new YieldCommand(robot.theOuttake::atTargetPosition),
                         new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.CLOSED)),
-                        new YieldCommand(50), // Wait for claw to close
+                        new YieldCommand(100), // Wait for claw to close
                         new OneTimeCommand(() -> setIntakeMotorState(IntakeMotorStates.STATIONARY)),
                         new OneTimeCommand(() -> setTargetHolderState(SampleHolderState.DEFAULT)),
                         new YieldCommand(50),

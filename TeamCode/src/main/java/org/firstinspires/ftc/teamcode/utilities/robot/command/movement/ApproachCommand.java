@@ -39,9 +39,7 @@ public class ApproachCommand extends SequentialCommandGroup {
                         new Pose(cycleSubmersible.getX(), cycleSubmersible.getY() + offset, cycleSubmersible.getHeading()),
                         new MovementConstants(40, 40, -0.2, DriveConstants.K_V, DriveConstants.K_A)
                 ),
-                new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
-                new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING))
+                new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher())
 
         );
     }

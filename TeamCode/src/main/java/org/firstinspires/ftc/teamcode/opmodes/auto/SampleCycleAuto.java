@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.utilities.math.MathHelper;
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.Alliance;
 import org.firstinspires.ftc.teamcode.utilities.robot.DriveConstants;
@@ -38,7 +39,7 @@ public class SampleCycleAuto extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
     public static Pose startPose = new Pose(-37.1, -61.0, Math.PI / 2);
-    public static Pose initialDrop = new Pose(-59.8, -52.2, 1.1784);
+    public static Pose initialDrop = new Pose(-59.8- 1* Math.sin(1.1784), -52.2 - 1* Math.cos(1.1784), 1.1784);
     public static Pose sample1 = new Pose(-59.2995, -52.0757, 1.1784);
     public static Pose sample1Final = new Pose(-57, -47.3757, 1.1784);
     public static Pose sample1Drop = new Pose(-58.1997, -51.2757, 1.1784);
@@ -50,9 +51,9 @@ public class SampleCycleAuto extends LinearOpMode {
     public static Pose partnerSamplePickupInitial = new Pose(-26.163, -57.8, 0);
     public static Pose partnerSamplePickupFinal = new Pose(-17.163, -57.8, 0);
     public static Pose cycleInitial = new Pose(-35.4, -17.6, Math.PI / 4);
-    public static Pose cycleSubmersible = new Pose(-30.4, -14, 0.558);
+    public static Pose cycleSubmersible = new Pose(-30.4, -14, 0.458);
     public static Pose cycleSubmersible2 = new Pose(-23, -3, 0);
-    public static Pose cycleSubmersible3 = new Pose(-27, 3, 0.5);
+    public static Pose cycleSubmersible3 = new Pose(-27, 0, 0.2);
     public static Pose cycleDrop = new Pose(-55, -56.5, Math.PI / 4);
     public static Pose cycleStrafe = new Pose(-23, -12, 0);
     public static Pose parkInitial = new Pose(-40, -9, Math.PI);
@@ -78,7 +79,7 @@ public class SampleCycleAuto extends LinearOpMode {
 
         SequentialCommandGroup preloadedSamples = new SequentialCommandGroup(
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
-                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION_FURTHER)),
                 new MovementCommand(
                         startPose,
                         initialDrop,
@@ -92,6 +93,7 @@ public class SampleCycleAuto extends LinearOpMode {
                                 new MovementConstants(-0.2)
                         )
                 ),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
                 new OneTimeCommand(() -> robot.theOuttake.reset()),
@@ -104,6 +106,7 @@ public class SampleCycleAuto extends LinearOpMode {
                         )
                 ),
                 new YieldCommand(1000, robot.theIntake::containsSampleColorSensor),
+                new OneTimeCommand(() -> robot.theOuttake.setMoreTilt(true)),
                 // new YieldCommand(250),
                 new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new ParallelCommandGroup(
@@ -121,7 +124,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(200),
+                new YieldCommand(150),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION)),
                 new YieldCommand(50),
@@ -160,7 +163,7 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(200),
+                new YieldCommand(150),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
                 new YieldCommand(50),
                 new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION_FURTHER)),
@@ -203,8 +206,9 @@ public class SampleCycleAuto extends LinearOpMode {
                 ),
                 new YieldCommand(2000, () -> robot.theOuttake.getSlidesState() == Outtake.OuttakeSlidesStates.SAMPLES),
                 new YieldCommand(() -> robot.theOuttake.atTargetPosition()),
-                new YieldCommand(200),
+                new YieldCommand(150),
                 new OneTimeCommand(() -> robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT)),
+                new OneTimeCommand(() -> robot.theOuttake.setMoreTilt(false)),
                 new YieldCommand(50)
         );
 
@@ -361,6 +365,7 @@ public class SampleCycleAuto extends LinearOpMode {
 
         robot.update();
         robot.theIntake.setAutomation(false);
+        robot.theOuttake.setMoreTilt(true);
 
         robot.theCommandScheduler.scheduleCommand(preloadedSamples);
         boolean retryingPickup = false;
@@ -391,6 +396,8 @@ public class SampleCycleAuto extends LinearOpMode {
                 if (currentlyCycling && initialCycleCommand.isFinished() || retryingPickup && retryCommand.isFinished()) {
                     retryingPickup = false;
                     currentlyCycling = false;
+                    offset += 2;
+                    offset = MathHelper.clamp(offset, 0, 7);
 
                     robot.theIntake.updatePossessedColor();
 
