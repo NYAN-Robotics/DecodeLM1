@@ -85,6 +85,7 @@ public class MainTeleop extends LinearOpMode {
         robot.theLocalizer.setPose(new Pose(-37.6, -61.8, Math.PI / 2));
 
         robot.theIntake.setAutomation(true);
+        boolean disableOuttakeSwitch = false;
 
         double frameTime = 0;
 
@@ -255,6 +256,15 @@ public class MainTeleop extends LinearOpMode {
 
             if (currentFrameGamepad1.cross && !previousFrameGamepad1.cross) {
                 robot.theIntake.triggerCowcatcher();
+            }
+
+            if (currentFrameGamepad1.square && !previousFrameGamepad1.square) {
+                disableOuttakeSwitch = !disableOuttakeSwitch;
+                robot.theIntake.setDisableOuttake(disableOuttakeSwitch);
+
+                if (disableOuttakeSwitch) {
+                    currentFrameGamepad1.rumble(500);
+                }
             }
 
             frameTime = robot.update();
