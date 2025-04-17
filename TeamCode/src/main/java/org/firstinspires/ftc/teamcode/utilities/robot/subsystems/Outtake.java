@@ -147,7 +147,7 @@ public class Outtake implements Subsystem {
         SPECIMEN_DROP(DEFAULT.position + 0),
         SAMPLE_DROP(DEFAULT.position + 0.16), // FIGURE OUT
         SAMPLE_DROP_MORE(DEFAULT.position + 0.24),
-        SPECIMEN_PICKUP(DEFAULT.position - 0.57),
+        SPECIMEN_PICKUP(DEFAULT.position - 0.575),
         HORIZONTAL_SAMPLE_DROP(SAMPLE_DROP.position - 0.1),
         DOWN(DEFAULT.position - 0.05); // FIGURE OUT
 

@@ -169,7 +169,7 @@ public class FourSpecimenAuto extends LinearOpMode {
     public static MovementConstants scoreEndMovementConstant = new MovementConstants(70, 70, -0.05);
     public static MovementConstants scoreApproachMovementConstant = new MovementConstants(70, 50, -0.1);
     public static MovementConstants pickupApproachMovementConstant = new MovementConstants(100, 100, -0.1);
-    public static MovementConstants pickupEndMovementConstant = new MovementConstants(60, 20, -0.4);
+    public static MovementConstants pickupEndMovementConstant = new MovementConstants(30, 20, -0.4);
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -602,8 +602,14 @@ public class FourSpecimenAuto extends LinearOpMode {
         double offset = 0;
 
         while (opModeInInit()) {
+
             if (gamepad1.cross) {
                 robot.theOuttake.clawServo.setPosition(Outtake.OuttakeClawStates.CLOSED.position);
+            }
+
+            if (gamepad2.triangle && !gamepad2Copy.triangle) {
+                robot.theOuttake.leftOuttakeServo.setPosition(Outtake.OuttakeServoState.AUTO_DEFAULT.position);
+                robot.theOuttake.rightOuttakeServo.setPosition(Outtake.OuttakeServoState.AUTO_DEFAULT.position);
             }
 
             if (gamepad1.circle) {

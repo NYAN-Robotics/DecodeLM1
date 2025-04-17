@@ -558,6 +558,10 @@ public class Intake implements Subsystem {
         } else {
             sampleContained = SampleContained.RED;
         }
+
+        if (MathHelper.epsilonEquals(hue, 0.001) && MathHelper.epsilonEquals(saturation, 0.001) && MathHelper.epsilonEquals(value, 0.001)) {
+            sampleContained = SampleContained.YELLOW;
+        }
         /*
         if (green > 0.002 && red > 0.002) {
             sampleContained = SampleContained.YELLOW;
