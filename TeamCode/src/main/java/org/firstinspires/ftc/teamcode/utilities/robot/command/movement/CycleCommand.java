@@ -16,13 +16,15 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 
 public class CycleCommand extends SequentialCommandGroup {
     public CycleCommand(RobotEx robot) {
-        super(new OneTimeCommand(() -> robot.theIntake.returnSlides()),
+        super(
+                new OneTimeCommand(() -> robot.theIntake.returnSlides()),
                 new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
                 new MovementCommand(
                         cycleSubmersible,
                         cycleInitial,
                         new MovementConstants(80, 80, -0.4, DriveConstants.K_V, DriveConstants.K_A)
                 ),
+                new OneTimeCommand(() -> robot.theIntake.setCurrentCowcatcherState(Intake.CowcatcherStates.ACTIVATED)),
                 new OneTimeCommand(() -> robot.theOuttake.setSlidesState(Outtake.OuttakeSlidesStates.SAMPLES)),
                 new MovementCommand(
                         cycleInitial,

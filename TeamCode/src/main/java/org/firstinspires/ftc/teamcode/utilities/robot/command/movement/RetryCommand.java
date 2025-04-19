@@ -19,6 +19,7 @@ public class RetryCommand extends SequentialCommandGroup {
         super(
                 new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
                 new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
+                new OneTimeCommand(() -> robot.theIntake.setTargetLinkageState(Intake.LinkageStates.AUTO_EXTENSION_FURTHER)),
                 new YieldCommand(1000),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeMotorState(Intake.IntakeMotorStates.INTAKING)),
