@@ -236,8 +236,8 @@ public class Intake implements Subsystem {
 
         cowcatcherServo = new CachingServo(newHardwareMap.get(Servo.class, "cowcatcher"), 1e-5);
 
-        intakeColorSensor1 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor1");
-        intakeColorSensor2 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor2");
+        intakeColorSensor1 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor1"); // rev
+        intakeColorSensor2 = newHardwareMap.get(RevColorSensorV3.class, "intakeColorSensor2"); // brushlands
         intakeColorSensor1.setGain((float) gain);
 
         intakeColorSensorDigital0 = newHardwareMap.get(DigitalChannel.class, "digital0");
