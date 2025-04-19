@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 public class RetryCommand extends SequentialCommandGroup {
     public RetryCommand(RobotEx robot, double offset) {
         super(
+                new OneTimeCommand(() -> robot.theIntake.triggerCowcatcher()),
                 new OneTimeCommand(() -> robot.theIntake.reverseIntake()),
                 new YieldCommand(1000),
                 new OneTimeCommand(() -> robot.theIntake.setIntakeState(Intake.IntakeState.EXTENDED)),

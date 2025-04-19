@@ -347,6 +347,7 @@ public class Intake implements Subsystem {
         if (currentBreakbeamState && !lastBreakbeamState && currentIntakeState != IntakeState.DEFAULT && linkageTimer.seconds() > 0.25) {
             containedTimer.reset();
             scheduledAutomation = true;
+            System.out.println("Sample detected");
         }
 
         if (scheduledAutomation && !disableAutomation) {
