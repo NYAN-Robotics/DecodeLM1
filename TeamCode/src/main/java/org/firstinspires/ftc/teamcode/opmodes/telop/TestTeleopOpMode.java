@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes.Telop.test;
+package org.firstinspires.ftc.teamcode.opmodes.telop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utilities.subsystems.testBench;
+import org.firstinspires.ftc.teamcode.utilities.subsystems.TestBenchSubsystem;
 
 /**
  * Test TeleOp OpMode - Control PID motor and servo for testing
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.utilities.subsystems.testBench;
 public class TestTeleopOpMode extends OpMode {
 
     // Subsystems
-    private testBench testBench;
+    private TestBenchSubsystem testBench;
 
     // Timing
     private ElapsedTime runtime = new ElapsedTime();

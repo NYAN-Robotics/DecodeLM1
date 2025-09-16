@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utilities.subsystems.testBench;
+package org.firstinspires.ftc.teamcode.utilities.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,7 +19,7 @@ public class TestBenchSubsystem {
 
     // State variables
     private boolean motorEnabled = false;
-    private double currentServoPosition = RobotConstants.SERVO_HOME_POSITION;
+    private double currentServoPosition = robotConstants.SERVO_HOME_POSITION;
 
     /**
      * Initialize the test bench hardware
@@ -27,8 +27,8 @@ public class TestBenchSubsystem {
      */
     public void init(HardwareMap hardwareMap) {
         // Initialize PID Motor
-        DcMotorEx motorEx = hardwareMap.get(DcMotorEx.class, RobotConstants.PID_MOTOR_NAME);
-        pidMotor = new CachedMotor(motorEx);
+        DcMotorEx motorEx = hardwareMap.get(DcMotorEx.class, robotConstants.PID_MOTOR_NAME);
+        pidMotor = new cachedMotor(motorEx);
 
         // Configure motor for velocity control
         pidMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -37,23 +37,23 @@ public class TestBenchSubsystem {
 
         // Set PID coefficients
         pidMotor.setPIDFCoefficients(
-                RobotConstants.MOTOR_KP,
-                RobotConstants.MOTOR_KI,
-                RobotConstants.MOTOR_KD,
-                RobotConstants.MOTOR_KF
+                robotConstants.MOTOR_KP,
+                robotConstants.MOTOR_KI,
+                robotConstants.MOTOR_KD,
+                robotConstants.MOTOR_KF
         );
 
         // Initialize Servo
-        testServo = hardwareMap.get(Servo.class, RobotConstants.TEST_SERVO_NAME);
-        testServo.setPosition(RobotConstants.SERVO_HOME_POSITION);
-        currentServoPosition = RobotConstants.SERVO_HOME_POSITION;
+        testServo = hardwareMap.get(Servo.class, robotConstants.TEST_SERVO_NAME);
+        testServo.setPosition(robotConstants.SERVO_HOME_POSITION);
+        currentServoPosition = robotConstants.SERVO_HOME_POSITION;
     }
 
     /**
      * Enable PID motor at target velocity
      */
     public void enableMotor() {
-        pidMotor.setVelocity(RobotConstants.MOTOR_TARGET_VELOCITY);
+        pidMotor.setVelocity(robotConstants.MOTOR_TARGET_VELOCITY);
         motorEnabled = true;
     }
 
@@ -90,8 +90,8 @@ public class TestBenchSubsystem {
      * @param position Servo position (0.0 to 1.0)
      */
     public void setServoPosition(double position) {
-        position = Math.max(RobotConstants.SERVO_MIN_POSITION,
-                Math.min(RobotConstants.SERVO_MAX_POSITION, position));
+        position = Math.max(robotConstants.SERVO_MIN_POSITION,
+                Math.min(robotConstants.SERVO_MAX_POSITION, position));
 
         testServo.setPosition(position);
         currentServoPosition = position;
@@ -101,7 +101,7 @@ public class TestBenchSubsystem {
      * Increment servo position
      */
     public void incrementServoPosition() {
-        double newPosition = currentServoPosition + RobotConstants.SERVO_INCREMENT;
+        double newPosition = currentServoPosition + robotConstants.SERVO_INCREMENT;
         setServoPosition(newPosition);
     }
 
@@ -109,7 +109,7 @@ public class TestBenchSubsystem {
      * Decrement servo position
      */
     public void decrementServoPosition() {
-        double newPosition = currentServoPosition - RobotConstants.SERVO_INCREMENT;
+        double newPosition = currentServoPosition - robotConstants.SERVO_INCREMENT;
         setServoPosition(newPosition);
     }
 
@@ -117,7 +117,7 @@ public class TestBenchSubsystem {
      * Move servo to home position
      */
     public void homeServo() {
-        setServoPosition(RobotConstants.SERVO_HOME_POSITION);
+        setServoPosition(robotConstants.SERVO_HOME_POSITION);
     }
 
     /**
@@ -133,7 +133,7 @@ public class TestBenchSubsystem {
      * @return Target velocity in ticks per second
      */
     public double getTargetVelocity() {
-        return motorEnabled ? RobotConstants.MOTOR_TARGET_VELOCITY : 0.0;
+        return motorEnabled ? robotConstants.MOTOR_TARGET_VELOCITY : 0.0;
     }
 
     /**
@@ -169,7 +169,7 @@ public class TestBenchSubsystem {
 
         double currentVelocity = getMotorVelocity();
         double targetVelocity = getTargetVelocity();
-        return Math.abs(currentVelocity - targetVelocity) <= RobotConstants.MOTOR_VELOCITY_TOLERANCE;
+        return Math.abs(currentVelocity - targetVelocity) <= robotConstants.MOTOR_VELOCITY_TOLERANCE;
     }
 
     /**
