@@ -10,7 +10,7 @@ public class robotConstants {
     // ========== HARDWARE CONSTANTS ==========
 
     // Motor Names (configured in Robot Configuration)
-    public static final String PID_MOTOR_NAME = "pidMotor";
+    public static final String PID_MOTOR_NAME = "leftFront";
 
     // Servo Names
     public static final String TEST_SERVO_NAME = "testServo";
