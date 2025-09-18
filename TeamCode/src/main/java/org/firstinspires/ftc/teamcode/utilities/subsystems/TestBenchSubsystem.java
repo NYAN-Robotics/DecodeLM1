@@ -61,7 +61,7 @@ public class TestBenchSubsystem {
      * Disable PID motor
      */
     public void disableMotor() {
-        pidMotor.setPower(0.0);
+        pidMotor.setVelocity(0.0);
         motorEnabled = false;
     }
 

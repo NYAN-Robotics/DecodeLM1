@@ -75,9 +75,9 @@ public class TestTeleopOpMode extends OpMode {
     private void handleButtonInputs() {
         boolean cooldownExpired = buttonCooldown.milliseconds() > BUTTON_COOLDOWN_MS;
 
-        // Toggle motor with A button
+        // Enable motor with A button
         if (gamepad1.a && !lastA && cooldownExpired) {
-            testBench.toggleMotor();
+            testBench.enableMotor();
             buttonCooldown.reset();
         }
 
@@ -92,10 +92,11 @@ public class TestTeleopOpMode extends OpMode {
             buttonCooldown.reset();
         }
 
-        // Home servo with Y button
+        // Disable motor
         if (gamepad1.y && !lastY && cooldownExpired) {
-            testBench.homeServo();
-            buttonCooldown.reset();
+//            testBench.homeServo();
+            testBench.disableMotor();
+//            buttonCooldown.reset();
         }
 
         // Emergency stop with Back button

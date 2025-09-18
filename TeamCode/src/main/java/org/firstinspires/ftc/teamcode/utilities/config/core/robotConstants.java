@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.config.core;
 
+import org.firstinspires.ftc.teamcode.utilities.math.MotorMath;
+
 /**
  * Robot Constants - Central location for all robot configuration values
  */
@@ -23,11 +25,6 @@ public class robotConstants {
     public static final double MOTOR_KI = 3.0;
     public static final double MOTOR_KD = 0.5;
     public static final double MOTOR_KF = 12.0;
-
-    // Motor specifications
-    public static final double MOTOR_TICKS_PER_REV = 537.7; // GoBilda 5202/3/4 series
-    public static final double MOTOR_MAX_RPM = 312.0;
-    public static final double MOTOR_TARGET_VELOCITY = 200.0; // Target velocity in ticks/sec
 
     // ========== SERVO CONSTANTS ==========
 
@@ -54,10 +51,17 @@ public class robotConstants {
     public static final double MOTOR_TIMEOUT_SECONDS = 5.0;
     public static final double SERVO_MOVE_TIME_MS = 500;
 
+    // TPR
+    public static final double YJ_5203_TPR = 537.7;
+
     // Control loop periods
     public static final double CONTROL_LOOP_PERIOD_MS = 20;
 
     // Tolerances
     public static final double MOTOR_VELOCITY_TOLERANCE = 10.0; // ticks/sec
     public static final double SERVO_POSITION_TOLERANCE = 0.05;
+
+    // Motor specifications
+    public static final double MOTOR_MAX_RPM = 312.0;
+    public static final double MOTOR_TARGET_VELOCITY = MotorMath.rpmToTPS(60, YJ_5203_TPR); // Target velocity in ticks/sec
 }
