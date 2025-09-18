@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utilities.config.core.robotConstants;
 public class TestBenchSubsystem {
 
     // Hardware components
-    private CachedMotor pidMotor;
+    private cachedMotor pidMotor;
     private Servo testServo;
 
     // State variables
