@@ -4,24 +4,31 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.utilities.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.utilities.subsystems.TestBenchSubsystem;
+import org.firstinspires.ftc.teamcode.utilities.config.core.robotConstants;
 
 /**
- * Test TeleOp OpMode - Control PID motor and servo for testing
+ * Test TeleOp OpMode - Control two-motor drivetrain with PID and RPM control
  *
  * Controls:
- * - A: Toggle motor on/off
- * - X: Increment servo position
- * - B: Decrement servo position
- * - Y: Home servo to center position
- * - Right Trigger: Increase motor velocity
- * - Left Trigger: Decrease motor velocity
+ * - A: Toggle motors on/off
+ * - X: Increment RPM
+ * - B: Decrement RPM
+ * - Y: Reset to default RPM
+ * - Right Trigger: Increase RPM
+ * - Left Trigger: Decrease RPM
+ * - D-Pad Up: Set high RPM (2000)
+ * - D-Pad Down: Set low RPM (500)
+ * - D-Pad Left: Set left motor only
+ * - D-Pad Right: Set right motor only
  * - Back: Emergency stop all
  */
-@TeleOp(name="Test Bench Control", group="Test")
+@TeleOp(name="Two Motor PID Control", group="Test")
 public class TestTeleopOpMode extends OpMode {
 
     // Subsystems
+    private DrivetrainSubsystem drivetrain;
     private TestBenchSubsystem testBench;
 
     // Timing
@@ -34,15 +41,22 @@ public class TestTeleopOpMode extends OpMode {
     private boolean lastB = false;
     private boolean lastY = false;
     private boolean lastBack = false;
+    private boolean lastDpadUp = false;
+    private boolean lastDpadDown = false;
+    private boolean lastDpadLeft = false;
+    private boolean lastDpadRight = false;
 
     // Control variables
-    private double customVelocity = 200.0; // Custom velocity control
-    private static final double VELOCITY_INCREMENT = 50.0;
+    private double customRPM = robotConstants.DEFAULT_TARGET_RPM; // Custom RPM control
+    private static final double RPM_INCREMENT = robotConstants.RPM_INCREMENT;
     private static final double BUTTON_COOLDOWN_MS = 200;
 
     @Override
     public void init() {
-        // Initialize subsystem
+        // Initialize subsystems
+        drivetrain = new DrivetrainSubsystem();
+        drivetrain.init(hardwareMap);
+        
         testBench = new TestBenchSubsystem();
         testBench.init(hardwareMap);
 
@@ -50,8 +64,9 @@ public class TestTeleopOpMode extends OpMode {
         runtime.reset();
         buttonCooldown.reset();
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.addData("Controls", "A=Motor Toggle, X/B=Servo, Y=Home, Triggers=Velocity");
+        telemetry.addData("Status", "Initialized - Two Motor PID Control");
+        telemetry.addData("Controls", "A=Toggle Motors, X/B=RPM +/-", "Y=Reset RPM, Triggers=RPM +/-");
+        telemetry.addData("D-Pad", "Up=High RPM, Down=Low RPM, L/R=Single Motor");
         telemetry.update();
     }
 
@@ -75,35 +90,65 @@ public class TestTeleopOpMode extends OpMode {
     private void handleButtonInputs() {
         boolean cooldownExpired = buttonCooldown.milliseconds() > BUTTON_COOLDOWN_MS;
 
-        // Enable motor with A button
+        // Toggle motors with A button
         if (gamepad1.a && !lastA && cooldownExpired) {
-            testBench.enableMotor();
+            drivetrain.toggleMotors();
             buttonCooldown.reset();
         }
 
-        // Servo control with X and B buttons
+        // RPM control with X and B buttons
         if (gamepad1.x && !lastX && cooldownExpired) {
-            testBench.incrementServoPosition();
+            drivetrain.incrementRPM();
+            customRPM = drivetrain.getCurrentTargetRPM();
             buttonCooldown.reset();
         }
 
         if (gamepad1.b && !lastB && cooldownExpired) {
-            testBench.decrementServoPosition();
+            drivetrain.decrementRPM();
+            customRPM = drivetrain.getCurrentTargetRPM();
             buttonCooldown.reset();
         }
 
-        // Disable motor
+        // Reset to default RPM with Y button
         if (gamepad1.y && !lastY && cooldownExpired) {
-//            testBench.homeServo();
-            testBench.disableMotor();
-//            buttonCooldown.reset();
+            drivetrain.setBothMotorsRPM(robotConstants.DEFAULT_TARGET_RPM);
+            customRPM = robotConstants.DEFAULT_TARGET_RPM;
+            buttonCooldown.reset();
+        }
+
+        // D-Pad controls
+        if (gamepad1.dpad_up && !lastDpadUp && cooldownExpired) {
+            drivetrain.setBothMotorsRPM(2000.0); // High RPM
+            customRPM = 2000.0;
+            buttonCooldown.reset();
+        }
+
+        if (gamepad1.dpad_down && !lastDpadDown && cooldownExpired) {
+            drivetrain.setBothMotorsRPM(500.0); // Low RPM
+            customRPM = 500.0;
+            buttonCooldown.reset();
+        }
+
+        if (gamepad1.dpad_left && !lastDpadLeft && cooldownExpired) {
+            // Set only left motor
+            drivetrain.setLeftMotorRPM(customRPM);
+            drivetrain.setRightMotorRPM(0.0);
+            buttonCooldown.reset();
+        }
+
+        if (gamepad1.dpad_right && !lastDpadRight && cooldownExpired) {
+            // Set only right motor
+            drivetrain.setLeftMotorRPM(0.0);
+            drivetrain.setRightMotorRPM(customRPM);
+            buttonCooldown.reset();
         }
 
         // Emergency stop with Back button
         if (gamepad1.back && !lastBack && cooldownExpired) {
+            drivetrain.disableMotors();
             testBench.disableMotor();
             testBench.homeServo();
-            customVelocity = 200.0;
+            customRPM = robotConstants.DEFAULT_TARGET_RPM;
             buttonCooldown.reset();
         }
 
@@ -113,28 +158,32 @@ public class TestTeleopOpMode extends OpMode {
         lastB = gamepad1.b;
         lastY = gamepad1.y;
         lastBack = gamepad1.back;
+        lastDpadUp = gamepad1.dpad_up;
+        lastDpadDown = gamepad1.dpad_down;
+        lastDpadLeft = gamepad1.dpad_left;
+        lastDpadRight = gamepad1.dpad_right;
     }
 
     /**
-     * Handle analog trigger inputs for velocity control
+     * Handle analog trigger inputs for RPM control
      */
     private void handleAnalogInputs() {
-        // Velocity control with triggers
+        // RPM control with triggers
         if (gamepad1.right_trigger > 0.1) {
-            customVelocity += VELOCITY_INCREMENT * gamepad1.right_trigger * 0.02; // Scale by loop time
-            customVelocity = Math.min(customVelocity, 1000.0); // Max velocity limit
+            customRPM += RPM_INCREMENT * gamepad1.right_trigger * 0.02; // Scale by loop time
+            customRPM = Math.min(customRPM, robotConstants.MAX_RPM); // Max RPM limit
 
-            if (testBench.isMotorEnabled()) {
-                testBench.setMotorVelocity(customVelocity);
+            if (drivetrain.areMotorsEnabled()) {
+                drivetrain.setBothMotorsRPM(customRPM);
             }
         }
 
         if (gamepad1.left_trigger > 0.1) {
-            customVelocity -= VELOCITY_INCREMENT * gamepad1.left_trigger * 0.02; // Scale by loop time
-            customVelocity = Math.max(customVelocity, 0.0); // Min velocity limit
+            customRPM -= RPM_INCREMENT * gamepad1.left_trigger * 0.02; // Scale by loop time
+            customRPM = Math.max(customRPM, robotConstants.MIN_RPM); // Min RPM limit
 
-            if (testBench.isMotorEnabled()) {
-                testBench.setMotorVelocity(customVelocity);
+            if (drivetrain.areMotorsEnabled()) {
+                drivetrain.setBothMotorsRPM(customRPM);
             }
         }
     }
@@ -147,27 +196,39 @@ public class TestTeleopOpMode extends OpMode {
         telemetry.addData("Runtime", "%.1f sec", runtime.seconds());
         telemetry.addData("Loop Time", "%.1f ms", runtime.milliseconds() % 20);
 
-        // Control status
-        telemetry.addData("Motor Status", testBench.isMotorEnabled() ? "ENABLED" : "DISABLED");
-        telemetry.addData("Motor Velocity", "%.1f / %.1f tps",
-                testBench.getMotorVelocity(),
-                testBench.getTargetVelocity());
-        telemetry.addData("Custom Velocity", "%.1f tps", customVelocity);
-        telemetry.addData("Motor Position", "%d ticks", testBench.getMotorPosition());
-        telemetry.addData("At Target Vel", testBench.isMotorAtTargetVelocity() ? "YES" : "NO");
+        // Drivetrain status
+        telemetry.addData("Motors Status", drivetrain.areMotorsEnabled() ? "ENABLED" : "DISABLED");
+        telemetry.addData("Target RPM", "%.0f RPM", drivetrain.getCurrentTargetRPM());
+        telemetry.addData("Custom RPM", "%.0f RPM", customRPM);
+        
+        // Left motor details
+        telemetry.addData("Left Motor", "%.0f/%.0f RPM", 
+                drivetrain.getLeftMotorRPM(), 
+                drivetrain.getLeftTargetRPM());
+        telemetry.addData("Left At Target", drivetrain.isLeftMotorAtTargetRPM() ? "YES" : "NO");
+        
+        // Right motor details
+        telemetry.addData("Right Motor", "%.0f/%.0f RPM", 
+                drivetrain.getRightMotorRPM(), 
+                drivetrain.getRightTargetRPM());
+        telemetry.addData("Right At Target", drivetrain.isRightMotorAtTargetRPM() ? "YES" : "NO");
+        
+        // Both motors at target
+        telemetry.addData("Both At Target", drivetrain.areMotorsAtTargetRPM() ? "YES" : "NO");
 
-        // Servo status
+        // Servo status (from test bench)
         telemetry.addData("Servo Position", "%.2f", testBench.getServoPosition());
 
-        // Quick status line
-        telemetry.addData("Quick Status", testBench.getTelemetryData());
+        // Detailed status line
+        telemetry.addData("Drivetrain Status", drivetrain.getTelemetryData());
 
         // Control hints
         telemetry.addData("", "--- CONTROLS ---");
-        telemetry.addData("A", "Toggle Motor");
-        telemetry.addData("X/B", "Servo +/-");
-        telemetry.addData("Y", "Home Servo");
-        telemetry.addData("RT/LT", "Velocity +/-");
+        telemetry.addData("A", "Toggle Motors");
+        telemetry.addData("X/B", "RPM +/-");
+        telemetry.addData("Y", "Reset RPM");
+        telemetry.addData("RT/LT", "RPM +/-");
+        telemetry.addData("D-Pad", "Up=High, Down=Low, L/R=Single Motor");
         telemetry.addData("Back", "Emergency Stop");
 
         telemetry.update();
@@ -176,10 +237,11 @@ public class TestTeleopOpMode extends OpMode {
     @Override
     public void stop() {
         // Ensure everything stops safely
+        drivetrain.disableMotors();
         testBench.disableMotor();
         testBench.homeServo();
 
-        telemetry.addData("Status", "Stopped");
+        telemetry.addData("Status", "Stopped - All Motors Disabled");
         telemetry.update();
     }
 }
