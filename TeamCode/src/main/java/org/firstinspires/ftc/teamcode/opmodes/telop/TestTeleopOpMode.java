@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.utilities.config.core.robotConstants;
  * Test TeleOp OpMode - Control two-motor drivetrain with PID and RPM control
  *
  * Controls:
+ * - Left Joystick Y: Control left motor speed (-1.0 to 1.0)
+ * - Right Joystick Y: Control right motor speed (-1.0 to 1.0)
  * - A: Toggle motors on/off
  * - X: Increment RPM
  * - B: Decrement RPM
@@ -50,6 +52,10 @@ public class TestTeleopOpMode extends OpMode {
     private double customRPM = robotConstants.DEFAULT_TARGET_RPM; // Custom RPM control
     private static final double RPM_INCREMENT = robotConstants.RPM_INCREMENT;
     private static final double BUTTON_COOLDOWN_MS = 200;
+    
+    // Joystick control variables
+    private boolean joystickControlEnabled = true; // Enable/disable joystick control
+    private double maxJoystickRPM = 2000.0; // Maximum RPM when joystick is fully up
 
     @Override
     public void init() {
@@ -65,7 +71,8 @@ public class TestTeleopOpMode extends OpMode {
         buttonCooldown.reset();
 
         telemetry.addData("Status", "Initialized - Two Motor PID Control");
-        telemetry.addData("Controls", "A=Toggle Motors, X/B=RPM +/-", "Y=Reset RPM, Triggers=RPM +/-");
+        telemetry.addData("Controls", "Left/Right Joystick Y = Motor Speed");
+        telemetry.addData("Buttons", "A=Toggle Motors, X/B=RPM +/-, Y=Reset RPM");
         telemetry.addData("D-Pad", "Up=High RPM, Down=Low RPM, L/R=Single Motor");
         telemetry.update();
     }
@@ -79,9 +86,42 @@ public class TestTeleopOpMode extends OpMode {
 
     @Override
     public void loop() {
+        handleJoystickInputs();
         handleButtonInputs();
         handleAnalogInputs();
         updateTelemetry();
+    }
+
+    /**
+     * Handle joystick inputs for motor control
+     */
+    private void handleJoystickInputs() {
+        if (joystickControlEnabled) {
+            // Get joystick Y values (inverted because joystick up is negative)
+            double leftJoystickY = -gamepad1.left_stick_y; // Invert so up is positive
+            double rightJoystickY = -gamepad1.right_stick_y; // Invert so up is positive
+            
+            // Apply deadzone to prevent drift
+            double deadzone = 0.1;
+            if (Math.abs(leftJoystickY) < deadzone) leftJoystickY = 0.0;
+            if (Math.abs(rightJoystickY) < deadzone) rightJoystickY = 0.0;
+            
+            // Convert joystick values to RPM
+            // Joystick value -1.0 to 1.0 maps to RPM 0 to maxJoystickRPM
+            double leftMotorRPM = leftJoystickY * maxJoystickRPM;
+            double rightMotorRPM = rightJoystickY * maxJoystickRPM;
+            
+            // Clamp RPM to safe bounds
+            leftMotorRPM = Math.max(0.0, Math.min(maxJoystickRPM, leftMotorRPM));
+            rightMotorRPM = Math.max(0.0, Math.min(maxJoystickRPM, rightMotorRPM));
+            
+            // Set motor RPMs
+            drivetrain.setLeftMotorRPM(leftMotorRPM);
+            drivetrain.setRightMotorRPM(rightMotorRPM);
+            
+            // Update custom RPM for button controls
+            customRPM = Math.max(leftMotorRPM, rightMotorRPM);
+        }
     }
 
     /**
@@ -198,8 +238,12 @@ public class TestTeleopOpMode extends OpMode {
 
         // Drivetrain status
         telemetry.addData("Motors Status", drivetrain.areMotorsEnabled() ? "ENABLED" : "DISABLED");
-        telemetry.addData("Target RPM", "%.0f RPM", drivetrain.getCurrentTargetRPM());
-        telemetry.addData("Custom RPM", "%.0f RPM", customRPM);
+        telemetry.addData("Joystick Control", joystickControlEnabled ? "ON" : "OFF");
+        telemetry.addData("Max Joystick RPM", "%.0f RPM", maxJoystickRPM);
+        
+        // Joystick values
+        telemetry.addData("Left Joystick", "%.2f", -gamepad1.left_stick_y);
+        telemetry.addData("Right Joystick", "%.2f", -gamepad1.right_stick_y);
         
         // Left motor details
         telemetry.addData("Left Motor", "%.0f/%.0f RPM", 
@@ -224,6 +268,8 @@ public class TestTeleopOpMode extends OpMode {
 
         // Control hints
         telemetry.addData("", "--- CONTROLS ---");
+        telemetry.addData("Left Stick Y", "Left Motor Speed");
+        telemetry.addData("Right Stick Y", "Right Motor Speed");
         telemetry.addData("A", "Toggle Motors");
         telemetry.addData("X/B", "RPM +/-");
         telemetry.addData("Y", "Reset RPM");
