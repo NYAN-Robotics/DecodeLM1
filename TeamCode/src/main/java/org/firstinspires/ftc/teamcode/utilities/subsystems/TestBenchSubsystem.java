@@ -26,8 +26,8 @@ public class TestBenchSubsystem {
      * @param hardwareMap The hardware map from the OpMode
      */
     public void init(HardwareMap hardwareMap) {
-        // Initialize PID Motor (using left motor for test bench)
-        DcMotorEx motorEx = hardwareMap.get(DcMotorEx.class, robotConstants.LEFT_MOTOR_NAME);
+        // Initialize PID Motor
+        DcMotorEx motorEx = hardwareMap.get(DcMotorEx.class, robotConstants.PID_MOTOR_NAME);
         pidMotor = new cachedMotor(motorEx);
 
         // Configure motor for velocity control
@@ -53,7 +53,7 @@ public class TestBenchSubsystem {
      * Enable PID motor at target velocity
      */
     public void enableMotor() {
-        pidMotor.setVelocity(robotConstants.DEFAULT_TARGET_VELOCITY);
+        pidMotor.setVelocity(robotConstants.MOTOR_TARGET_VELOCITY);
         motorEnabled = true;
     }
 
@@ -133,7 +133,7 @@ public class TestBenchSubsystem {
      * @return Target velocity in ticks per second
      */
     public double getTargetVelocity() {
-        return motorEnabled ? robotConstants.DEFAULT_TARGET_VELOCITY : 0.0;
+        return motorEnabled ? robotConstants.MOTOR_TARGET_VELOCITY : 0.0;
     }
 
     /**
