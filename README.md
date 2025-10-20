@@ -1,2 +1,3 @@
-# NYAN-IntoTheDeep
-Developers: Jorge Seoane (mentor), Darren Pinto, Andrew Leung
+# Decode LM1
+First FTC Team 10091 Not Your Average Nerds (NYAN)
+Developers: Noah Petschke, Bruce Allkanjari, Ozzy Cline

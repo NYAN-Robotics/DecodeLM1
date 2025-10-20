@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 /**
  * Example teleop code for a basic mecanum drive
  */
-@Disabled
 @Autonomous(name = "Drive Forward")
 public class DriveForward extends LinearOpMode {
 
