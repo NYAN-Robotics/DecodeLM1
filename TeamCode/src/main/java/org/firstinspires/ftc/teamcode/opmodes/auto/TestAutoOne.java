@@ -34,11 +34,27 @@ public class TestAutoOne extends LinearOpMode {
         robot.init(this, telemetry);
 
         SequentialCommandGroup commands = new SequentialCommandGroup(
-                new MovementCommand (
-                        new Pose(0, 0, Math.PI / 2),
-                        new Pose(0, 10, Math.PI / 4),
-                        new MovementConstants()
+                new ParallelCommandGroup (
+                        new MovementCommand (
+                                new Pose(0, 0, Math.PI / 2),
+                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new MovementConstants()
+                        ),
+                        new SequentialCommandGroup (
+                                new YieldCommand(1000)
+                        )
+                ),
+                new ParallelCommandGroup (
+                        new MovementCommand (
+                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(-22, 26, Math.PI),
+                                new MovementConstants()
+                        ),
+                        new SequentialCommandGroup(
+                                new YieldCommand(1000)
+                        )
                 )
+
         );
 
         waitForStart();
