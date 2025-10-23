@@ -3,26 +3,21 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.utilities.math.linearalgebra.Pose;
 import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
-import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 
 /**
  * Test teleop path
  */
-@Autonomous(name = "Awesome Cool Auto")
-public class TestAutoOne extends LinearOpMode {
+@Autonomous(name = "Awesome Blue Auto")
+public class TestAutoBlue extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
     @Override
@@ -61,6 +56,26 @@ public class TestAutoOne extends LinearOpMode {
                         ),
                         new SequentialCommandGroup (
                                 new YieldCommand(2000)
+                        )
+                ),
+                new ParallelCommandGroup (
+                        new MovementCommand (
+                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(-22, 47, Math.PI),
+                                new MovementConstants()
+                        ),
+                        new SequentialCommandGroup (
+                                new YieldCommand(2000)
+                        )
+                ),
+                new ParallelCommandGroup (
+                        new MovementCommand (
+                                new Pose(-22, 47, Math.PI),
+                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new MovementConstants()
+                        ),
+                        new SequentialCommandGroup (
+                                new YieldCommand(3000)
                         )
                 )
 
