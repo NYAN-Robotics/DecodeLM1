@@ -22,7 +22,6 @@ import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
  * Test teleop path
  */
 @Autonomous(name = "Awesome Cool Auto")
-
 public class TestAutoOne extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
@@ -41,7 +40,7 @@ public class TestAutoOne extends LinearOpMode {
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(1000)
+                                new YieldCommand(2000)
                         )
                 ),
                 new ParallelCommandGroup (
@@ -51,7 +50,17 @@ public class TestAutoOne extends LinearOpMode {
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup(
-                                new YieldCommand(1000)
+                                new YieldCommand(2000)
+                        )
+                ),
+                new ParallelCommandGroup (
+                        new MovementCommand (
+                                new Pose(-22, 26, Math.PI),
+                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new MovementConstants()
+                        ),
+                        new SequentialCommandGroup (
+                                new YieldCommand(2000)
                         )
                 )
 
