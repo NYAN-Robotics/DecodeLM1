@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants
 /**
  * Test teleop path
  */
-@Autonomous(name = "Awesome Red Auto")
-public class TestAutoRed extends LinearOpMode {
+@Autonomous(name = "Low Red Auto")
+public class LowRedAuto extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
     @Override
@@ -31,7 +31,7 @@ public class TestAutoRed extends LinearOpMode {
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(0, 0, Math.PI / 2),
-                                new Pose(0, 10, Math.PI * 11 / 32),
+                                new Pose(0, 50, 3 * Math.PI / 2),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
@@ -40,8 +40,8 @@ public class TestAutoRed extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 10, Math.PI * 11 / 32),
-                                new Pose(22, 26, 0),
+                                new Pose(0, 50, 3 * Math.PI / 2),
+                                new Pose(-23, 38,  5 * Math.PI / 4),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup(
@@ -50,35 +50,14 @@ public class TestAutoRed extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(22, 26, 0),
-                                new Pose(0, 10, Math.PI * 11 / 32),
+                                new Pose(-23, 38,  5 * Math.PI / 4),
+                                new Pose(0, 50, 3 * Math.PI / 2),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
                                 new YieldCommand(2000)
-                        )
-                ),
-                new ParallelCommandGroup (
-                        new MovementCommand (
-                                new Pose(0, 10, Math.PI * 11 / 32),
-                                new Pose(22, 47, 0),
-                                new MovementConstants()
-                        ),
-                        new SequentialCommandGroup (
-                                new YieldCommand(2000)
-                        )
-                ),
-                new ParallelCommandGroup (
-                        new MovementCommand (
-                                new Pose(22, 47, 0),
-                                new Pose(0, 10, Math.PI * 11 / 32),
-                                new MovementConstants()
-                        ),
-                        new SequentialCommandGroup (
-                                new YieldCommand(3000)
                         )
                 )
-
         );
 
         waitForStart();

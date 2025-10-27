@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants
 /**
  * Test teleop path
  */
-@Autonomous(name = "Awesome Blue Auto")
-public class TestAutoBlue extends LinearOpMode {
+@Autonomous(name = "High Red Auto")
+public class HighRedAuto extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
     @Override
@@ -31,7 +31,7 @@ public class TestAutoBlue extends LinearOpMode {
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(0, 0, Math.PI / 2),
-                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(0, 10, Math.PI * 11 / 32),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
@@ -40,8 +40,8 @@ public class TestAutoBlue extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 10, Math.PI * 21 / 32),
-                                new Pose(-22, 26, Math.PI),
+                                new Pose(0, 10, Math.PI * 11 / 32),
+                                new Pose(22, 26, 0),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup(
@@ -50,8 +50,8 @@ public class TestAutoBlue extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(-22, 26, Math.PI),
-                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(22, 26, 0),
+                                new Pose(0, 10, Math.PI * 11 / 32),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
@@ -60,8 +60,8 @@ public class TestAutoBlue extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 10, Math.PI * 21 / 32),
-                                new Pose(-22, 47, Math.PI),
+                                new Pose(0, 10, Math.PI * 11 / 32),
+                                new Pose(22, 47, 0),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
@@ -70,8 +70,8 @@ public class TestAutoBlue extends LinearOpMode {
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(-22, 47, Math.PI),
-                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(22, 47, 0),
+                                new Pose(0, 10, Math.PI * 11 / 32),
                                 new MovementConstants()
                         ),
                         new SequentialCommandGroup (
