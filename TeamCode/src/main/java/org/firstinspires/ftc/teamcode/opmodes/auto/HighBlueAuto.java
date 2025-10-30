@@ -31,48 +31,48 @@ public class HighBlueAuto extends LinearOpMode {
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(0, 0, Math.PI / 2),
-                                new Pose(0, 10, Math.PI * 21 / 32),
-                                new MovementConstants()
+                                new Pose(0, 10, 2.01),
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(2000)
+                                new YieldCommand(3000)
                         )
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(0, 10, 2.01),
                                 new Pose(-22, 26, Math.PI),
-                                new MovementConstants()
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup(
-                                new YieldCommand(2000)
+                                new YieldCommand(3000)
                         )
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(-22, 26, Math.PI),
-                                new Pose(0, 10, Math.PI * 21 / 32),
-                                new MovementConstants()
+                                new Pose(0, 10, 2.01),
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(2000)
+                                new YieldCommand(3000)
                         )
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 10, Math.PI * 21 / 32),
+                                new Pose(0, 10, 2.01),
                                 new Pose(-22, 47, Math.PI),
-                                new MovementConstants()
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(2000)
+                                new YieldCommand(3000)
                         )
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(-22, 47, Math.PI),
-                                new Pose(0, 10, Math.PI * 21 / 32),
-                                new MovementConstants()
+                                new Pose(0, 10, 2.01),
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
                                 new YieldCommand(3000)
