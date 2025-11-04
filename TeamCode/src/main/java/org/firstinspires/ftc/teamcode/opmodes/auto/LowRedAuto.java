@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.utilities.robot.RobotEx;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.ParallelCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 
 /**

@@ -10,14 +10,10 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utilities.datastructures.CentripetalBuffer;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.CommandScheduler;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Localizer;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.OpticalOdometry;
-import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.PinpointOdometry;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Subsystem;
 
@@ -58,8 +54,8 @@ public class RobotEx {
 
     public Drivetrain theDrivetrain = new Drivetrain();
     public Localizer theLocalizer = new PinpointOdometry();
-    public Outtake theOuttake = new Outtake();
-    public Intake theIntake = new Intake();
+    // public Outtake theOuttake = new Outtake();
+    // public Intake theIntake = new Intake();
     public Limelight theLimelight = new Limelight();
 
     public VoltageSensor theVoltageSensor;
@@ -69,8 +65,8 @@ public class RobotEx {
     private final Subsystem[] theSubsystems = new Subsystem[]{
             theDrivetrain,
             theLocalizer,
-            theOuttake,
-            theIntake,
+            // theOuttake,
+            // theIntake,
             theLimelight
     };
 

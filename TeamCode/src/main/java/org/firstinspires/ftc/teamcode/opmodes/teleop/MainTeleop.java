@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+/* package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -17,15 +17,12 @@ import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandt
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.OneTimeCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.utilities.robot.command.framework.commandtypes.YieldCommand;
-import org.firstinspires.ftc.teamcode.utilities.robot.command.movement.MovementCommand;
+import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementCommand;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants;
 import org.firstinspires.ftc.teamcode.utilities.robot.movement.PIDDrive;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utilities.robot.subsystems.Outtake;
 
-/**
- * Example teleop code for a basic mecanum drive
- */
 
 @TeleOp(name = "Main Teleop")
 public class MainTeleop extends LinearOpMode {
@@ -144,13 +141,13 @@ public class MainTeleop extends LinearOpMode {
                 }
             }
 
-            /*
+
             if (currentFrameGamepad1.square && !previousFrameGamepad2.square) {
                 robot.theIntake.setDisableOuttake(true);
             } else if (currentFrameGamepad1.triangle && !previousFrameGamepad2.triangle) {
                 robot.theIntake.setDisableOuttake(false);
             }
-             */
+
 
 
             if (currentFrameGamepad1.circle && !previousFrameGamepad1.circle) {
@@ -204,7 +201,7 @@ public class MainTeleop extends LinearOpMode {
             }
 
             if ((currentFrameGamepad2.left_bumper && !previousFrameGamepad2.left_bumper) || (oneDriver && (currentFrameGamepad1.cross && !previousFrameGamepad1.cross))) {
-                /*
+
                 if (robot.theOuttake.getOuttakeServoState() == Outtake.OuttakeServoState.SPECIMEN_INITIAL) {
                     robot.theCommandScheduler.scheduleCommand(
                             new SequentialCommandGroup(
@@ -219,7 +216,7 @@ public class MainTeleop extends LinearOpMode {
                     robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
                 }
 
-                 */
+
                 robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.DEFAULT);
 
             }
@@ -229,10 +226,10 @@ public class MainTeleop extends LinearOpMode {
                 robot.theOuttake.setCurrentClawState(Outtake.OuttakeClawStates.LESS_CLOSED);
             }
 
-            /*
+
             if (currentFrameGamepad2.circle && !previousFrameGamepad2.circle) {
                 robot.outtake.setCurrentOuttakeState(Outtake.OuttakeServoState.BACK_PICKUP);
-            }*/
+            }
 
             if (currentFrameGamepad2.cross && !previousFrameGamepad2.cross) {
                 robot.theCommandScheduler.scheduleCommand(
@@ -277,3 +274,4 @@ public class MainTeleop extends LinearOpMode {
         Globals.inTeleop = false;
     }
 }
+*/

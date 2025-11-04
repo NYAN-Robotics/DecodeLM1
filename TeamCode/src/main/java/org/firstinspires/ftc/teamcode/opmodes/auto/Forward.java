@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.utilities.robot.movement.MovementConstants
 /**
  * Test teleop path
  */
-@Autonomous(name = "Low Blue Auto")
-public class LowBlueAuto extends LinearOpMode {
+@Autonomous(name = "Forward")
+public class Forward extends LinearOpMode {
     RobotEx robot = RobotEx.getInstance();
 
     @Override
@@ -31,31 +31,21 @@ public class LowBlueAuto extends LinearOpMode {
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(0, 0, Math.PI / 2),
-                                new Pose(0, 50, 3 * Math.PI / 2),
-                                new MovementConstants()
+                                new Pose(0, 30, Math.PI / 2),
+                                new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(2000)
+                                new YieldCommand(3000)
                         )
                 ),
                 new ParallelCommandGroup (
                         new MovementCommand (
-                                new Pose(0, 50, 3 * Math.PI / 2),
-                                new Pose(23, 38,  7 * Math.PI / 4),
-                                new MovementConstants()
-                        ),
-                        new SequentialCommandGroup(
-                                new YieldCommand(2000)
-                        )
-                ),
-                new ParallelCommandGroup (
-                        new MovementCommand (
-                                new Pose(23, 38,  7 * Math.PI / 4),
-                                new Pose(0, 50, 3 * Math.PI / 2),
-                                new MovementConstants()
+                            new Pose (0, 30, Math.PI / 2),
+                            new Pose (0, 30, Math.PI),
+                            new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
-                                new YieldCommand(2000)
+                                new YieldCommand(300)
                         )
                 )
         );
