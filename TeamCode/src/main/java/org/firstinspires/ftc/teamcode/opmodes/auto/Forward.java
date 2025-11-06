@@ -31,13 +31,13 @@ public class Forward extends LinearOpMode {
                 new ParallelCommandGroup (
                         new MovementCommand (
                                 new Pose(0, 0, Math.PI / 2),
-                                new Pose(0, 30, Math.PI / 2),
+                                new Pose(0, 80, Math.PI / 2),
                                 new MovementConstants(2.0)
                         ),
                         new SequentialCommandGroup (
                                 new YieldCommand(3000)
                         )
-                ),
+                )/*,
                 new ParallelCommandGroup (
                         new MovementCommand (
                             new Pose (0, 30, Math.PI / 2),
@@ -47,7 +47,7 @@ public class Forward extends LinearOpMode {
                         new SequentialCommandGroup (
                                 new YieldCommand(300)
                         )
-                )
+                )*/
         );
 
         waitForStart();

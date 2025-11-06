@@ -183,10 +183,10 @@ public class Drivetrain implements Subsystem {
         lastLeftFrontPower = leftFrontPower;
         lastRightFrontPower = rightFrontPower;
 
-        rightBackPower = 0;
+        /*rightBackPower = 0;
         leftBackPower = 0;
         leftFrontPower = 0;
-        rightFrontPower = 0;
+        rightFrontPower = 0;*/
     }
 
     public void robotCentricDriveFromGamepad(double leftJoystickY, double leftJoystickX, double rightJoystickX) {
